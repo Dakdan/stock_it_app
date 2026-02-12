@@ -103,3 +103,10 @@
 
     <script>
         const API_URL = 'https://script.google.com/macros/
+function confirmLogout() {
+    localStorage.removeItem("it_session"); // ลบ Session ออก
+    document.getElementById('logout-alert').style.display = 'flex'; // แสดง Alert สำเร็จ
+    setTimeout(() => {
+        window.location.replace("./login.html"); // ส่งกลับหน้า Login
+    }, 1500);
+}

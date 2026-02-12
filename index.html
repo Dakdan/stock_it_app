@@ -153,6 +153,12 @@
         }
 
         function renderDashboard() {
+            // ใน renderDashboard ให้เปลี่ยนส่วนของปุ่มเป็นแบบนี้ครับ
+const btnAction = `
+    <button onclick="viewJobDetail('${j.JobID}')" 
+            class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-bold">
+        ดูรายละเอียด
+    </button>`;
             const jobs = store.AllJobs || [];
             document.getElementById('count-wait').innerText = jobs.filter(j => j.Status === 'รอรับงาน').length;
             document.getElementById('count-doing').innerText = jobs.filter(j => j.Status === 'กำลังดำเนินการ').length;
@@ -262,6 +268,39 @@
 }
 
         document.addEventListener('DOMContentLoaded', initApp);
+        function viewJobDetail(jobId) {
+    const job = store.AllJobs.find(j => j.JobID === jobId);
+    if (!job) return;
+
+    const content = document.getElementById('detail-content');
+    const actions = document.getElementById('detail-actions');
+
+    // แสดงข้อมูลใน Modal
+    content.innerHTML = `
+        <div class="bg-pink-50 p-4 rounded-2xl">
+            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">Job ID: ${job.JobID}</p>
+            <p class="font-bold text-base text-slate-800">${job.Problem}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-4">
+            <div><p class="text-[10px] text-slate-400">หน่วยงาน</p><p class="font-semibold">${job.Department}</p></div>
+            <div><p class="text-[10px] text-slate-400">ความสำคัญ</p><p class="font-semibold text-pink-600">${job.Priority}</p></div>
+            <div class="col-span-2"><p class="text-[10px] text-slate-400">ผู้แจ้ง/เบอร์ติดต่อ</p><p class="font-semibold">${job.Contact || '-'}</p></div>
+        </div>
+    `;
+
+    // ตรวจสอบสิทธิ์แสดงปุ่มรับงาน
+    if (job.Status === 'รอรับงาน') {
+        actions.innerHTML = `
+            <button onclick="handleJob('${job.JobID}', 'accept'); closeModal('modal-detail');" 
+                    class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
+                ✅ ยืนยันรับงานนี้
+            </button>`;
+    } else {
+        actions.innerHTML = `<p class="text-center text-slate-400 text-xs italic">งานนี้ถูกรับไปแล้ว</p>`;
+    }
+
+    document.getElementById('modal-detail').style.display = 'flex';
+}
     </script>
 </body>
 </html>

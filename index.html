@@ -239,7 +239,7 @@
             }
         }
 
-        // --- ส่วนที่ปรับปรุง: แสดงรายละเอียดงานและข้อมูลครุภัณฑ์จาก BackupData ---
+        // --- ส่วนที่ปรับปรุง: แสดงข้อมูลครุภัณฑ์จาก BackupData ---
         function viewJobDetail(jobId) {
             const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
             if (!job) return;
@@ -247,32 +247,36 @@
             const content = document.getElementById('detail-content');
             const actions = document.getElementById('detail-actions');
 
-            // 1. ดึงข้อมูลครุภัณฑ์หากเป็นประเภทแจ้งซ่อม
             let assetHTML = '';
+            // เงื่อนไข: ถ้าเป็นแจ้งซ่อมครุภัณฑ์ ให้หาข้อมูลจาก BackupData
             if (job.JobType === 'แจ้งซ่อมครุภัณฑ์' && job.AssetCode) {
-                const asset = (store.BackupData || []).find(a => String(a[2]) === String(job.AssetCode));
+                // ค้นหา Object ใน BackupData โดยใช้ Key ตามที่ Backend ส่งมา (AssetCode)
+                const asset = (store.BackupData || []).find(a => String(a.AssetCode) === String(job.AssetCode));
+                
                 if (asset) {
+                    // แสดงข้อมูลตามที่คุณระบุ: AssetID, ชื่อรายการ, รายละเอียดสเปค
                     assetHTML = `
                         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
-                            <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์</p>
+                            <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์ในระบบ</p>
                             <div class="space-y-1.5">
-                                <p class="text-xs text-slate-500">รหัสครุภัณฑ์: <span class="font-bold text-slate-700">${asset[3]}</span></p>
-                                <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset[6]}</span></p>
-                                <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset[7] || '-'}</span></p>
+                                <p class="text-xs text-slate-500">รหัสครุภัณฑ์: <span class="font-bold text-slate-700">${asset.AssetID || asset.AssetCode || '-'}</span></p>
+                                <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset.AssetName || asset[5] || '-'}</span></p>
+                                <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset.Spec || asset[6] || '-'}</span></p>
                             </div>
                         </div>`;
                 } else {
-                    assetHTML = `<div class="bg-slate-50 p-3 rounded-2xl border border-dashed mt-4 text-center text-[10px] text-slate-400 italic">ไม่พบข้อมูลครุภัณฑ์รหัส: ${job.AssetCode}</div>`;
+                    assetHTML = `<div class="bg-slate-50 p-3 rounded-2xl border border-dashed mt-4 text-center text-[10px] text-slate-400 italic">ไม่พบฐานข้อมูลครุภัณฑ์รหัส: ${job.AssetCode}</div>`;
                 }
             }
 
-            // 2. แสดงรายละเอียดปัญหาและแทรกข้อมูลครุภัณฑ์
             content.innerHTML = `
                 <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
                     <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
                     <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
                 </div>
+
                 ${assetHTML}
+
                 <div class="grid grid-cols-2 gap-4 px-1 mt-4">
                     <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
                     <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
@@ -280,7 +284,7 @@
                     <div class="col-span-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${job.Owner || 'ยังไม่มี'}</p></div>
                 </div>`;
 
-            // 3. จัดการปุ่มกด (Logic เดิมที่ทำงานได้ดีอยู่แล้ว)
+            // Logic ปุ่มกดคงเดิม
             let btns = '';
             const status = String(job.Status).trim();
             const role = String(currentUser.UserTypeID).toUpperCase().trim();
@@ -313,7 +317,6 @@
             document.getElementById('modal-detail').style.display = 'flex';
         }
 
-        // ฟังก์ชันอื่นๆ ยังคงเดิม
         async function handleJobUI(jobId, type, extra = {}) {
             showLoading(true);
             const data = { JobID: jobId, type: type, Owner: currentUser.USERID, By: currentUser.UserName, ...extra };

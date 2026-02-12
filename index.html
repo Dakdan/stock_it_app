@@ -254,7 +254,7 @@ function viewJobDetail(jobId) {
     if (job.AssetCode) {
         const asset = (store.BackupData || []).find(a => String(a.NOID) === String(job.AssetCode));
         
-       if (asset) {
+                   if (asset) {
     // ดึงค่าตามลำดับคอลัมน์ (Index เริ่มจาก 0) เพื่อป้องกันชื่อหัวตารางไม่ตรง
     const allValues = Object.values(asset); 
     const assetName = asset.AssetName || allValues[6] || '-'; // คอลัมน์ที่ 7 ใน Google Sheet

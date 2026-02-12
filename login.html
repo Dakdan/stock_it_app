@@ -26,7 +26,213 @@
     <header class="pink-grad text-white px-6 py-6 sticky top-0 z-50 shadow-lg">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
+                <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Udon Hospital Logo">
                 <div>
                     <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)</h1>
-                    <p class="text-[10px] opacity-80">ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์
+                    <p class="text-[10px] opacity-80">ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p id="u-fname" class="text-xs font-bold leading-none"></p>
+                    <p id="u-type-name" class="text-[9px] opacity-70"></p>
+                </div>
+                <button onclick="logout()" class="bg-white/20 p-2 rounded-xl">🚪</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-[88px] z-40 border-b border-pink-100">
+        <div class="max-w-4xl mx-auto flex">
+            <button onclick="switchTab(1)" id="t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600">DASHBOARD</button>
+            <button onclick="switchTab(2)" id="t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">MY JOBS</button>
+            <button onclick="switchTab(3)" id="t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">SYSTEMLINK</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 mt-4 space-y-6">
+        <div id="tab1" class="tab-content active space-y-4">
+            <div class="grid grid-cols-5 gap-2">
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">New</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Doing</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Spare</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Done</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Cancel</p><p id="count-cancel" class="text-lg font-black text-slate-300">0</p></div>
+            </div>
+            <div id="job-list-dashboard" class="space-y-3"></div>
+        </div>
+
+        <div id="tab2" class="tab-content space-y-4">
+            <div class="bg-white p-4 rounded-3xl flex justify-between items-center shadow-sm">
+                <h2 class="text-pink-600 font-bold">งานที่คุณรับผิดชอบ</h2>
+                <button onclick="openModal('modal-it-ticket')" class="bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">+ บันทึกกิจกรรม</button>
+            </div>
+            <div id="job-list-myjob" class="space-y-3"></div>
+        </div>
+
+        <div id="tab3" class="tab-content grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </main>
+
+    <div id="modal-transfer" class="overlay">
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm mx-4">
+            <h3 class="font-bold text-pink-600 mb-4">🔄 โอนงาน/มอบหมายงาน</h3>
+            <div class="space-y-3">
+                <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl border-none outline-pink-500 text-sm"></select>
+                <textarea id="transfer-reason" placeholder="ระบุเหตุผลการโอนงาน..." class="w-full p-3 bg-slate-50 rounded-xl border-none outline-pink-500 text-sm h-24"></textarea>
+                <button id="btn-confirm-transfer" class="w-full py-3 pink-grad text-white rounded-xl font-bold shadow-lg">ยืนยันการโอน</button>
+                <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 font-bold text-xs">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
+        let store = { AllJobs: [], StaffList: [], SystemLink: [] };
+        let currentUser = null;
+
+        const Auth = {
+            check: () => {
+                const s = localStorage.getItem("it_session");
+                if (!s) window.location.href = "login.html";
+                return JSON.parse(s);
+            }
+        };
+
+        async function initApp() {
+            currentUser = Auth.check();
+            if (currentUser) {
+                document.getElementById('u-fname').innerText = currentUser.UserName + " " + (currentUser.UserSname || "");
+                document.getElementById('u-type-name').innerText = currentUser.UserTypeName || "Staff";
+                await loadData();
+            }
+        }
+
+        async function loadData() {
+            showLoading(true);
+            try {
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'getInitialData', data: { userName: currentUser.UserName } }) 
+                });
+                const result = await res.json();
+                if (result.success) {
+                    store = result;
+                    renderDashboard();
+                    renderMyJobs();
+                    renderSystemLinks();
+                }
+            } catch (e) { console.error("Error!"); }
+            showLoading(false);
+        }
+
+        function renderDashboard() {
+            const jobs = store.AllJobs || [];
+            document.getElementById('count-wait').innerText = jobs.filter(j => j.Status === 'รอรับงาน').length;
+            document.getElementById('count-doing').innerText = jobs.filter(j => j.Status === 'กำลังดำเนินการ').length;
+            document.getElementById('count-spare').innerText = jobs.filter(j => j.Status === 'รออะไหล่').length;
+            document.getElementById('count-done').innerText = jobs.filter(j => j.Status === 'เสร็จสิ้น').length;
+            document.getElementById('count-cancel').innerText = jobs.filter(j => j.Status === 'ยกเลิก').length;
+
+            const listContainer = document.getElementById('job-list-dashboard');
+            listContainer.innerHTML = jobs.map(j => {
+                // สีสถานะให้ตรงตามเงื่อนไข (เด่นชัดขึ้น)
+                let sColor = "text-slate-500 bg-slate-100";
+                if (j.Status === 'รอรับงาน') sColor = "text-pink-600 bg-pink-100 border border-pink-200";
+                if (j.Status === 'กำลังดำเนินการ') sColor = "text-blue-500 bg-blue-100 border border-blue-200";
+                if (j.Status === 'เสร็จสิ้น') sColor = "text-green-500 bg-green-100 border border-green-200";
+
+                return `
+                    <div class="card-pro p-5 border-l-8 ${j.Status === 'รอรับงาน' ? 'border-pink-500 status-pulse' : 'border-slate-200'} mb-3">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <p class="text-[10px] text-slate-400 font-bold">${j.JobID} | ${j.Priority}</p>
+                                <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                                <p class="text-[10px] text-pink-600 mt-1">🏢 ${j.Department}</p>
+                            </div>
+                            <div class="text-right flex flex-col items-end gap-2">
+                                <span class="text-[10px] font-black uppercase px-2 py-1 rounded ${sColor}">
+                                    ${j.Status}
+                                </span>
+                                ${(j.Status === 'รอรับงาน' && (currentUser.UserTypeID === 'IT' || currentUser.UserTypeID === 'Admin')) 
+                                    ? `<button onclick="handleJob('${j.JobID}', 'accept')" class="bg-pink-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold shadow-md">รับงาน</button>` 
+                                    : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderMyJobs() {
+            const myJobs = store.AllJobs.filter(j => j.Owner === currentUser.UserName);
+            document.getElementById('job-list-myjob').innerHTML = myJobs.length === 0 ? '<p class="text-center text-slate-400 text-xs py-10 italic">ยังไม่มีงานในความรับผิดชอบ</p>' : myJobs.map(j => `
+                <div class="card-pro p-5 border-l-8 border-blue-500 mb-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold">${j.JobID}</p>
+                            <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                        </div>
+                        <button onclick="openTransfer('${j.JobID}')" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-bold">โอนงาน</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function handleJob(jobId, type, extra = {}) {
+            showLoading(true);
+            const data = { JobID: jobId, type: type, Owner: currentUser.UserName, ...extra };
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: data }) });
+                const result = await res.json();
+                if (result.success) { 
+                    closeModal('modal-transfer');
+                    await loadData(); 
+                }
+            } catch (e) { alert("Error!"); }
+            showLoading(false);
+        }
+
+        function openTransfer(jobId) {
+            const modal = document.getElementById('modal-transfer');
+            const select = document.getElementById('select-staff');
+            
+            // เติมข้อมูลใน Modal (แก้ปัญหาข้อมูลไม่แสดง)
+            if (store.StaffList && store.StaffList.length > 0) {
+                select.innerHTML = store.StaffList.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            }
+            
+            modal.style.display = 'flex';
+
+            document.getElementById('btn-confirm-transfer').onclick = () => {
+                const reason = document.getElementById('transfer-reason').value;
+                const newOwner = select.value;
+                if (!reason) return alert("กรุณาระบุเหตุผล");
+                handleJob(jobId, 'transfer', { NewOwner: newOwner, Reason: reason, By: currentUser.UserName });
+            };
+        }
+
+        function renderSystemLinks() {
+            const container = document.getElementById('tab3');
+            container.innerHTML = store.SystemLink.map(l => `
+                <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50">
+                    <span class="text-2xl">${l.Linkicon || '🔗'}</span>
+                    <span class="font-bold text-slate-700 text-sm">${l.SystemName || l.Name}</span>
+                </a>
+            `).join('');
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab' + n).classList.add('active');
+            document.querySelectorAll('nav button').forEach(b => { b.classList.remove('text-pink-600', 'border-pink-600'); b.classList.add('text-slate-400', 'border-transparent'); });
+            document.getElementById('t' + n).classList.add('text-pink-600', 'border-pink-600');
+        }
+
+        function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { localStorage.clear(); window.location.href = "login.html"; }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>

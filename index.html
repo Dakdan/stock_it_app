@@ -254,24 +254,17 @@ function viewJobDetail(jobId) {
     if (job.AssetCode) {
         const asset = (store.BackupData || []).find(a => String(a.NOID) === String(job.AssetCode));
         
-                   if (asset) {
-    // ดึงค่าตามลำดับคอลัมน์ (Index เริ่มจาก 0) เพื่อป้องกันชื่อหัวตารางไม่ตรง
-    const allValues = Object.values(asset); 
-    const assetName = asset.AssetName || allValues[6] || '-'; // คอลัมน์ที่ 7 ใน Google Sheet
-    const assetSpec = asset.Spec || allValues[7] || '-';    // คอลัมน์ที่ 8 ใน Google Sheet
-
-    assetHTML = `
-        <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
-            <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์ (Refer NOID: ${job.AssetCode})</p>
-            <div class="space-y-1.5">
-                <p class="text-xs text-slate-500">รหัสครุภัณฑ์ (AssetID): <span class="font-bold text-slate-700">${asset.AssetID || allValues[3] || '-'}</span></p>
-                <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${assetName}</span></p>
-                <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${assetSpec}</span></p>
-            </div>
-        </div>`;
-} else {
-    // ... กรณีไม่พบข้อมูล
-}
+        if (asset) {
+            assetHTML = `
+                <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
+                    <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์ (Refer NOID: ${job.AssetCode})</p>
+                    <div class="space-y-1.5">
+                        <p class="text-xs text-slate-500">รหัสครุภัณฑ์ (AssetID): <span class="font-bold text-slate-700">${asset.AssetID || '-'}</span></p>
+                        <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset.AssetName || [6]}</span></p>
+                        <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset.Spec || [7]}</span></p>
+                    </div>
+                </div>`;
+        } else {
             assetHTML = `
                 <div class="bg-slate-50 p-3 rounded-2xl border border-dashed mt-4 text-center">
                     <p class="text-[10px] text-slate-400 italic font-medium">ไม่พบข้อมูลครุภัณฑ์ในระบบ BackupData</p>

@@ -260,8 +260,8 @@ function viewJobDetail(jobId) {
                     <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์ (Refer NOID: ${job.AssetCode})</p>
                     <div class="space-y-1.5">
                         <p class="text-xs text-slate-500">รหัสครุภัณฑ์ (AssetID): <span class="font-bold text-slate-700">${asset.AssetID || '-'}</span></p>
-                        <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset.AssetName || [6]}</span></p>
-                        <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset.Spec || [7]}</span></p>
+                        <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset.AssetName || '-'}</span></p>
+                        <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset.Spec || '-'}</span></p>
                     </div>
                 </div>`;
         } else {

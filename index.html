@@ -50,9 +50,9 @@
 
     <nav class="bg-white/80 backdrop-blur-md sticky top-[88px] z-40 border-b border-pink-100">
         <div class="max-w-4xl mx-auto flex">
-            <button onclick="switchTab(1)" id="t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600 uppercase tracking-wider">Dashboard</button>
-            <button onclick="switchTab(2)" id="t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">My Jobs</button>
-            <button onclick="switchTab(3)" id="t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">Links</button>
+            <button onclick="switchTab(1)" id="nav-t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600 uppercase tracking-wider">Dashboard</button>
+            <button onclick="switchTab(2)" id="nav-t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">My Jobs</button>
+            <button onclick="switchTab(3)" id="nav-t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">Links</button>
         </div>
     </nav>
 
@@ -162,6 +162,7 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
         let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [] };
         let currentUser = null;
+        let currentTab = 1; // ติดตาม Tab ปัจจุบัน
 
         async function initApp() {
             const session = localStorage.getItem("it_session");
@@ -214,7 +215,6 @@
         }
 
         function renderMyJobs() {
-            // แก้ไข Logic การกรอง: ใช้ USERID ตัวพิมพ์ใหญ่
             const myJobs = store.AllJobs.filter(j => 
                 String(j.Owner).trim() === String(currentUser.USERID).trim() && 
                 j.Status === 'กำลังดำเนินการ'
@@ -239,6 +239,7 @@
             }
         }
 
+        // แก้ไขฟังก์ชันนี้ให้แสดงปุ่มตาม Tab
         function viewJobDetail(jobId) {
             const job = store.AllJobs.find(j => j.JobID === jobId);
             if (!job) return;
@@ -255,32 +256,45 @@
                     <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
                     <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
                     <div class="col-span-2 border-t pt-2 mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้แจ้ง</p><p class="font-semibold text-slate-700 text-xs">${job.CreateBy || 'ไม่ระบุ'}</p></div>
+                    <div class="col-span-2"><p class="text-[10px] text-slate-400 font-bold uppercase">สถานะ</p><p class="font-bold text-pink-600 text-xs italic">${job.Status}</p></div>
                 </div>`;
 
             let btns = '';
-            if (job.Status === 'รอรับงาน') {
-                if (currentUser.UserTypeID === 'IT') {
-                    btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2">⚡ รับงานเข้าเครื่องฉัน</button>`;
-                }
-                if (currentUser.UserTypeID === 'Boss') {
-                    btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
-                }
-                if (currentUser.UserTypeID !== 'IT' && currentUser.UserTypeID !== 'Boss') {
-                    btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">รอเจ้าหน้าที่ดำเนินการ</div>`;
+
+            // เงื่อนไขสำหรับ Tab 1: Dashboard
+            if (currentTab === 1) {
+                if (job.Status === 'รอรับงาน') {
+                    if (currentUser.UserTypeID === 'IT') {
+                        btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2">⚡ รับงานเข้าเครื่องฉัน</button>`;
+                    }
+                    if (currentUser.UserTypeID === 'Boss') {
+                        btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
+                    }
+                    if (currentUser.UserTypeID !== 'IT' && currentUser.UserTypeID !== 'Boss') {
+                        btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl font-bold uppercase">รอเจ้าหน้าที่ดำเนินการ</div>`;
+                    }
+                } else {
+                    // ถ้าไม่ใช่ "รอรับงาน" ใน Tab 1 ให้แสดงแค่ชื่อคนรับผิดชอบ
+                    btns = `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">ผู้รับผิดชอบงานนี้</p>
+                                <p class="text-xs font-bold text-slate-700 uppercase">🆔 ${job.Owner || 'ไม่มีผู้รับผิดชอบ'}</p>
+                            </div>
+                            <button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-xs mt-2">ปิดหน้าต่าง</button>`;
                 }
             } 
-            else if (job.Status === 'กำลังดำเนินการ') {
-                if (String(job.Owner).trim() === String(currentUser.USERID).trim()) {
+            // เงื่อนไขสำหรับ Tab 2: My Jobs
+            else if (currentTab === 2) {
+                if (job.Status === 'กำลังดำเนินการ' && String(job.Owner).trim() === String(currentUser.USERID).trim()) {
                     btns = `
                         <div class="grid grid-cols-2 gap-2">
-                            <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold">✅ ปิดงาน</button>
-                            <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm">🔄 โอนงาน</button>
+                            <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ ปิดงาน</button>
+                            <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm border">🔄 โอนงาน</button>
                         </div>`;
                 } else {
-                    btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">ผู้รับผิดชอบ: ${job.Owner}</div>`;
+                    btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดรายละเอียด</button>`;
                 }
             } else {
-                btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดหน้าต่าง</button>`;
+                btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดรายละเอียด</button>`;
             }
 
             actions.innerHTML = btns;
@@ -334,7 +348,7 @@
                     jobType: document.getElementById('it-job-type').value, 
                     problem: document.getElementById('it-problem').value, 
                     dept: document.getElementById('it-dept').value, 
-                    owner: currentUser.USERID // ใช้ USERID
+                    owner: currentUser.USERID 
                 }
             };
             try {
@@ -390,11 +404,15 @@
         }
 
         function switchTab(n) {
+            currentTab = n; // เก็บค่า Tab ปัจจุบันไว้ใช้ใน Modal
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('tab' + n).classList.add('active');
             document.querySelectorAll('nav button').forEach((b, i) => { 
-                b.classList.toggle('text-pink-600', i+1 === n); b.classList.toggle('border-pink-600', i+1 === n);
-                b.classList.toggle('text-slate-400', i+1 !== n); b.classList.toggle('border-transparent', i+1 !== n);
+                const isActive = (i + 1 === n);
+                b.classList.toggle('text-pink-600', isActive);
+                b.classList.toggle('border-pink-600', isActive);
+                b.classList.toggle('text-slate-400', !isActive);
+                b.classList.toggle('border-transparent', !isActive);
             });
         }
 

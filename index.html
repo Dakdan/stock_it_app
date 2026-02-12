@@ -17,8 +17,6 @@
         .card-pro:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1); }
         .status-pulse { animation: pulse-pink 2s infinite; }
         @keyframes pulse-pink { 0% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(219, 39, 119, 0); } 100% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0); } }
-        
-        /* สไตล์สำหรับ Alert ภายใน Modal */
         .inner-alert { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.9); z-index:100; flex-direction:column; align-items:center; justify-content:center; border-radius: 2rem; }
     </style>
 </head>
@@ -72,14 +70,12 @@
 
         <div id="tab2" class="tab-content space-y-4">
             <div class="bg-white p-4 rounded-3xl flex justify-between items-center shadow-sm border-l-4 border-pink-500">
-                <h2 class="text-pink-600 font-bold text-sm">งานที่รับผิดชอบ</h2>
+                <h2 class="text-pink-600 font-bold text-sm">งานที่รับผิดชอบ (กำลังทำ)</h2>
             </div>
             <div id="job-list-myjob" class="space-y-3"></div>
-
             <hr class="border-pink-100 my-4">
-
             <div class="flex justify-between items-center px-1">
-                <h2 class="text-blue-600 font-bold text-sm border-l-4 border-blue-500 pl-2 uppercase tracking-wide">IT Ticket (บันทึกงานส่วนอื่น)</h2>
+                <h2 class="text-blue-600 font-bold text-sm border-l-4 border-blue-500 pl-2 uppercase tracking-wide">IT Ticket (บันทึกงานอื่นๆ)</h2>
                 <button onclick="openITTicketForm()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-all">+ บันทึกงาน</button>
             </div>
             <div id="it-ticket-list" class="space-y-3"></div>
@@ -91,18 +87,15 @@
     <div id="modal-detail" class="overlay">
         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl overflow-hidden relative">
             <div id="detail-alert" class="inner-alert">
-                <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse">
-                    <span class="text-3xl">✅</span>
-                </div>
+                <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">✅</span></div>
                 <p id="detail-alert-text" class="text-pink-600 font-bold">ดำเนินการสำเร็จ</p>
             </div>
-
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="font-bold text-pink-600 text-lg flex items-center gap-2">📄 ข้อมูลการแจ้งซ่อม</h3>
+                    <h3 class="font-bold text-pink-600 text-lg">📄 รายละเอียดงาน</h3>
                     <button onclick="closeModal('modal-detail')" class="text-slate-400 text-3xl">&times;</button>
                 </div>
-                <div id="detail-content" class="space-y-4 max-h-[60vh] overflow-y-auto pr-1"></div>
+                <div id="detail-content" class="space-y-4 max-h-[60vh] overflow-y-auto"></div>
                 <div id="detail-actions" class="mt-6 flex flex-col gap-3"></div>
             </div>
         </div>
@@ -111,29 +104,26 @@
     <div id="modal-it-ticket" class="overlay">
         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
             <div id="it-alert" class="inner-alert">
-                <div class="bg-blue-100 p-4 rounded-full mb-3 status-pulse">
-                    <span class="text-3xl">📝</span>
-                </div>
+                <div class="bg-blue-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">📝</span></div>
                 <p class="text-blue-600 font-bold">บันทึกข้อมูลเรียบร้อย</p>
             </div>
-
             <form id="form-it-ticket" class="p-6 space-y-4">
-                <h3 class="font-bold text-blue-600 text-lg mb-4 flex items-center gap-2">บันทึกงาน IT Ticket</h3>
+                <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                    <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl border-none outline-blue-500 text-sm" required></select>
+                    <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
-                    <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl border-none outline-blue-500 text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
+                    <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หน่วยงาน</label>
-                    <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl border-none outline-blue-500 text-sm" required></select>
+                    <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
                 </div>
                 <div class="flex gap-2 pt-4">
                     <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
-                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg">บันทึกข้อมูล</button>
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">บันทึกข้อมูล</button>
                 </div>
             </form>
         </div>
@@ -141,38 +131,32 @@
 
     <div id="modal-transfer" class="overlay">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm mx-4">
-            <h3 class="font-bold text-pink-600 mb-4">🔄 โอนงาน/มอบหมายงาน</h3>
+            <h3 class="font-bold text-pink-600 mb-4">🔄 จัดการงาน</h3>
             <div class="space-y-3">
-                <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl border-none outline-pink-500 text-sm"></select>
-                <textarea id="transfer-reason" placeholder="เหตุผล..." class="w-full p-3 bg-slate-50 rounded-xl border-none outline-pink-500 text-sm h-20"></textarea>
-                <button id="btn-confirm-transfer" class="w-full py-3 pink-grad text-white rounded-xl font-bold shadow-lg">ยืนยัน</button>
+                <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                <textarea id="transfer-reason" placeholder="เหตุผล/หมายเหตุ..." class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
+                <button id="btn-confirm-transfer" class="w-full py-3 pink-grad text-white rounded-xl font-bold shadow-lg">ยืนยันการบันทึก</button>
                 <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 text-xs">ยกเลิก</button>
             </div>
         </div>
     </div>
-    <div id="modal-logout" class="overlay">
-    <div class="bg-white rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl relative overflow-hidden">
-        <div id="logout-alert" class="inner-alert">
-            <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse">
-                <span class="text-3xl">👋</span>
-            </div>
-            <p class="text-pink-600 font-bold">ออกจากระบบสำเร็จ</p>
-        </div>
 
-        <div class="p-8 text-center">
-            <div class="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span class="text-4xl">🚪</span>
+    <div id="modal-logout" class="overlay">
+        <div class="bg-white rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl relative overflow-hidden">
+            <div id="logout-alert" class="inner-alert">
+                <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">👋</span></div>
+                <p class="text-pink-600 font-bold">ออกจากระบบสำเร็จ</p>
             </div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ยืนยันการออกจากระบบ?</h3>
-            <p class="text-xs text-slate-400 mb-8">คุณต้องการออกจากระบบ IT Management ใช่หรือไม่?</p>
-            
-            <div class="flex gap-3">
-                <button onclick="closeModal('modal-logout')" class="flex-1 py-3 text-slate-400 font-bold text-sm bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all">ยกเลิก</button>
-                <button onclick="confirmLogout()" class="flex-1 py-3 pink-grad text-white rounded-2xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">ยืนยัน</button>
+            <div class="p-8 text-center">
+                <div class="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4"><span class="text-4xl">🚪</span></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">ยืนยันการออกจากระบบ?</h3>
+                <div class="flex gap-3 mt-8">
+                    <button onclick="closeModal('modal-logout')" class="flex-1 py-3 text-slate-400 font-bold text-sm bg-slate-50 rounded-2xl">ยกเลิก</button>
+                    <button onclick="confirmLogout()" class="flex-1 py-3 pink-grad text-white rounded-2xl font-bold shadow-lg">ยืนยัน</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
@@ -191,7 +175,13 @@
         async function loadData() {
             showLoading(true);
             try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getInitialData', data: { userName: currentUser.UserName } }) });
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        action: 'getInitialData', 
+                        data: { userName: currentUser.UserName, USERID: currentUser.USERID } 
+                    }) 
+                });
                 const result = await res.json();
                 if (result.success) {
                     store = result;
@@ -224,168 +214,82 @@
         }
 
         function renderMyJobs() {
-            const myJobs = store.AllJobs.filter(j => j.Owner === currentUser.UserName && j.Status === 'กำลังดำเนินการ');
-            document.getElementById('job-list-myjob').innerHTML = myJobs.length ? myJobs.map(j => `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 border-blue-500 mb-3">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <p class="text-[9px] text-slate-400 font-bold">${j.JobID}</p>
-                            <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
-                            <p class="text-[9px] text-blue-500 mt-1 font-bold">📍 ${j.Department}</p>
+            // แก้ไข Logic การกรอง: ใช้ USERID ตัวพิมพ์ใหญ่
+            const myJobs = store.AllJobs.filter(j => 
+                String(j.Owner).trim() === String(currentUser.USERID).trim() && 
+                j.Status === 'กำลังดำเนินการ'
+            );
+            
+            const container = document.getElementById('job-list-myjob');
+            if (myJobs.length > 0) {
+                container.innerHTML = myJobs.map(j => `
+                    <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 border-blue-500 mb-3 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <p class="text-[9px] text-slate-400 font-bold">${j.JobID}</p>
+                                <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                                <p class="text-[9px] text-blue-500 mt-1 font-bold">📍 ${j.Department}</p>
+                            </div>
+                            <span class="text-[9px] text-blue-500 bg-blue-50 px-2 py-1 rounded font-bold status-pulse uppercase">Doing</span>
                         </div>
-                        <span class="text-[9px] text-blue-500 bg-blue-50 px-2 py-1 rounded font-bold">กำลังทำ...</span>
                     </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="p-8 text-center opacity-40 italic text-xs bg-white rounded-2xl border-dashed border border-slate-200">ไม่มีงานที่กำลังดำเนินการของคุณ</div>';
+            }
+        }
+
+        function viewJobDetail(jobId) {
+            const job = store.AllJobs.find(j => j.JobID === jobId);
+            if (!job) return;
+            
+            const content = document.getElementById('detail-content');
+            const actions = document.getElementById('detail-actions');
+
+            content.innerHTML = `
+                <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+                    <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา</p>
+                    <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
                 </div>
-            `).join('') : '<div class="p-8 text-center opacity-40 italic text-xs">ไม่มีงานค้าง</div>';
-        }
-
-      // แก้ไขฟังก์ชัน viewJobDetail เพื่อเช็คสิทธิ์ IT และ Boss
-// ฟังก์ชันดูรายละเอียดงาน (เช็คสิทธิ์โดยใช้ USERID พิมพ์ใหญ่)
-function viewJobDetail(jobId) {
-    const job = store.AllJobs.find(j => j.JobID === jobId);
-    if (!job) return;
-    
-    const content = document.getElementById('detail-content');
-    const actions = document.getElementById('detail-actions');
-
-    content.innerHTML = `
-        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase tracking-wider">รายละเอียดปัญหา</p>
-            <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
-        </div>
-        <div class="grid grid-cols-2 gap-4 px-1 mt-4">
-            <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
-            <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
-            <div class="col-span-2 border-t pt-2 mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้แจ้ง</p><p class="font-semibold text-slate-700 text-xs">${job.CreateBy || 'ไม่ระบุ'}</p></div>
-        </div>`;
-
-    let btns = '';
-
-    if (job.Status === 'รอรับงาน') {
-        // เงื่อนไขสำหรับกลุ่ม IT (ใช้ UserTypeID ตามเดิม แต่ส่ง USERID ไปบันทึก)
-        if (currentUser.UserTypeID === 'IT') {
-            btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงาน (ลงชื่อ: ${currentUser.USERID})</button>`;
-        }
-        
-        // เงื่อนไขสำหรับ Boss
-        if (currentUser.UserTypeID === 'Boss') {
-            btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงาน (โดย: ${currentUser.USERID})</button>`;
-        }
-
-        if (currentUser.UserTypeID !== 'IT' && currentUser.UserTypeID !== 'Boss') {
-            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">สถานะ: รอเจ้าหน้าที่ IT รับงาน</div>`;
-        }
-    } 
-    else if (job.Status === 'กำลังดำเนินการ') {
-        // ตรวจสอบความเป็นเจ้าของงานผ่าน USERID (ตัวพิมพ์ใหญ่)
-        if (job.Owner === currentUser.USERID) {
-            btns = `
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">✅ ปิดงาน</button>
-                    <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm active:scale-95 transition-all">🔄 โอนงาน</button>
+                <div class="grid grid-cols-2 gap-4 px-1 mt-4">
+                    <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
+                    <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
+                    <div class="col-span-2 border-t pt-2 mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้แจ้ง</p><p class="font-semibold text-slate-700 text-xs">${job.CreateBy || 'ไม่ระบุ'}</p></div>
                 </div>`;
-        } else {
-            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">ผู้รับผิดชอบ ID: ${job.Owner}</div>`;
-        }
-    } else {
-        btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดหน้าต่าง</button>`;
-    }
 
-    actions.innerHTML = btns;
-    document.getElementById('modal-detail').style.display = 'flex';
-}
+            let btns = '';
+            if (job.Status === 'รอรับงาน') {
+                if (currentUser.UserTypeID === 'IT') {
+                    btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2">⚡ รับงานเข้าเครื่องฉัน</button>`;
+                }
+                if (currentUser.UserTypeID === 'Boss') {
+                    btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
+                }
+                if (currentUser.UserTypeID !== 'IT' && currentUser.UserTypeID !== 'Boss') {
+                    btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">รอเจ้าหน้าที่ดำเนินการ</div>`;
+                }
+            } 
+            else if (job.Status === 'กำลังดำเนินการ') {
+                if (String(job.Owner).trim() === String(currentUser.USERID).trim()) {
+                    btns = `
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold">✅ ปิดงาน</button>
+                            <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm">🔄 โอนงาน</button>
+                        </div>`;
+                } else {
+                    btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">ผู้รับผิดชอบ: ${job.Owner}</div>`;
+                }
+            } else {
+                btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดหน้าต่าง</button>`;
+            }
 
-// ฟังก์ชันอัปเดตสถานะ (ส่ง USERID ไปบันทึกใน Sheet)
-async function handleJobUI(jobId, type, extra = {}) {
-    showLoading(true);
-    const data = { 
-        JobID: jobId, 
-        type: type, 
-        Owner: currentUser.USERID, // ใช้ USERID พิมพ์ใหญ่ส่งไปที่คอลัมน์ Owner ใน Sheet
-        ...extra 
-    };
-    
-    try {
-        const res = await fetch(API_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: 'updateJobStatus', data: data }) 
-        });
-        const result = await res.json();
-        if (result.success) { 
-            showInnerAlert('modal-detail', 'ดำเนินการสำเร็จ!');
-            await loadData(); 
-        }
-    } catch (e) { alert("Error connecting to server"); }
-    showLoading(false);
-}
-
-// ฟังก์ชันดึงรายชื่อเจ้าหน้าที่ (Mapping USERID เข้ากับ Value)
-function openTransfer(jobId) {
-    const select = document.getElementById('select-staff');
-    const title = document.querySelector('#modal-transfer h3');
-    
-    title.innerText = (currentUser.UserTypeID === 'Boss') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/มอบหมายงาน";
-    
-    // id ในที่นี้คือ USERID จากแผ่นงาน ITUser
-    select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name} (${s.id})</option>`).join('');
-    
-    document.getElementById('modal-transfer').style.display = 'flex';
-    
-    document.getElementById('btn-confirm-transfer').onclick = () => {
-        const reason = document.getElementById('transfer-reason').value;
-        if (!reason && currentUser.UserTypeID !== 'Boss') return alert("กรุณาระบุเหตุผล");
-        
-        handleJobUI(jobId, 'transfer', { 
-            NewOwner: select.value, // ส่งค่า USERID ของคนที่จะรับงานต่อ
-            Reason: reason || "Assigned by " + currentUser.USERID 
-        });
-        closeModal('modal-transfer');
-    };
-}
-
-// แก้ไขฟังก์ชัน openTransfer ให้รองรับทั้งการ "โอนงาน" และ "มอบหมายงาน"
-function openTransfer(jobId) {
-    const select = document.getElementById('select-staff');
-    const title = document.querySelector('#modal-transfer h3');
-    const btnConfirm = document.getElementById('btn-confirm-transfer');
-    
-    // เปลี่ยนหัวข้อตาม Role
-    title.innerText = (currentUser.UserTypeID === 'Boss') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/มอบหมายงาน";
-    
-    // ดึงรายชื่อเจ้าหน้าที่จาก store
-    select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-    
-    document.getElementById('modal-transfer').style.display = 'flex';
-    
-    btnConfirm.onclick = () => {
-        const reason = document.getElementById('transfer-reason').value;
-        if (!reason && currentUser.UserTypeID !== 'Boss') return alert("ระบุเหตุผลการโอนงาน");
-        
-        // ถ้าเป็น Boss มอบหมายงาน ให้ส่ง type เป็น 'assign' (หรือ 'transfer' ตาม API ของคุณ)
-        const actionType = (currentUser.UserTypeID === 'Boss') ? 'assign' : 'transfer';
-        
-        handleJobUI(jobId, actionType, { 
-            NewOwner: select.value, 
-            Reason: reason || "Boss assigned" 
-        });
-        closeModal('modal-transfer');
-    };
-}
-        // แจ้งเตือน Alert สวยๆ แบบ Login
-        function showInnerAlert(modalId, text) {
-            const alertDiv = document.querySelector(`#${modalId} .inner-alert`);
-            const alertText = alertDiv.querySelector('p');
-            alertText.innerText = text;
-            alertDiv.style.display = 'flex';
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-                closeModal(modalId);
-            }, 1800);
+            actions.innerHTML = btns;
+            document.getElementById('modal-detail').style.display = 'flex';
         }
 
         async function handleJobUI(jobId, type, extra = {}) {
             showLoading(true);
-            const data = { JobID: jobId, type: type, Owner: currentUser.UserName, ...extra };
+            const data = { JobID: jobId, type: type, Owner: currentUser.USERID, ...extra };
             try {
                 const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: data }) });
                 const result = await res.json();
@@ -397,7 +301,24 @@ function openTransfer(jobId) {
             showLoading(false);
         }
 
-        // IT Ticket Logic
+        function openTransfer(jobId) {
+            const select = document.getElementById('select-staff');
+            const title = document.querySelector('#modal-transfer h3');
+            title.innerText = (currentUser.UserTypeID === 'Boss') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/มอบหมายงาน";
+            
+            select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name} (${s.id})</option>`).join('');
+            document.getElementById('modal-transfer').style.display = 'flex';
+            
+            document.getElementById('btn-confirm-transfer').onclick = () => {
+                const reason = document.getElementById('transfer-reason').value;
+                if (!reason && currentUser.UserTypeID !== 'Boss') return alert("กรุณาระบุเหตุผล");
+                
+                const actionType = (currentUser.UserTypeID === 'Boss') ? 'assign' : 'transfer';
+                handleJobUI(jobId, actionType, { NewOwner: select.value, Reason: reason || "Assigned by " + currentUser.USERID });
+                closeModal('modal-transfer');
+            };
+        }
+
         function openITTicketForm() {
             document.getElementById('it-job-type').innerHTML = (store.JobTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
             document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
@@ -409,7 +330,12 @@ function openTransfer(jobId) {
             showLoading(true);
             const data = {
                 action: 'saveITTicket',
-                data: { jobType: document.getElementById('it-job-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.UserName }
+                data: { 
+                    jobType: document.getElementById('it-job-type').value, 
+                    problem: document.getElementById('it-problem').value, 
+                    dept: document.getElementById('it-dept').value, 
+                    owner: currentUser.USERID // ใช้ USERID
+                }
             };
             try {
                 const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
@@ -440,7 +366,14 @@ function openTransfer(jobId) {
                 </div>`).join('');
         }
 
-        // Utility Functions
+        function renderSystemLinks() {
+            document.getElementById('tab3').innerHTML = (store.SystemLink || []).map(l => `
+                <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all">
+                    <span class="text-2xl">${l.Linkicon || '🔗'}</span>
+                    <span class="font-bold text-slate-700 text-sm">${l.SystemName || l.Name}</span>
+                </a>`).join('');
+        }
+
         function updateStats(jobs) {
             document.getElementById('count-wait').innerText = jobs.filter(j => j.Status === 'รอรับงาน').length;
             document.getElementById('count-doing').innerText = jobs.filter(j => j.Status === 'กำลังดำเนินการ').length;
@@ -456,14 +389,6 @@ function openTransfer(jobId) {
             return "text-slate-400 bg-slate-50";
         }
 
-        function renderSystemLinks() {
-            document.getElementById('tab3').innerHTML = (store.SystemLink || []).map(l => `
-                <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all">
-                    <span class="text-2xl">${l.Linkicon || '🔗'}</span>
-                    <span class="font-bold text-slate-700 text-sm">${l.SystemName || l.Name}</span>
-                </a>`).join('');
-        }
-
         function switchTab(n) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('tab' + n).classList.add('active');
@@ -473,38 +398,30 @@ function openTransfer(jobId) {
             });
         }
 
-        function openTransfer(jobId) {
-            const select = document.getElementById('select-staff');
-            select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-            document.getElementById('modal-transfer').style.display = 'flex';
-            document.getElementById('btn-confirm-transfer').onclick = () => {
-                const reason = document.getElementById('transfer-reason').value;
-                if (!reason) return alert("ระบุเหตุผล");
-                handleJobUI(jobId, 'transfer', { NewOwner: select.value, Reason: reason });
-                closeModal('modal-transfer');
-            };
+        function showInnerAlert(modalId, text) {
+            const alertDiv = document.querySelector(`#${modalId} .inner-alert`);
+            const alertText = alertDiv.querySelector('p');
+            alertText.innerText = text;
+            alertDiv.style.display = 'flex';
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+                closeModal(modalId);
+            }, 1800);
+        }
+
+        function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
+        
+        async function confirmLogout() {
+            document.getElementById('logout-alert').style.display = 'flex';
+            setTimeout(() => {
+                localStorage.clear();
+                window.location.replace("./login.html");
+            }, 1500);
         }
 
         function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-      // ฟังก์ชันเรียกเปิด Modal ยืนยัน Logout
-function logout() {
-    document.getElementById('modal-logout').style.display = 'flex';
-}
 
-// ฟังก์ชันดำเนินการ Logout จริง
-async function confirmLogout() {
-    // แสดง Inner Alert ภายใน Modal
-    const alertDiv = document.getElementById('logout-alert');
-    alertDiv.style.display = 'flex';
-    
-    // หน่วงเวลาเพื่อให้ผู้ใช้เห็น Alert แป๊บนึง (เหมือนหน้า Login)
-    setTimeout(() => {
-        localStorage.clear();
-        window.location.replace("./login.html");
-    }, 1500);
-}
-        
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>

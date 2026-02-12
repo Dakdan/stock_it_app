@@ -240,62 +240,63 @@
         }
 
         // แก้ไขฟังก์ชันนี้ให้แสดงปุ่มตาม Tab
-      function viewJobDetail(jobId) {
+       function viewJobDetail(jobId) {
     const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
     if (!job) return;
     
+    // Debug: ตรวจสอบค่าที่ได้รับจากระบบ (เปิด Console F12 ดูได้ครับ)
+    console.log("Current User:", currentUser);
+    console.log("Selected Job Status:", job.Status);
+
     const content = document.getElementById('detail-content');
     const actions = document.getElementById('detail-actions');
 
-    // ส่วนแสดงข้อมูล (เหมือนเดิม)
     content.innerHTML = `
-        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100 mb-4">
-            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase tracking-tighter">Issue Details</p>
+        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา</p>
             <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
         </div>
-        <div class="grid grid-cols-2 gap-4 px-1">
+        <div class="grid grid-cols-2 gap-4 px-1 mt-4">
             <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
             <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
             <div class="col-span-2 border-t pt-2 mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">สถานะปัจจุบัน</p><p class="font-bold text-pink-600 text-xs italic">${job.Status}</p></div>
-            <div class="col-span-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${job.Owner || 'ยังไม่มีผู้รับงาน'}</p></div>
         </div>`;
 
     let btns = '';
-    const role = String(currentUser.UserTypeID).toUpperCase().trim();
+    
+    // ปรับให้รองรับทั้งตัวพิมพ์เล็ก/ใหญ่ และตัดช่องว่าง
     const status = String(job.Status).trim();
+    const role = String(currentUser.UserTypeID).toUpperCase().trim();
 
-    // --- LOGIC การแสดงปุ่มแยกตาม TAB ---
-
-    if (activeTab === 1) { 
-        // [Tab 1: Dashboard] แสดงปุ่มเฉพาะงานที่ยังไม่ถูกรับ (Status === 'รอรับงาน')
-        if (status === 'รอรับงาน') {
-            if (role === 'IT') {
-                btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงานเข้าเครื่องฉัน</button>`;
-            } else if (role === 'BOSS') {
-                btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงาน</button>`;
-            }
-        } else {
-            // กรณีเป็นงานที่รับไปแล้วใน Tab 1 จะไม่แสดงปุ่มจัดการใดๆ เพื่อลดความสับสน
-            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">งานนี้อยู่ระหว่างดำเนินการโดย ${job.Owner}</div>`;
+    if (status === 'รอรับงาน') {
+        // เงื่อนไขสำหรับ IT
+        if (role === 'IT') {
+            btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงานเข้าเครื่องฉัน</button>`;
+        }
+        // เงื่อนไขสำหรับ Boss
+        else if (role === 'BOSS') {
+            btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
+        }
+        // ถ้าไม่ใช่ทั้งคู่
+        else {
+            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">สิทธิ์ของคุณ (${role}) ไม่สามารถรับงานได้</div>`;
         }
     } 
-    else if (activeTab === 2) {
-        // [Tab 2: My Jobs] แสดงปุ่มจัดการเฉพาะงานที่เป็นเจ้าของและกำลังทำอยู่
-        const isOwner = String(job.Owner).trim() === String(currentUser.USERID).trim();
-        
-        if (isOwner && status === 'กำลังดำเนินการ') {
+    else if (status === 'กำลังดำเนินการ') {
+        // เช็คว่าเป็นเจ้าของงานหรือไม่
+        if (String(job.Owner).trim() === String(currentUser.USERID).trim()) {
             btns = `
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">✅ ปิดงาน</button>
-                    <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm border active:scale-95 transition-all">🔄 โอนงาน</button>
+                    <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ ปิดงาน</button>
+                    <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm border">🔄 โอนงาน</button>
                 </div>`;
-        } else if (status === 'เสร็จสิ้น') {
-            btns = `<div class="p-4 bg-green-50 text-green-600 rounded-2xl text-center font-bold text-xs border border-green-200 uppercase">งานนี้เสร็จสิ้นแล้ว</div>`;
+        } else {
+            btns = `<div class="p-4 bg-slate-50 rounded-2xl text-center font-bold text-xs text-slate-500 uppercase border border-dashed">งานของ: ${job.Owner}</div>`;
         }
     }
 
-    // ปุ่มปิดหน้าต่าง (แสดงทุกกรณี)
-    btns += `<button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-[10px] mt-2 uppercase tracking-widest">Close</button>`;
+    // เพิ่มปุ่มปิดพื้นฐานทุกกรณี
+    btns += `<button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-[10px] mt-2 uppercase tracking-widest">Close Detail</button>`;
 
     actions.innerHTML = btns;
     document.getElementById('modal-detail').style.display = 'flex';

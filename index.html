@@ -240,67 +240,67 @@
         }
 
         // แก้ไขฟังก์ชันนี้ให้แสดงปุ่มตาม Tab
-        function viewJobDetail(jobId) {
-            const job = store.AllJobs.find(j => j.JobID === jobId);
-            if (!job) return;
-            
-            const content = document.getElementById('detail-content');
-            const actions = document.getElementById('detail-actions');
+       function viewJobDetail(jobId) {
+    const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
+    if (!job) return;
+    
+    // Debug: ตรวจสอบค่าที่ได้รับจากระบบ (เปิด Console F12 ดูได้ครับ)
+    console.log("Current User:", currentUser);
+    console.log("Selected Job Status:", job.Status);
 
-            content.innerHTML = `
-                <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-                    <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา</p>
-                    <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
-                </div>
-                <div class="grid grid-cols-2 gap-4 px-1 mt-4">
-                    <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
-                    <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
-                    <div class="col-span-2 border-t pt-2 mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้แจ้ง</p><p class="font-semibold text-slate-700 text-xs">${job.CreateBy || 'ไม่ระบุ'}</p></div>
-                    <div class="col-span-2"><p class="text-[10px] text-slate-400 font-bold uppercase">สถานะ</p><p class="font-bold text-pink-600 text-xs italic">${job.Status}</p></div>
-                </div>`;
+    const content = document.getElementById('detail-content');
+    const actions = document.getElementById('detail-actions');
 
-            let btns = '';
+    content.innerHTML = `
+        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา</p>
+            <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 px-1 mt-4">
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
+            <div class="col-span-2 border-t pt-2 mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">สถานะปัจจุบัน</p><p class="font-bold text-pink-600 text-xs italic">${job.Status}</p></div>
+        </div>`;
 
-            // เงื่อนไขสำหรับ Tab 1: Dashboard
-            if (currentTab === 1) {
-                if (job.Status === 'รอรับงาน') {
-                    if (currentUser.UserTypeID === 'IT') {
-                        btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2">⚡ รับงาน</button>`;
-                    }
-                    if (currentUser.UserTypeID === 'Boss') {
-                        btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
-                    }
-                    if (currentUser.UserTypeID !== 'IT' && currentUser.UserTypeID !== 'Boss') {
-                        btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl font-bold uppercase">รอเจ้าหน้าที่ดำเนินการ</div>`;
-                    }
-                } else {
-                    // ถ้าไม่ใช่ "รอรับงาน" ใน Tab 1 ให้แสดงแค่ชื่อคนรับผิดชอบ
-                    btns = `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
-                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">ผู้รับผิดชอบงานนี้</p>
-                                <p class="text-xs font-bold text-slate-700 uppercase">🆔 ${job.Owner || 'ไม่มีผู้รับผิดชอบ'}</p>
-                            </div>
-                            <button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-xs mt-2">ปิดหน้าต่าง</button>`;
-                }
-            } 
-            // เงื่อนไขสำหรับ Tab 2: My Jobs
-            else if (currentTab === 2) {
-                if (job.Status === 'กำลังดำเนินการ' && String(job.Owner).trim() === String(currentUser.USERID).trim()) {
-                    btns = `
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ ปิดงาน</button>
-                            <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm border">🔄 โอนงาน</button>
-                        </div>`;
-                } else {
-                    btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดรายละเอียด</button>`;
-                }
-            } else {
-                btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดรายละเอียด</button>`;
-            }
+    let btns = '';
+    
+    // ปรับให้รองรับทั้งตัวพิมพ์เล็ก/ใหญ่ และตัดช่องว่าง
+    const status = String(job.Status).trim();
+    const role = String(currentUser.UserTypeID).toUpperCase().trim();
 
-            actions.innerHTML = btns;
-            document.getElementById('modal-detail').style.display = 'flex';
+    if (status === 'รอรับงาน') {
+        // เงื่อนไขสำหรับ IT
+        if (role === 'IT') {
+            btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงานเข้าเครื่องฉัน</button>`;
         }
+        // เงื่อนไขสำหรับ Boss
+        else if (role === 'BOSS') {
+            btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
+        }
+        // ถ้าไม่ใช่ทั้งคู่
+        else {
+            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">สิทธิ์ของคุณ (${role}) ไม่สามารถรับงานได้</div>`;
+        }
+    } 
+    else if (status === 'กำลังดำเนินการ') {
+        // เช็คว่าเป็นเจ้าของงานหรือไม่
+        if (String(job.Owner).trim() === String(currentUser.USERID).trim()) {
+            btns = `
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ ปิดงาน</button>
+                    <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm border">🔄 โอนงาน</button>
+                </div>`;
+        } else {
+            btns = `<div class="p-4 bg-slate-50 rounded-2xl text-center font-bold text-xs text-slate-500 uppercase border border-dashed">งานของ: ${job.Owner}</div>`;
+        }
+    }
 
+    // เพิ่มปุ่มปิดพื้นฐานทุกกรณี
+    btns += `<button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-[10px] mt-2 uppercase tracking-widest">Close Detail</button>`;
+
+    actions.innerHTML = btns;
+    document.getElementById('modal-detail').style.display = 'flex';
+}
         async function handleJobUI(jobId, type, extra = {}) {
             showLoading(true);
             const data = { JobID: jobId, type: type, Owner: currentUser.USERID, ...extra };

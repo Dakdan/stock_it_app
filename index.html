@@ -135,8 +135,8 @@
             <div class="space-y-3">
                 <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
                 <textarea id="transfer-reason" placeholder="เหตุผล/หมายเหตุ..." class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
-                <button id="btn-confirm-transfer" class="w-full py-3 pink-grad text-white rounded-xl font-bold shadow-lg">ยืนยันการบันทึก</button>
-                <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 text-xs">ยกเลิก</button>
+                <button id="btn-confirm-transfer" class="w-full pink-grad text-white rounded-xl font-bold py-3 shadow-lg">ยืนยัน</button>
+                <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 text-xs uppercase font-bold">ยกเลิก</button>
             </div>
         </div>
     </div>
@@ -160,7 +160,7 @@
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
-        let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [] };
+        let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [], BackupData: [] };
         let currentUser = null;
         let currentTab = 1; 
 
@@ -239,7 +239,7 @@
             }
         }
 
-        // --- แก้ไขจุดนี้: ฟังก์ชันแสดงรายละเอียดพร้อมเงื่อนไขแยก Tab ---
+        // --- ส่วนที่ปรับปรุง: แสดงรายละเอียดงานและข้อมูลครุภัณฑ์จาก BackupData ---
         function viewJobDetail(jobId) {
             const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
             if (!job) return;
@@ -247,11 +247,32 @@
             const content = document.getElementById('detail-content');
             const actions = document.getElementById('detail-actions');
 
+            // 1. ดึงข้อมูลครุภัณฑ์หากเป็นประเภทแจ้งซ่อม
+            let assetHTML = '';
+            if (job.JobType === 'แจ้งซ่อมครุภัณฑ์' && job.AssetCode) {
+                const asset = (store.BackupData || []).find(a => String(a[2]) === String(job.AssetCode));
+                if (asset) {
+                    assetHTML = `
+                        <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
+                            <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์</p>
+                            <div class="space-y-1.5">
+                                <p class="text-xs text-slate-500">รหัสครุภัณฑ์: <span class="font-bold text-slate-700">${asset[2]}</span></p>
+                                <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset[5]}</span></p>
+                                <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset[6] || '-'}</span></p>
+                            </div>
+                        </div>`;
+                } else {
+                    assetHTML = `<div class="bg-slate-50 p-3 rounded-2xl border border-dashed mt-4 text-center text-[10px] text-slate-400 italic">ไม่พบข้อมูลครุภัณฑ์รหัส: ${job.AssetCode}</div>`;
+                }
+            }
+
+            // 2. แสดงรายละเอียดปัญหาและแทรกข้อมูลครุภัณฑ์
             content.innerHTML = `
                 <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-                    <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา</p>
+                    <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
                     <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
                 </div>
+                ${assetHTML}
                 <div class="grid grid-cols-2 gap-4 px-1 mt-4">
                     <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
                     <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
@@ -259,16 +280,16 @@
                     <div class="col-span-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${job.Owner || 'ยังไม่มี'}</p></div>
                 </div>`;
 
+            // 3. จัดการปุ่มกด (Logic เดิมที่ทำงานได้ดีอยู่แล้ว)
             let btns = '';
             const status = String(job.Status).trim();
             const role = String(currentUser.UserTypeID).toUpperCase().trim();
             const isOwner = String(job.Owner).trim() === String(currentUser.USERID).trim();
 
             if (currentTab === 1) {
-                // Tab 1: Dashboard - แสดงเฉพาะปุ่ม รับงาน/มอบหมาย เมื่อสถานะว่าง
                 if (status === 'รอรับงาน') {
                     if (role === 'IT') {
-                        btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงาน</button>`;
+                        btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงานเข้าเครื่องฉัน</button>`;
                     } else if (role === 'BOSS') {
                         btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
                     }
@@ -277,7 +298,6 @@
                 }
             } 
             else if (currentTab === 2) {
-                // Tab 2: My Jobs - แสดงปุ่มปิดงาน/โอนงาน เฉพาะงานของตนเอง
                 if (isOwner && status === 'กำลังดำเนินการ') {
                     btns = `
                         <div class="grid grid-cols-2 gap-2">
@@ -293,6 +313,7 @@
             document.getElementById('modal-detail').style.display = 'flex';
         }
 
+        // ฟังก์ชันอื่นๆ ยังคงเดิม
         async function handleJobUI(jobId, type, extra = {}) {
             showLoading(true);
             const data = { JobID: jobId, type: type, Owner: currentUser.USERID, By: currentUser.UserName, ...extra };
@@ -311,14 +332,11 @@
             const select = document.getElementById('select-staff');
             const title = document.querySelector('#modal-transfer h3');
             title.innerText = (currentUser.UserTypeID === 'Boss') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/มอบหมายงาน";
-            
             select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name} (${s.id})</option>`).join('');
             document.getElementById('modal-transfer').style.display = 'flex';
-            
             document.getElementById('btn-confirm-transfer').onclick = () => {
                 const reason = document.getElementById('transfer-reason').value;
                 if (!reason && currentUser.UserTypeID !== 'Boss') return alert("กรุณาระบุเหตุผล");
-                
                 const actionType = (currentUser.UserTypeID === 'Boss') ? 'assign' : 'transfer';
                 handleJobUI(jobId, actionType, { NewOwner: select.value, Reason: reason || "Assigned by " + currentUser.USERID });
                 closeModal('modal-transfer');
@@ -336,12 +354,7 @@
             showLoading(true);
             const data = {
                 action: 'saveITTicket',
-                data: { 
-                    jobType: document.getElementById('it-job-type').value, 
-                    problem: document.getElementById('it-problem').value, 
-                    dept: document.getElementById('it-dept').value, 
-                    owner: currentUser.USERID 
-                }
+                data: { jobType: document.getElementById('it-job-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID }
             };
             try {
                 const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
@@ -420,13 +433,9 @@
         }
 
         function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
-        
         async function confirmLogout() {
             document.getElementById('logout-alert').style.display = 'flex';
-            setTimeout(() => {
-                localStorage.clear();
-                window.location.replace("./login.html");
-            }, 1500);
+            setTimeout(() => { localStorage.clear(); window.location.replace("./login.html"); }, 1500);
         }
 
         function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }

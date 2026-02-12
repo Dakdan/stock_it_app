@@ -216,41 +216,91 @@
             `).join('') : '<div class="p-8 text-center opacity-40 italic text-xs">ไม่มีงานค้าง</div>';
         }
 
-        function viewJobDetail(jobId) {
-            const job = store.AllJobs.find(j => j.JobID === jobId);
-            if (!job) return;
-            
-            const content = document.getElementById('detail-content');
-            const actions = document.getElementById('detail-actions');
+      // แก้ไขฟังก์ชัน viewJobDetail เพื่อเช็คสิทธิ์ IT และ Boss
+function viewJobDetail(jobId) {
+    const job = store.AllJobs.find(j => j.JobID === jobId);
+    if (!job) return;
+    
+    const content = document.getElementById('detail-content');
+    const actions = document.getElementById('detail-actions');
 
-            content.innerHTML = `
-                <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-                    <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase tracking-wider">รายละเอียดปัญหา</p>
-                    <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
-                </div>
-                <div class="grid grid-cols-2 gap-4 px-1">
-                    <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
-                    <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
-                    <div class="col-span-2 border-t pt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้แจ้ง</p><p class="font-semibold text-slate-700 text-xs">${job.CreateBy || 'ไม่ระบุ'}</p></div>
-                </div>`;
+    // ส่วนแสดงข้อมูลพื้นฐาน
+    content.innerHTML = `
+        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase tracking-wider">รายละเอียดปัญหา</p>
+            <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 px-1">
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
+            <div class="col-span-2 border-t pt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้แจ้ง</p><p class="font-semibold text-slate-700 text-xs">${job.CreateBy || 'ไม่ระบุ'}</p></div>
+        </div>`;
 
-            // จัดการปุ่มดำเนินการตามสถานะ
-            let btns = '';
-            if (job.Status === 'รอรับงาน' && (currentUser.UserTypeID === 'IT' || currentUser.UserTypeID === 'Admin')) {
-                btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg">⚡ รับงานเข้าเครื่องฉัน</button>`;
-            } else if (job.Status === 'กำลังดำเนินการ' && job.Owner === currentUser.UserName) {
-                btns = `
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ ปิดงาน</button>
-                        <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm">🔄 โอนงาน</button>
-                    </div>`;
-            } else {
-                btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic">งานนี้เป็นของ: ${job.Owner || 'ระบบ'} (${job.Status})</div>`;
-            }
-            actions.innerHTML = btns;
-            document.getElementById('modal-detail').style.display = 'flex';
+    // --- ส่วนจัดการปุ่มตาม UserTypeID และ Status ---
+    let btns = '';
+
+    if (job.Status === 'รอรับงาน') {
+        // 1. ถ้าเป็น IT ให้แสดงปุ่มรับงาน
+        if (currentUser.UserTypeID === 'IT') {
+            btns += `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2">⚡ รับงานเข้าเครื่องฉัน</button>`;
+        }
+        
+        // 2. ถ้าเป็น Boss ให้แสดงปุ่มมอบหมายงาน
+        if (currentUser.UserTypeID === 'Boss') {
+            btns += `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
         }
 
+        // หากไม่มีสิทธิ์จัดการ
+        if (currentUser.UserTypeID !== 'IT' && currentUser.UserTypeID !== 'Boss') {
+            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">รอเจ้าหน้าที่ IT ดำเนินการ</div>`;
+        }
+    } 
+    else if (job.Status === 'กำลังดำเนินการ') {
+        if (job.Owner === currentUser.UserName) {
+            btns = `
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="handleJobUI('${job.JobID}', 'done')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ ปิดงาน</button>
+                    <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm">🔄 โอนงาน</button>
+                </div>`;
+        } else {
+            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl">ผู้รับผิดชอบ: ${job.Owner}</div>`;
+        }
+    } else {
+        btns = `<button onclick="closeModal('modal-detail')" class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-xs">ปิดหน้าต่าง</button>`;
+    }
+
+    actions.innerHTML = btns;
+    document.getElementById('modal-detail').style.display = 'flex';
+}
+
+// แก้ไขฟังก์ชัน openTransfer ให้รองรับทั้งการ "โอนงาน" และ "มอบหมายงาน"
+function openTransfer(jobId) {
+    const select = document.getElementById('select-staff');
+    const title = document.querySelector('#modal-transfer h3');
+    const btnConfirm = document.getElementById('btn-confirm-transfer');
+    
+    // เปลี่ยนหัวข้อตาม Role
+    title.innerText = (currentUser.UserTypeID === 'Boss') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/มอบหมายงาน";
+    
+    // ดึงรายชื่อเจ้าหน้าที่จาก store
+    select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    
+    document.getElementById('modal-transfer').style.display = 'flex';
+    
+    btnConfirm.onclick = () => {
+        const reason = document.getElementById('transfer-reason').value;
+        if (!reason && currentUser.UserTypeID !== 'Boss') return alert("ระบุเหตุผลการโอนงาน");
+        
+        // ถ้าเป็น Boss มอบหมายงาน ให้ส่ง type เป็น 'assign' (หรือ 'transfer' ตาม API ของคุณ)
+        const actionType = (currentUser.UserTypeID === 'Boss') ? 'assign' : 'transfer';
+        
+        handleJobUI(jobId, actionType, { 
+            NewOwner: select.value, 
+            Reason: reason || "Boss assigned" 
+        });
+        closeModal('modal-transfer');
+    };
+}
         // แจ้งเตือน Alert สวยๆ แบบ Login
         function showInnerAlert(modalId, text) {
             const alertDiv = document.querySelector(`#${modalId} .inner-alert`);

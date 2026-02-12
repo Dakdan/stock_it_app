@@ -1,0 +1,39 @@
+{
+  "persistence_enabled": false,
+  "app_name": "IT Service Management System",
+  "avoids_browser_dialogs": true,
+  "avoids_viewport_units": true,
+  "verified_editable_features_usage": true,
+  "edit_panel": {
+    "header_label": {
+      "type": "label",
+      "text": "ตั้งค่าระบบจัดการงาน IT",
+      "size": "large"
+    },
+    "system_title": {
+      "type": "text_input",
+      "label": "ชื่อระบบ",
+      "placeholder": "ระบบจัดการงานบริการและซ่อมอุปกรณ์คอมพิวเตอร์"
+    },
+    "hospital_name": {
+      "type": "text_input",
+      "label": "ชื่อโรงพยาบาล",
+      "placeholder": "โรงพยาบาลอุดรธานี"
+    },
+    "section_label": {
+      "type": "label",
+      "text": "ข้อมูลติดต่อ",
+      "size": "medium"
+    },
+    "contact_email": {
+      "type": "text_input",
+      "label": "อีเมลติดต่อ",
+      "placeholder": "it@hospital.go.th"
+    },
+    "contact_phone": {
+      "type": "text_input",
+      "label": "เบอร์โทรศัพท์",
+      "placeholder": "0-4242-xxxx"
+    }
+  }
+}

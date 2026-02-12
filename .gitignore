@@ -1,0 +1,306 @@
+# ============================================
+# Credentials & Secrets (ต้องเก็บลับ)
+# ============================================
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+credentials.json
+secrets.json
+config.secret.js
+.aws/
+.ssh/
+
+
+# ============================================
+# Node.js & Dependencies
+# ============================================
+node_modules/
+package-lock.json
+yarn.lock
+npm-debug.log
+yarn-error.log
+*.tgz
+
+
+# ============================================
+# Build & Distribution Files
+# ============================================
+dist/
+build/
+out/
+*.min.js
+*.min.css
+coverage/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.eslintcache
+
+
+# ============================================
+# IDE & Editor Files
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.sublime-project
+.sublime-workspace
+*.iml
+.classpath
+.project
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+
+# ============================================
+# Logs & Temporary Files
+# ============================================
+*.log
+logs/
+log/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+
+# ============================================
+# Testing & Coverage
+# ============================================
+coverage/
+.nyc_output/
+*.lcov
+.coverage
+htmlcov/
+
+
+# ============================================
+# Google Apps Script & Sheets
+# ============================================
+clasp.json
+src/
+dist/
+.clasp.json
+appsscript.json
+
+
+# ============================================
+# Database Files (ถ้ามี)
+# ============================================
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.dbf
+*.mdf
+*.ldf
+
+
+# ============================================
+# Backup Files
+# ============================================
+*.backup
+*.bak
+*.swp
+*.swo
+*~
+*.orig
+
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+docker-compose.override.yml
+
+
+# ============================================
+# Git
+# ============================================
+.git/
+.gitmodules
+
+
+# ============================================
+# Package Management
+# ============================================
+.npm/
+.eslintcache
+.node_repl_history
+
+
+# ============================================
+# VS Code
+# ============================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+
+# ============================================
+# JetBrains IDEs
+# ============================================
+.idea/
+*.iml
+*.iws
+*.ipr
+
+
+# ============================================
+# Sublime Text
+# ============================================
+*.sublime-workspace
+*.sublime-project
+
+
+# ============================================
+# Vim
+# ============================================
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+*~
+
+
+# ============================================
+# Emacs
+# ============================================
+*~
+\#*\#
+.\#*
+
+
+# ============================================
+# MacOS
+# ============================================
+.AppleDouble
+.LSOverride
+._*
+.apdisk
+
+
+# ============================================
+# Windows
+# ============================================
+[Dd]esktop.ini
+[Tt]humbs.db
+*.lnk
+
+
+# ============================================
+# Linux
+# ============================================
+.directory
+
+
+# ============================================
+# Project Specific
+# ============================================
+# API Keys & Credentials
+api-keys.txt
+auth-tokens.json
+user-data/
+private/
+uploads/
+temp-uploads/
+
+# Local Development
+localhost/
+.local/
+*.local
+
+# Documentation Generated
+docs/generated/
+docs/build/
+
+# Browser Extensions
+extension/
+plugins/
+
+# Cache
+.cache/
+cache/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.development
+.env.production
+.env.test
+
+# IDE Workspace
+.workspace/
+workspace.code-workspace
+
+# Build Artifacts
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Large Files (สำหรับ Git LFS)
+*.psd
+*.ai
+*.mov
+*.mp4
+*.mp3
+*.iso
+
+# System Files
+$RECYCLE.BIN/
+System Volume Information/
+.TemporaryItems/
+.VolumeIcon.icns
+
+# Miscellaneous
+.vagrant/
+.vagrant/*
+*.vagrant
+.venv/
+venv/
+ENV/
+env

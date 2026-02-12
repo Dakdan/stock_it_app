@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Service Management - รพ.อุดรธานี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #fdf2f8; position: relative; min-height: 100vh; }
+        body::before { content: "IT UDON HOSP"; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 8rem; color: rgba(0,0,0,0.03); font-weight: 900; pointer-events: none; z-index: -1; }
+        .pink-grad { background: linear-gradient(135deg, #be185d 0%, #db2777 100%); }
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card-pro { background: white; border-radius: 1.2rem; border: 1px solid #fce7f3; transition: 0.3s; cursor: pointer; }
+        .card-pro:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1); }
+        .status-pulse { animation: pulse-pink 2s infinite; }
+        @keyframes pulse-pink { 0% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(219, 39, 119, 0); } 100% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0); } }
+    </style>
+</head>
+<body class="pb-10">
+
+    <div id="loader" class="overlay"><div class="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center"><div class="animate-spin rounded-full h-10 w-10 border-4 border-pink-600 border-t-transparent mb-3"></div><p class="text-pink-600 font-bold text-xs">กำลังประมวลผล...</p></div></div>
+
+    <header class="pink-grad text-white px-6 py-6 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Udon Hospital Logo">
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)</h1>
+                    <p class="text-[10px] opacity-80">ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p id="u-fname" class="text-xs font-bold leading-none"></p>
+                    <p id="u-type-name" class="text-[9px] opacity-70"></p>
+                </div>
+                <button onclick="logout()" class="bg-white/20 p-2 rounded-xl">🚪</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-[88px] z-40 border-b border-pink-100">
+        <div class="max-w-4xl mx-auto flex">
+            <button onclick="switchTab(1)" id="t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600">DASHBOARD</button>
+            <button onclick="switchTab(2)" id="t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">MY JOBS</button>
+            <button onclick="switchTab(3)" id="t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">SYSTEMLINK</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 mt-4 space-y-6">
+        <div id="tab1" class="tab-content active space-y-4">
+            <div class="grid grid-cols-5 gap-2">
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">New</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Doing</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Spare</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Done</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Cancel</p><p id="count-cancel" class="text-lg font-black text-slate-300">0</p></div>
+            </div>
+            <div id="job-list-dashboard" class="space-y-3"></div>
+        </div>
+
+        <div id="tab2" class="tab-content space-y-4">
+            <div class="bg-white p-4 rounded-3xl flex justify-between items-center shadow-sm">
+                <h2 class="text-pink-600 font-bold">งานที่คุณรับผิดชอบ</h2>
+                <button onclick="openModal('modal-it-ticket')" class="bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">+ บันทึกกิจกรรม</button>
+            </div>
+            <div id="job-list-myjob" class="space-y-3"></div>
+        </div>
+
+        <div id="tab3" class="tab-content grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </main>
+
+    <div id="modal-transfer" class="overlay">
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm mx-4">
+            <h3 class="font-bold text-pink-600 mb-4">🔄 โอนงาน/มอบหมายงาน</h3>
+            <div class="space-y-3">
+                <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl border-none outline-pink-500 text-sm"></select>
+                <textarea id="transfer-reason" placeholder="ระบุเหตุผลการโอนงาน..." class="w-full p-3 bg-slate-50 rounded-xl border-none outline-pink-500 text-sm h-24"></textarea>
+                <button id="btn-confirm-transfer" class="w-full py-3 pink-grad text-white rounded-xl font-bold shadow-lg">ยืนยันการโอน</button>
+                <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 font-bold text-xs">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+   <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
+        let store = { AllJobs: [], StaffList: [], SystemLink: [] };
+        let currentUser = null;
+        let isInitialLoaded = false; // บังคับให้โหลดแค่ครั้งเดียว
+
+        const Auth = {
+            check: () => {
+                const s = localStorage.getItem("it_session");
+                if (!s) {
+                    window.location.href = "login.html";
+                    return null;
+                }
+                return JSON.parse(s);
+            }
+        };
+
+        async function initApp() {
+            if (isInitialLoaded) return; // ถ้าโหลดแล้ว ไม่ต้องโหลดซ้ำ
+            
+            currentUser = Auth.check();
+            if (currentUser) {
+                const nameEl = document.getElementById('u-fname');
+                const typeEl = document.getElementById('u-type-name');
+                if (nameEl) nameEl.innerText = currentUser.UserName + " " + (currentUser.UserSname || "");
+                if (typeEl) typeEl.innerText = currentUser.UserTypeName || "Staff";
+                
+                await loadData();
+                isInitialLoaded = true;
+            }
+        }
+
+        async function loadData() {
+            showLoading(true);
+            try {
+                // เพิ่ม Timestamp เพื่อป้องกัน Browser จำ Cache (ต้นเหตุของข้อมูลไม่อัปเดต)
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        action: 'getInitialData', 
+                        data: { userName: currentUser.UserName, _t: Date.now() } 
+                    }) 
+                });
+                const result = await res.json();
+                if (result.success) {
+                    store = result;
+                    renderDashboard();
+                    renderMyJobs();
+                    renderSystemLinks();
+                }
+            } catch (e) { 
+                console.error("Fetch Error:", e);
+                // ถ้า Error ให้ลองใหม่ในอีก 3 วินาที (ครั้งเดียว)
+                setTimeout(() => { if(!isInitialLoaded) loadData(); }, 3000);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // --- ฟังก์ชัน Render อื่นๆ ของคุณ (คงเดิมได้เลยเพราะเขียนไว้ดีแล้ว) ---
+
+        function showLoading(v) { 
+            const loader = document.getElementById('loader');
+            if(loader) loader.style.display = v ? 'flex' : 'none'; 
+        }
+
+        // ใช้ DOMContentLoaded แทน window.onload เพื่อความเสถียร
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

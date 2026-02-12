@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITSM - รพ.อุดรธานี </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #fdf2f8; min-height: 100vh; }
+        .pink-grad { background: linear-gradient(135deg, #be185d 0%, #db2777 100%); }
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card-pro { background: white; border-radius: 1.2rem; border: 1px solid #fce7f3; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    </style>
+</head>
+<body>
+
+    <div id="loader" class="overlay">
+        <div class="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-4 border-pink-600 border-t-transparent mb-3"></div>
+            <p class="text-pink-600 font-bold text-xs">กำลังโหลดข้อมูล...</p>
+        </div>
+    </div>
+
+    <header class="pink-grad text-white px-6 py-6 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo">
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)</h1>
+                    <p class="text-[10px] opacity-80">ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p id="u-fname" class="text-xs font-bold leading-none"></p>
+                    <p id="u-type-name" class="text-[9px] opacity-70 mt-1"></p>
+                </div>
+                <button onclick="logout()" class="bg-white/20 p-2 rounded-xl hover:bg-white/30 transition">🚪</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white/90 backdrop-blur-md sticky top-[88px] z-40 border-b border-pink-100 flex max-w-4xl mx-auto shadow-sm">
+        <button onclick="switchTab(1)" id="t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600">DASHBOARD</button>
+        <button onclick="switchTab(2)" id="t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">MY JOBS</button>
+        <button onclick="switchTab(3)" id="t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">LINK</button>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-4">
+        <div id="tab1" class="tab-content active space-y-4">
+            <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-pink-50"><p class="text-[9px] text-slate-400 font-bold uppercase">New</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-pink-50"><p class="text-[9px] text-slate-400 font-bold uppercase">Doing</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-pink-50"><p class="text-[9px] text-slate-400 font-bold uppercase">Spare</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-pink-50"><p class="text-[9px] text-slate-400 font-bold uppercase">Done</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
+            </div>
+            <div id="job-list-dashboard" class="space-y-3 pt-2"></div>
+        </div>
+        
+        <div id="tab2" class="tab-content">
+            <div id="job-list-myjob" class="space-y-3"></div>
+        </div>
+        
+        <div id="tab3" class="tab-content grid grid-cols-2 gap-4"></div>
+    </main>
+
+    <div id="modal-transfer" class="overlay">
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl">
+            <h3 class="font-bold text-pink-600 mb-4 flex items-center gap-2">🔄 โอน/มอบหมายงาน</h3>
+            <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl mb-3 text-sm border-none outline-pink-500"></select>
+            <textarea id="transfer-reason" placeholder="ระบุเหตุผลการโอนงาน..." class="w-full p-3 bg-slate-50 rounded-xl mb-3 text-sm h-24 border-none outline-pink-500"></textarea>
+            <button id="btn-confirm-transfer" class="w-full py-3 pink-grad text-white rounded-xl font-bold shadow-lg">ยืนยันการดำเนินการ</button>
+            <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 text-xs font-bold">ยกเลิก</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
+        let store = { AllJobs: [], StaffList: [], SystemLink: [] };
+        
+        const session = localStorage.getItem("it_session");
+        if (!session) { window.location.href = "login.html"; }
+        const currentUser = JSON.parse(session);
+
+        const toggleLoader = (show) => {
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = show ? 'flex' : 'none';
+        };
+
+        async function loadInitialData() {
+            toggleLoader(true);
+            try {
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'getInitialData', data: { userName: currentUser.UserName } }) 
+                });
+                const result = await res.json();
+                if (result.success) {
+                    store = result;
+                    renderDashboard();
+                    renderMyJobs();
+                    renderLinks();
+                }
+            } catch (e) { console.error("Error:", e); }
+            finally { toggleLoader(false); }
+        }
+
+        function renderDashboard() {
+            const jobs = store.AllJobs || [];
+            const counts = { 'count-wait':'รอรับงาน', 'count-doing':'กำลังดำเนินการ', 'count-spare':'รออะไหล่', 'count-done':'เสร็จสิ้น' };
+            Object.keys(counts).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = jobs.filter(j => j.Status === counts[id]).length;
+            });
+
+            const list = document.getElementById('job-list-dashboard');
+            if (!list) return;
+
+            list.innerHTML = jobs.map(j => `
+                <div class="card-pro border-l-4 ${j.Status === 'รอรับงาน' ? 'border-pink-500' : 'border-slate-200'}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="text-[10px] text-slate-400 font-bold">${j.JobID}</p>
+                            <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                            <p class="text-[10px] text-pink-600 mt-1">🏢 ${j.Department}</p>
+                        </div>
+                        <div class="text-right flex flex-col items-end gap-2">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded bg-slate-50 text-slate-500 border border-slate-100">${j.Status}</span>
+                            ${j.Status === 'รอรับงาน' && (currentUser.UserTypeID === 'IT' || currentUser.UserTypeID === 'Admin') ? 
+                                `<button onclick="handleAction('${j.JobID}', 'accept')" class="bg-pink-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">รับงาน</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMyJobs() {
+            const myJobs = (store.AllJobs || []).filter(j => j.Owner === currentUser.UserName);
+            const list = document.getElementById('job-list-myjob');
+            if (!list) return;
+
+            list.innerHTML = myJobs.length ? myJobs.map(j => `
+                <div class="card-pro border-l-4 border-blue-500">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold">${j.JobID}</p>
+                            <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                        </div>
+                        <button onclick="openTransferModal('${j.JobID}')" class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-[10px] font-bold">โอนงาน</button>
+                    </div>
+                </div>
+            `).join('') : '<div class="text-center py-10"><p class="text-xs text-slate-400 italic">ไม่มีงานในความรับผิดชอบ</p></div>';
+        }
+
+        function renderLinks() {
+            const list = document.getElementById('tab3');
+            if (!list) return;
+            list.innerHTML = (store.SystemLink || []).map(l => `
+                <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition">
+                    <span class="text-2xl">${l.Linkicon || '🔗'}</span>
+                    <span class="font-bold text-slate-700 text-xs">${l.SystemName || l.Name}</span>
+                </a>
+            `).join('');
+        }
+
+        async function handleAction(jobId, type, extra = {}) {
+            toggleLoader(true);
+            try {
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'updateJobStatus', data: { JobID: jobId, type: type, Owner: currentUser.UserName, ...extra } }) 
+                });
+                const result = await res.json();
+                if (result.success) {
+                    closeModal('modal-transfer');
+                    await loadInitialData();
+                }
+            } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึก"); }
+            finally { toggleLoader(false); }
+        }
+
+        function openTransferModal(jobId) {
+            const select = document.getElementById('select-staff');
+            if (select && store.StaffList) {
+                select.innerHTML = store.StaffList.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            }
+            document.getElementById('modal-transfer').style.display = 'flex';
+            document.getElementById('btn-confirm-transfer').onclick = () => {
+                const reason = document.getElementById('transfer-reason').value;
+                if (!reason) return alert("กรุณาระบุเหตุผล");
+                handleAction(jobId, 'transfer', { NewOwner: select.value, Reason: reason });
+            };
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab' + n).classList.add('active');
+            document.querySelectorAll('nav button').forEach((b, i) => {
+                const isActive = (i + 1 === n);
+                b.classList.toggle('text-pink-600', isActive);
+                b.classList.toggle('border-pink-600', isActive);
+                b.classList.toggle('text-slate-400', !isActive);
+                b.classList.toggle('border-transparent', !isActive);
+            });
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { localStorage.removeItem("it_session"); window.location.href = "login.html"; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameEl = document.getElementById('u-fname');
+            const typeEl = document.getElementById('u-type-name');
+            if(nameEl) nameEl.innerText = currentUser.UserName || "User";
+            if(typeEl) typeEl.innerText = currentUser.UserTypeName || "Staff";
+            loadInitialData();
+        });
+    </script>
+</body>
+</html>

@@ -150,6 +150,29 @@
             </div>
         </div>
     </div>
+    <div id="modal-logout" class="overlay">
+    <div class="bg-white rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl relative overflow-hidden">
+        <div id="logout-alert" class="inner-alert">
+            <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse">
+                <span class="text-3xl">👋</span>
+            </div>
+            <p class="text-pink-600 font-bold">ออกจากระบบสำเร็จ</p>
+        </div>
+
+        <div class="p-8 text-center">
+            <div class="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-4xl">🚪</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ยืนยันการออกจากระบบ?</h3>
+            <p class="text-xs text-slate-400 mb-8">คุณต้องการออกจากระบบ IT Management ใช่หรือไม่?</p>
+            
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-logout')" class="flex-1 py-3 text-slate-400 font-bold text-sm bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all">ยกเลิก</button>
+                <button onclick="confirmLogout()" class="flex-1 py-3 pink-grad text-white rounded-2xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
@@ -464,7 +487,23 @@ function openTransfer(jobId) {
 
         function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { if (confirm("ออกจากระบบ?")) { localStorage.clear(); window.location.replace("./login.html"); } }
+      // ฟังก์ชันเรียกเปิด Modal ยืนยัน Logout
+function logout() {
+    document.getElementById('modal-logout').style.display = 'flex';
+}
+
+// ฟังก์ชันดำเนินการ Logout จริง
+async function confirmLogout() {
+    // แสดง Inner Alert ภายใน Modal
+    const alertDiv = document.getElementById('logout-alert');
+    alertDiv.style.display = 'flex';
+    
+    // หน่วงเวลาเพื่อให้ผู้ใช้เห็น Alert แป๊บนึง (เหมือนหน้า Login)
+    setTimeout(() => {
+        localStorage.clear();
+        window.location.replace("./login.html");
+    }, 1500);
+}
         
         document.addEventListener('DOMContentLoaded', initApp);
     </script>

@@ -268,7 +268,7 @@
                 // Tab 1: Dashboard - แสดงเฉพาะปุ่ม รับงาน/มอบหมาย เมื่อสถานะว่าง
                 if (status === 'รอรับงาน') {
                     if (role === 'IT') {
-                        btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงานเข้าเครื่องฉัน</button>`;
+                        btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงาน</button>`;
                     } else if (role === 'BOSS') {
                         btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงานให้เจ้าหน้าที่</button>`;
                     }

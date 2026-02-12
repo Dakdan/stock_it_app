@@ -240,7 +240,14 @@
 
         function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { localStorage.clear(); window.location.replace("./login.html"); }
+       function logout() {
+    // แสดงยืนยันก่อนออก (ป้องกันมือไปโดน)
+    if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+        localStorage.clear(); 
+        alert("ออกจากระบบเรียบร้อยแล้ว"); // แสดง Modal Alert
+        window.location.replace("./login.html");
+    }
+}
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>

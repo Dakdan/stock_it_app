@@ -200,27 +200,36 @@
         await loadData();
     }
 
-    async function loadData() {
-        showLoading(true);
-        try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ 
-                    action: 'getInitialData', 
-                    data: { userName: currentUser.UserName, USERID: currentUser.USERID } 
-                }) 
-            });
-            const result = await res.json();
-            if (result.success) {
-                store = result;
-                renderDashboard();
-                renderMyJobs();
-                renderITTicketList();
-                renderSystemLinks();
-            }
-        } catch (e) { console.error("Data error", e); }
-        showLoading(false);
+   async function loadData() {
+    showLoading(true);
+    try {
+        const res = await fetch(API_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ 
+                action: 'getInitialData', 
+                data: { userName: currentUser.UserName, USERID: currentUser.USERID } 
+            }) 
+        });
+
+        // ตรวจสอบว่า Response โอเคไหมก่อนแปลงเป็น JSON
+        if (!res.ok) throw new Error('Network response was not ok');
+
+        const result = await res.json();
+        if (result.success) {
+            store = result;
+            renderDashboard();
+            renderMyJobs();
+            renderITTicketList();
+            renderSystemLinks();
+        }
+    } catch (e) { 
+        console.error("Data error:", e);
+        //alert("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+        // บรรทัดนี้สำคัญมาก! ไม่ว่าจะสำเร็จหรือพัง ต้องปิด Loader เสมอ
+        showLoading(false); 
     }
+}
 
     // --- แก้ไขฟังก์ชันกำหนดสีให้สมบูรณ์ ---
     function getStatusColor(status) {
@@ -334,45 +343,28 @@
         }
     }
 async function handleJobUI(jobId, type, extra = {}) {
-    // 1. ปิด Modal ทั้งหมดที่มีอยู่ทันที
     closeModal('modal-detail');
-    closeModal('modal-transfer');
-    
-    // 2. แสดง Loader หมุนๆ กลางจอหลัก
+    closeModal('modal-close-job'); // ปิดหน้าบันทึกซ่อมด้วย
     showLoading(true);
-
-    const data = { 
-        JobID: jobId, 
-        type: type, 
-        Owner: currentUser.USERID, 
-        By: currentUser.UserName, 
-        ...extra 
-    }; 
 
     try {
         const res = await fetch(API_URL, { 
             method: 'POST', 
-            body: JSON.stringify({ action: 'updateJobStatus', data: data }) 
+            body: JSON.stringify({ action: 'updateJobStatus', data: { JobID: jobId, type: type, ...extra } }) 
         });
         const result = await res.json();
         
         if (result.success) { 
-            showLoading(false); // ปิดตัวหมุน
-            
-            // 3. แสดงแจ้งเตือนสำเร็จแบบเต็มจอ
+            // ไม่ต้องรีบปิดโหลดที่นี่ ให้รอ loadData เสร็จก่อน
+            await loadData(); 
             document.getElementById('success-text').innerText = "ดำเนินการสำเร็จ!";
             document.getElementById('modal-success').style.display = 'flex';
-            
-            // 4. โหลดข้อมูลใหม่ และปิดแจ้งเตือนหลังจาก 1.5 วินาที
-            await loadData(); 
             setTimeout(() => { closeModal('modal-success'); }, 1500);
-        } else {
-            showLoading(false);
-            alert("ผิดพลาด: " + result.message);
         }
     } catch (e) { 
-        showLoading(false);
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ"); 
+        alert("เกิดข้อผิดพลาด"); 
+    } finally {
+        showLoading(false); // ปิดตัวหมุนแน่นอน
     }
 }
     // --- คงฟังก์ชัน viewJobDetail และอื่นๆ ไว้ตามเดิมของคุณ ---

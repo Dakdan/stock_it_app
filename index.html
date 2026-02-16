@@ -195,23 +195,43 @@
             showLoading(false);
         }
 
-        function renderDashboard() {
+       function renderDashboard() {
             const jobs = store.AllJobs || [];
             updateStats(jobs);
-            document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${j.Status === 'รอรับงาน' ? 'border-pink-500 status-pulse' : 'border-slate-200'} mb-3">
+            document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
+                // กำหนดตัวแปรสำหรับสีเงาและสีขอบตามสถานะ
+                let shadowClass = "shadow-sm"; // ค่าเริ่มต้น
+                let borderClass = "border-slate-200";
+
+                if (j.Status === 'รอรับงาน') {
+                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.3)]"; // เงาสีชมพู
+                    borderClass = "border-pink-500 status-pulse";
+                } else if (j.Status === 'กำลังดำเนินการ') {
+                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]"; // เงาสีฟ้า
+                    borderClass = "border-blue-500";
+                } else if (j.Status === 'เสร็จสิ้น') {
+                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]"; // เงาสีเขียว
+                    borderClass = "border-green-500";
+                } else if (j.Status === 'รออะไหล่') {
+                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(251,146,60,0.2)]"; // เงาสีส้ม
+                    borderClass = "border-orange-400";
+                }
+
+                return `
+                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4 transition-all duration-300">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
-                            <p class="text-[9px] text-slate-400 font-bold uppercase">${j.JobID} | ${j.Priority}</p>
-                            <h3 class="font-bold text-slate-700 text-sm mt-0.5">${j.Problem}</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">${j.JobID} | ${j.Priority}</p>
+                            <h3 class="font-bold text-slate-700 text-sm mt-0.5 leading-snug">${j.Problem}</h3>
                             <div class="flex gap-2 mt-2">
-                                <span class="text-[9px] bg-pink-50 text-pink-600 px-2 py-0.5 rounded-full font-bold italic">🏢 ${j.Department}</span>
+                                <span class="text-[9px] bg-slate-50 text-slate-500 px-2 py-0.5 rounded-full font-bold">🏢 ${j.Department}</span>
                             </div>
                         </div>
-                        <span class="text-[9px] font-black uppercase px-2 py-1 rounded ${getStatusColor(j.Status)}">${j.Status}</span>
+                        <span class="text-[9px] font-black uppercase px-2 py-1 rounded shadow-sm ${getStatusColor(j.Status)}">${j.Status}</span>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderMyJobs() {

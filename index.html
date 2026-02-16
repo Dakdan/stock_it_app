@@ -220,14 +220,12 @@
     document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
         const status = String(j.Status || '').trim();
         
-        // --- ส่วนที่เพิ่ม: ค้นหาชื่อผู้ดูแลจาก StaffList ---
+        // ค้นหาชื่อผู้ดูแล
         const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(j.Owner).trim());
         const ownerName = staff ? staff.name : (j.Owner && j.Owner !== "-" ? j.Owner : "ยังไม่มีผู้ดูแล");
-        // -------------------------------------------
 
         let shadowClass = "shadow-sm";
         let borderClass = "border-slate-200";
-
         if (status === 'รอรับงาน') {
             shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.35)]";
             borderClass = "border-pink-500 status-pulse";
@@ -253,7 +251,7 @@
         }
 
         return `
-            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4">
+            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4 transition-all duration-300">
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400">#${j.JobID}</span>
@@ -273,12 +271,17 @@
                     ${assetBoxHTML}
 
                     <div class="flex justify-between items-end pt-2 border-t border-slate-50 mt-2">
-                        <div class="space-y-0.5">
-                            <p class="text-[8px] text-slate-400 uppercase font-bold">ผู้ดูแลงาน</p>
-                            <p class="text-[10px] font-bold text-slate-600 italic">👤 ${ownerName}</p>
+                        <div class="space-y-1">
+                            <div class="flex flex-col">
+                                <p class="text-[8px] text-slate-400 uppercase font-bold">ผู้ดูแลงาน</p>
+                                <p class="text-[10px] font-bold text-blue-600 italic leading-tight">👤 ${ownerName}</p>
+                            </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right space-y-1">
                             <p class="text-[9px] font-bold text-slate-500">🏢 ${j.Department}</p>
+                            <p class="text-[10px] font-bold ${String(j.Priority).includes('ด่วน') ? 'text-red-500' : 'text-orange-500'}">
+                                ⚠️ ${j.Priority}
+                            </p>
                         </div>
                     </div>
                 </div>

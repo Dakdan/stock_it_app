@@ -356,23 +356,26 @@ async function handleJobUI(jobId, type, extra = {}) {
     }
 }
     // --- คงฟังก์ชัน viewJobDetail และอื่นๆ ไว้ตามเดิมของคุณ ---
-   function viewJobDetail(jobId) {
+  function viewJobDetail(jobId) {
     const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
     if (!job) return;
 
-    // ประกาศตัวแปรสำคัญไว้ด้านบนสุด
+    // --- 1. ประกาศตัวแปรที่จำเป็น (รวมเบอร์โทรศัพท์) ---
     const status = String(job.Status || '').trim();
     const role = String(currentUser.UserTypeID).toUpperCase().trim();
     const isOwner = String(job.Owner).trim() === String(currentUser.USERID).trim();
     
+    // ดึงเบอร์โทรจาก job (ตรวจสอบชื่อ Field ใน Sheet ของคุณว่าใช้ Phone หรือ Tel)
+    const phoneNumber = job.Phone || job.Tel || '-'; 
+    // ----------------------------------------------
+
     const content = document.getElementById('detail-content');
     const actions = document.getElementById('detail-actions');
 
-    // ค้นหาชื่อพนักงาน
     const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(job.Owner).trim());
     const ownerDisplayName = staff ? staff.name : (job.Owner || 'ยังไม่มี');
 
-    // ข้อมูลครุภัณฑ์
+    // ส่วนของ Asset (คงเดิม)
     let assetHTML = '';
     if (job.AssetCode && job.AssetCode !== "" && job.AssetCode !== "-") {
         const asset = (store.BackupData || []).find(a => String(a.NOID) === String(job.AssetCode));
@@ -388,6 +391,7 @@ async function handleJobUI(jobId, type, extra = {}) {
         }
     }
 
+    // --- 2. อัปเดต HTML (เพิ่มส่วนเบอร์โทรศัพท์เข้าไป) ---
     content.innerHTML = `
     <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
         <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
@@ -402,14 +406,16 @@ async function handleJobUI(jobId, type, extra = {}) {
             <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">📞 เบอร์โทรศัพท์ติดต่อ</p>
             <p class="font-bold text-blue-600 text-sm">${phoneNumber}</p>
         </div>
+
         <div class="col-span-2 border-t pt-2 mt-2">
             <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">สถานะปัจจุบัน</p>
             <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
         </div>
         <div class="col-span-2 pt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${ownerDisplayName}</p></div>
     </div>`;
-     
-    // ปุ่มกด Action
+
+    // ส่วนของปุ่ม Action (คงเดิม)
+    // ... โค้ดปุ่ม btns เดิมของคุณ ...
     let btns = '';
     if (currentTab === 1) { 
         if (status === 'รอรับงาน') {

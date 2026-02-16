@@ -500,22 +500,29 @@ function renderSystemLinks() {
     const tab3Container = document.getElementById('tab3');
     if (!tab3Container) return;
 
-    // เงื่อนไข: ถ้า currentTab ไม่ใช่ 3 ให้ซ่อน container และหยุดทำงานทันที
+    // ถ้าไม่ใช่ Tab 3 ให้ล้างข้อมูลและซ่อนทันที
     if (currentTab !== 3) {
+        tab3Container.innerHTML = ''; 
         tab3Container.style.display = 'none';
         return;
     }
 
-    // ถ้าเป็น Tab 3 ให้แสดงผล (ใช้ grid เพื่อความสวยงาม)
     tab3Container.style.display = 'grid';
+    const links = store.SystemLink || [];
+    
+    if (links.length === 0) {
+        tab3Container.innerHTML = '<div class="col-span-full text-center p-10 text-slate-400 italic text-sm">ไม่มีข้อมูลลิงก์ระบบ</div>';
+        return;
+    }
 
-    tab3Container.innerHTML = (store.SystemLink || [])
-        .filter(l => String(l.Active).toUpperCase() === "TRUE") // กรองเฉพาะที่ Active เป็น TRUE
+    tab3Container.innerHTML = links
+        .filter(l => String(l.Active).toUpperCase() === "TRUE")
         .map(l => `
             <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all active:scale-95">
                 <span class="text-2xl">${l.Linkicon || '🔗'}</span>
                 <div class="flex flex-col">
                     <span class="font-bold text-slate-700 text-sm">${l.Name || 'ไม่ระบุชื่อ'}</span>
+                    <p class="text-[9px] text-slate-400 truncate w-40">${l.URL}</p>
                 </div>
             </a>
         `).join('');
@@ -530,17 +537,22 @@ function renderSystemLinks() {
     }
 
     function switchTab(n) {
-        currentTab = n; 
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById('tab' + n).classList.add('active');
-        document.querySelectorAll('nav button').forEach((b, i) => { 
-            const isActive = (i + 1 === n);
-            b.classList.toggle('text-pink-600', isActive);
-            b.classList.toggle('border-pink-600', isActive);
-            b.classList.toggle('text-slate-400', !isActive);
-            b.classList.toggle('border-transparent', !isActive);
-        });
-    }
+    currentTab = n; 
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab' + n).classList.add('active');
+    
+    // อัปเดตสีปุ่ม Navbar
+    document.querySelectorAll('nav button').forEach((b, i) => { 
+        const isActive = (i + 1 === n);
+        b.classList.toggle('text-pink-600', isActive);
+        b.classList.toggle('border-pink-600', isActive);
+        b.classList.toggle('text-slate-400', !isActive);
+        b.classList.toggle('border-transparent', !isActive);
+    });
+
+    // เพิ่มบรรทัดนี้: เพื่อให้ Tab 3 เช็คตัวเองว่าควรแสดงหรือซ่อน
+    renderSystemLinks(); 
+}
 
     function showInnerAlert(modalId, text) {
         const alertDiv = document.querySelector(`#${modalId} .inner-alert`);

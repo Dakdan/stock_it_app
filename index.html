@@ -496,23 +496,28 @@ function openTransfer(jobId) {
             </div>`).join('');
     }
 
-  function renderSystemLinks() {
-    const tab3Container = document.getElementById('tab3');
-    if (!tab3Container) return;
+ function renderSystemLinks() {
+    const container = document.getElementById('tab3');
+    if (!container) return;
 
-    // ตรวจสอบเงื่อนไข: ให้ทำงานและแสดงผลเฉพาะเมื่อ currentTab เท่ากับ 3 เท่านั้น
-    if (currentTab === 3) {
-        tab3Container.style.display = 'grid'; // หรือ 'block' ตาม CSS ของคุณ
-        tab3Container.innerHTML = (store.SystemLink || []).map(l => `
-            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50">
-                <span class="text-2xl">${l.Linkicon || '🔗'}</span>
-                <span class="font-bold text-slate-700 text-sm">${l.SystemName || l.Name}</span>
-            </a>`).join('');
-    } else {
-        // ถ้าไม่ใช่หน้า Tab 3 ให้ล้างข้อมูลออก หรือสั่งซ่อนไว้
-        tab3Container.style.display = 'none';
-        tab3Container.innerHTML = ''; 
+    // ตรวจสอบว่าถ้าหน้าปัจจุบันไม่ใช่ Tab 3 ให้ซ่อน container และหยุดทำงาน
+    if (currentTab !== 3) {
+        container.style.display = 'none';
+        return;
     }
+
+    // ถ้าเป็น Tab 3 ให้แสดง container (เลือกใช้ grid หรือ block ตามดีไซน์)
+    container.style.display = 'grid'; 
+
+    // แสดงผลข้อมูล โดยใช้คอลัมน์ NameURL และ Linkicon ตามที่ระบุ
+    container.innerHTML = (store.SystemLink || [])
+        .filter(l => l.Active === "TRUE" || l.Active === true) // แสดงเฉพาะที่ Active
+        .map(l => `
+            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all">
+                <span class="text-2xl">${l.Linkicon || '🔗'}</span>
+                <span class="font-bold text-slate-700 text-sm">${l.NameURL || 'ไม่มีชื่อระบบ'}</span>
+            </a>
+        `).join('');
 }
     function updateStats(jobs) {
         const getCount = (s) => jobs.filter(j => String(j.Status).trim() === s).length;

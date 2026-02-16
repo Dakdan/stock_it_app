@@ -194,73 +194,68 @@
             } catch (e) { console.error("Data error"); }
             showLoading(false);
         }
+       function getStatusColor(status) {
+    const s = String(status).trim();
+    // คืนค่า class ของ Tailwind ตามสถานะ
+    if (s === 'รอรับงาน') return "text-pink-600 bg-pink-50 border border-pink-200";
+    if (s === 'กำลังดำเนินการ') return "text-blue-600 bg-blue-50 border border-blue-200";
+    if (s === 'รออะไหล่') return "text-orange-600 bg-orange-50 border border-orange-200";
+    if (s === 'เสร็จสิ้น') return "text-green-600 bg-green-50 border border-green-200";
+    if (s === 'ยกเลิก') return "text-slate-400 bg-slate-50 border border-slate-200";
+    return "text-slate-500 bg-slate-100";
 
       function renderDashboard() {
-            const jobs = store.AllJobs || [];
-            updateStats(jobs);
-            document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
-                // ใช้ .trim() เพื่อป้องกันปัญหาช่องว่างในข้อความสถานะ
-                const status = String(j.Status).trim();
-                
-                let shadowClass = "shadow-sm"; 
-                let borderClass = "border-slate-200";
+    const jobs = store.AllJobs || [];
+    updateStats(jobs);
+    document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
+        const status = String(j.Status).trim();
+        let shadowClass = "shadow-sm";
+        
+        // กำหนดเงาตามสถานะ
+        if (status === 'รอรับงาน') shadowClass = "shadow-[0_8px_15px_-3px_rgba(219,39,119,0.3)]";
+        else if (status === 'กำลังดำเนินการ') shadowClass = "shadow-[0_8px_15px_-3px_rgba(59,130,246,0.3)]";
+        else if (status === 'เสร็จสิ้น') shadowClass = "shadow-[0_8px_15px_-3px_rgba(34,197,94,0.2)]";
 
-                // ตรวจสอบเงื่อนไขสถานะเพื่อกำหนดสี
-                if (status === 'รอรับงาน') {
-                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.4)]"; // เงาสีชมพูเข้มขึ้น
-                    borderClass = "border-pink-500 status-pulse"; // เพิ่มแอนิเมชันกะพริบ
-                } else if (status === 'กำลังดำเนินการ') {
-                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]"; // เงาสีฟ้า
-                    borderClass = "border-blue-500";
-                } else if (status === 'รออะไหล่') {
-                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(251,146,60,0.3)]"; // เงาสีส้ม
-                    borderClass = "border-orange-400";
-                } else if (status === 'เสร็จสิ้น') {
-                    shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]"; // เงาสีเขียว
-                    borderClass = "border-green-500";
-                }
-
-                return `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4 transition-all duration-300">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">${j.JobID} | ${j.Priority}</p>
-                            <h3 class="font-bold text-slate-700 text-sm mt-0.5 leading-snug">${j.Problem}</h3>
-                            <div class="flex gap-2 mt-2">
-                                <span class="text-[9px] bg-slate-50 text-slate-500 px-2 py-0.5 rounded-full font-bold">🏢 ${j.Department}</span>
-                            </div>
-                        </div>
-                        <span class="text-[9px] font-black uppercase px-2 py-1 rounded shadow-sm ${getStatusColor(status)}">${status}</span>
+        return `
+            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${status === 'รอรับงาน' ? 'border-pink-500 status-pulse' : 'border-slate-200'} ${shadowClass} mb-3">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">${j.JobID}</p>
+                        <h3 class="font-bold text-slate-700 text-sm mt-0.5">${j.Problem}</h3>
+                        <p class="text-[9px] mt-2 italic text-slate-500">🏢 ${j.Department}</p>
                     </div>
+                    <span class="text-[10px] font-black uppercase px-2 py-1 rounded-lg ${getStatusColor(status)}">
+                        ${status}
+                    </span>
                 </div>
-                `;
-            }).join('');
-        }
-
-        function renderMyJobs() {
-            const myJobs = store.AllJobs.filter(j => 
-                String(j.Owner).trim() === String(currentUser.USERID).trim() && 
-                j.Status === 'กำลังดำเนินการ'
-            );
-            
-            const container = document.getElementById('job-list-myjob');
-            if (myJobs.length > 0) {
-                container.innerHTML = myJobs.map(j => `
-                    <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 border-blue-500 mb-3 shadow-sm">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <p class="text-[9px] text-slate-400 font-bold">${j.JobID}</p>
-                                <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
-                                <p class="text-[9px] text-blue-500 mt-1 font-bold">📍 ${j.Department}</p>
-                            </div>
-                            <span class="text-[9px] text-blue-500 bg-blue-50 px-2 py-1 rounded font-bold status-pulse uppercase">Doing</span>
-                        </div>
+            </div>`;
+    }).join('');
+}
+       function renderMyJobs() {
+    const myJobs = store.AllJobs.filter(j => 
+        String(j.Owner).trim() === String(currentUser.USERID).trim() && 
+        j.Status === 'กำลังดำเนินการ'
+    );
+    
+    const container = document.getElementById('job-list-myjob');
+    if (myJobs.length > 0) {
+        container.innerHTML = myJobs.map(j => `
+            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 border-blue-500 mb-3 shadow-[0_8px_15px_-3px_rgba(59,130,246,0.2)]">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <p class="text-[9px] text-slate-400 font-bold">${j.JobID}</p>
+                        <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                        <p class="text-[9px] text-blue-500 mt-1 font-bold">📍 ${j.Department}</p>
                     </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<div class="p-8 text-center opacity-40 italic text-xs bg-white rounded-2xl border-dashed border border-slate-200">ไม่มีงานที่กำลังดำเนินการของคุณ</div>';
-            }
-        }
+                    <span class="text-[10px] font-bold px-2 py-1 rounded-lg ${getStatusColor(j.Status)} uppercase">
+                        ${j.Status}
+                    </span>
+                </div>
+            </div>`).join('');
+    } else {
+        container.innerHTML = '<div class="p-8 text-center opacity-40 italic text-xs bg-white rounded-2xl border-dashed border border-slate-200">ไม่มีงานที่กำลังดำเนินการของคุณ</div>';
+    }
+}
 
         // --- ส่วนที่ปรับปรุง: แสดงข้อมูลครุภัณฑ์จาก BackupData ---
        // --- ส่วนที่ปรับปรุง: ให้ AssetCode จับคู่กับ NOID ใน BackupData ---

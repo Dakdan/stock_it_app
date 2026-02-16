@@ -496,17 +496,22 @@ function openTransfer(jobId) {
             </div>`).join('');
     }
 
-   function renderSystemLinks() {
+  function renderSystemLinks() {
     const tab3Container = document.getElementById('tab3');
-    
-    // ตรวจสอบว่ามี Element tab3 อยู่จริง และมีข้อมูลใน store
-    if (tab3Container) {
+    if (!tab3Container) return;
+
+    // ตรวจสอบเงื่อนไข: ให้ทำงานและแสดงผลเฉพาะเมื่อ currentTab เท่ากับ 3 เท่านั้น
+    if (currentTab === 3) {
+        tab3Container.style.display = 'grid'; // หรือ 'block' ตาม CSS ของคุณ
         tab3Container.innerHTML = (store.SystemLink || []).map(l => `
-            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all active:scale-95">
+            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50">
                 <span class="text-2xl">${l.Linkicon || '🔗'}</span>
                 <span class="font-bold text-slate-700 text-sm">${l.SystemName || l.Name}</span>
-            </a>
-        `).join('');
+            </a>`).join('');
+    } else {
+        // ถ้าไม่ใช่หน้า Tab 3 ให้ล้างข้อมูลออก หรือสั่งซ่อนไว้
+        tab3Container.style.display = 'none';
+        tab3Container.innerHTML = ''; 
     }
 }
     function updateStats(jobs) {

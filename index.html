@@ -496,26 +496,27 @@ function openTransfer(jobId) {
             </div>`).join('');
     }
 
- function renderSystemLinks() {
-    const container = document.getElementById('tab3');
-    if (!container) return;
+function renderSystemLinks() {
+    const tab3Container = document.getElementById('tab3');
+    if (!tab3Container) return;
 
-    // ตรวจสอบว่าถ้าหน้าปัจจุบันไม่ใช่ Tab 3 ให้ซ่อน container และหยุดทำงาน
+    // เงื่อนไข: ถ้า currentTab ไม่ใช่ 3 ให้ซ่อน container และหยุดทำงานทันที
     if (currentTab !== 3) {
-        container.style.display = 'none';
+        tab3Container.style.display = 'none';
         return;
     }
 
-    // ถ้าเป็น Tab 3 ให้แสดง container (เลือกใช้ grid หรือ block ตามดีไซน์)
-    container.style.display = 'grid'; 
+    // ถ้าเป็น Tab 3 ให้แสดงผล (ใช้ grid เพื่อความสวยงาม)
+    tab3Container.style.display = 'grid';
 
-    // แสดงผลข้อมูล โดยใช้คอลัมน์ NameURL และ Linkicon ตามที่ระบุ
-    container.innerHTML = (store.SystemLink || [])
-        .filter(l => l.Active === "TRUE" || l.Active === true) // แสดงเฉพาะที่ Active
+    tab3Container.innerHTML = (store.SystemLink || [])
+        .filter(l => String(l.Active).toUpperCase() === "TRUE") // กรองเฉพาะที่ Active เป็น TRUE
         .map(l => `
-            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all">
+            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all active:scale-95">
                 <span class="text-2xl">${l.Linkicon || '🔗'}</span>
-                <span class="font-bold text-slate-700 text-sm">${l.NameURL || 'ไม่มีชื่อระบบ'}</span>
+                <div class="flex flex-col">
+                    <span class="font-bold text-slate-700 text-sm">${l.Name || 'ไม่ระบุชื่อ'}</span>
+                </div>
             </a>
         `).join('');
 }

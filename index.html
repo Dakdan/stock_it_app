@@ -389,21 +389,26 @@ async function handleJobUI(jobId, type, extra = {}) {
     }
 
     content.innerHTML = `
-        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
-            <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
+    <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+        <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
+        <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
+    </div>
+    ${assetHTML}
+    <div class="grid grid-cols-2 gap-4 px-1 mt-4">
+        <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
+        <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
+        
+        <div class="col-span-2 border-t pt-2">
+            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">📞 เบอร์โทรศัพท์ติดต่อ</p>
+            <p class="font-bold text-blue-600 text-sm">${phoneNumber}</p>
         </div>
-        ${assetHTML}
-        <div class="grid grid-cols-2 gap-4 px-1 mt-4">
-            <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
-            <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
-            <div class="col-span-2 border-t pt-2 mt-2">
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">สถานะปัจจุบัน</p>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
-            </div>
-            <div class="col-span-2 pt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${ownerDisplayName}</p></div>
-        </div>`;
-
+        <div class="col-span-2 border-t pt-2 mt-2">
+            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">สถานะปัจจุบัน</p>
+            <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
+        </div>
+        <div class="col-span-2 pt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${ownerDisplayName}</p></div>
+    </div>`;
+     
     // ปุ่มกด Action
     let btns = '';
     if (currentTab === 1) { 

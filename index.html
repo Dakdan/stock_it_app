@@ -156,7 +156,15 @@
             </div>
         </div>
     </div>
-
+    <div id="modal-success" class="overlay">
+    <div class="bg-white rounded-[2rem] p-8 text-center shadow-2xl mx-4">
+        <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 status-pulse">
+            <span class="text-4xl">✅</span>
+        </div>
+        <h3 id="success-text" class="text-xl font-bold text-slate-800">ดำเนินการสำเร็จ</h3>
+        <p class="text-slate-400 text-xs mt-2">ระบบบันทึกข้อมูลเรียบร้อยแล้ว</p>
+    </div>
+    </div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
     let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [], BackupData: [], JobSubTypeMaster: [], };
@@ -300,7 +308,13 @@
         }
     }
 async function handleJobUI(jobId, type, extra = {}) {
+    // 1. ปิด Modal ทั้งหมดที่มีอยู่ทันที
+    closeModal('modal-detail');
+    closeModal('modal-transfer');
+    
+    // 2. แสดง Loader หมุนๆ กลางจอหลัก
     showLoading(true);
+
     const data = { 
         JobID: jobId, 
         type: type, 
@@ -308,6 +322,7 @@ async function handleJobUI(jobId, type, extra = {}) {
         By: currentUser.UserName, 
         ...extra 
     }; 
+
     try {
         const res = await fetch(API_URL, { 
             method: 'POST', 
@@ -316,18 +331,23 @@ async function handleJobUI(jobId, type, extra = {}) {
         const result = await res.json();
         
         if (result.success) { 
-            // ✅ แสดงแจ้งเตือนบนหน้า Detail (ให้หน้า Detail ยังคงเปิดอยู่)
-            showInnerAlert('modal-detail', 'ดำเนินการสำเร็จ!'); 
+            showLoading(false); // ปิดตัวหมุน
             
-            // รอให้ข้อมูลใน Store อัปเดต แล้ววาดหน้าจอใหม่ใต้ Modal
+            // 3. แสดงแจ้งเตือนสำเร็จแบบเต็มจอ
+            document.getElementById('success-text').innerText = "ดำเนินการสำเร็จ!";
+            document.getElementById('modal-success').style.display = 'flex';
+            
+            // 4. โหลดข้อมูลใหม่ และปิดแจ้งเตือนหลังจาก 1.5 วินาที
             await loadData(); 
+            setTimeout(() => { closeModal('modal-success'); }, 1500);
         } else {
+            showLoading(false);
             alert("ผิดพลาด: " + result.message);
         }
     } catch (e) { 
+        showLoading(false);
         alert("เกิดข้อผิดพลาดในการเชื่อมต่อ"); 
     }
-    showLoading(false);
 }
     // --- คงฟังก์ชัน viewJobDetail และอื่นๆ ไว้ตามเดิมของคุณ ---
    function viewJobDetail(jobId) {

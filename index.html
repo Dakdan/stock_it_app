@@ -206,52 +206,74 @@
         return "text-slate-500 bg-slate-100 border border-slate-200";
     }
 
-    function renderDashboard() {
-        const jobs = store.AllJobs || [];
-        updateStats(jobs);
+   function renderDashboard() {
+    const jobs = store.AllJobs || [];
+    updateStats(jobs);
+    
+    document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
+        const status = String(j.Status || '').trim();
         
-        document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
-            const status = String(j.Status || '').trim();
+        // 1. กำหนดสีเงา (Shadow) และขอบ (Border) ตามสถานะ
+        let shadowClass = "shadow-sm";
+        let borderClass = "border-slate-200";
+
+        if (status === 'รอรับงาน') {
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.35)]"; // เงาสีชมพู
+            borderClass = "border-pink-500 status-pulse";
+        } else if (status === 'กำลังดำเนินการ') {
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]"; // เงาสีฟ้า
+            borderClass = "border-blue-500";
+        } else if (status === 'รออะไหล่') {
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(251,146,60,0.3)]"; // เงาสีส้ม
+            borderClass = "border-orange-400";
+        } else if (status === 'เสร็จสิ้น') {
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]"; // เงาสีเขียว
+            borderClass = "border-green-500";
+        }
+
+        // 2. จัดการข้อมูลครุภัณฑ์ (แสดงเฉพาะเมื่อมี AssetCode และดึง AssetID มาโชว์)
+        const assetInfo = (store.BackupData || []).find(a => String(a.NOID) === String(j.AssetCode));
+        let assetBoxHTML = "";
+        
+        if (j.AssetCode && j.AssetCode !== "" && j.AssetCode !== "-") {
+            const displayID = assetInfo ? assetInfo.AssetID : j.AssetCode;
+            const displayName = assetInfo ? assetInfo.AssetName : "";
             
-            let shadowClass = "shadow-sm";
-            if (status === 'รอรับงาน') shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.3)]";
-            else if (status === 'กำลังดำเนินการ') shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]";
-            else if (status === 'เสร็จสิ้น') shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]";
-
-            const assetInfo = (store.BackupData || []).find(a => String(a.NOID) === String(j.AssetCode));
-            const assetName = assetInfo ? assetInfo.AssetName : (j.AssetName || "");
-
-            return `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${status === 'รอรับงาน' ? 'border-pink-500 status-pulse' : 'border-slate-200'} ${shadowClass} mb-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase">#${j.JobID}</span>
-                            <span class="text-[9px] text-slate-400 ml-2">📅 ${j.CreateDate || ''}</span>
-                        </div>
-                        <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">
-                            ${status}
-                        </span>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div>
-                            <p class="text-[10px] font-bold text-pink-500 uppercase">${j.JobType || ''}</p>
-                            <h3 class="font-bold text-slate-700 text-sm leading-snug">${j.Problem}</h3>
-                        </div>
-
-                        <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
-                            <p class="text-[9px] text-slate-500 font-bold uppercase">📦 รหัส: ${j.AssetCode || ''}</p>
-                            <p class="text-[10px] text-slate-600 truncate">${assetName}</p>
-                        </div>
-
-                        <div class="flex justify-between items-center pt-1">
-                            <span class="text-[10px] font-bold text-slate-500">🏢 ${j.Department}</span>
-                            <span class="text-[10px] font-bold ${String(j.Priority).includes('ด่วน') ? 'text-red-500' : 'text-orange-500'}">${j.Priority}</span>
-                        </div>
-                    </div>
+            assetBoxHTML = `
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 mt-2">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">📦 รหัสครุภัณฑ์: ${displayID}</p>
+                    ${displayName ? `<p class="text-[10px] text-slate-600 truncate">${displayName}</p>` : ''}
                 </div>`;
-        }).join('');
-    }
+        }
+
+        return `
+            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4 transition-all duration-300">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">#${j.JobID}</span>
+                        <span class="text-[9px] text-slate-400 ml-2">📅 ${j.CreateDate || ''}</span>
+                    </div>
+                    <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">
+                        ${status}
+                    </span>
+                </div>
+
+                <div class="space-y-2">
+                    <div>
+                        <p class="text-[10px] font-bold text-pink-500 uppercase">${j.JobType || ''}</p>
+                        <h3 class="font-bold text-slate-700 text-sm leading-snug">${j.Problem}</h3>
+                    </div>
+
+                    ${assetBoxHTML}
+
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-[10px] font-bold text-slate-500">🏢 ${j.Department}</span>
+                        <span class="text-[10px] font-bold ${String(j.Priority).includes('ด่วน') ? 'text-red-500' : 'text-orange-500'}">${j.Priority}</span>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+}
 
     function renderMyJobs() {
         const myJobs = (store.AllJobs || []).filter(j => 

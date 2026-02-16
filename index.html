@@ -301,7 +301,6 @@
     }
 async function handleJobUI(jobId, type, extra = {}) {
     showLoading(true);
-    // รวมข้อมูลที่จะส่งไปยัง Google Apps Script
     const data = { 
         JobID: jobId, 
         type: type, 
@@ -315,16 +314,18 @@ async function handleJobUI(jobId, type, extra = {}) {
             body: JSON.stringify({ action: 'updateJobStatus', data: data }) 
         });
         const result = await res.json();
+        
         if (result.success) { 
-            // แสดงแจ้งเตือนใน Modal Detail
-            showInnerAlert('modal-detail', 'ดำเนินการสำเร็จ!');
-            await loadData(); // รีโหลดข้อมูลใหม่
+            // ✅ แสดงแจ้งเตือนบนหน้า Detail (ให้หน้า Detail ยังคงเปิดอยู่)
+            showInnerAlert('modal-detail', 'ดำเนินการสำเร็จ!'); 
+            
+            // รอให้ข้อมูลใน Store อัปเดต แล้ววาดหน้าจอใหม่ใต้ Modal
+            await loadData(); 
         } else {
             alert("ผิดพลาด: " + result.message);
         }
     } catch (e) { 
-        console.error(e);
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); 
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ"); 
     }
     showLoading(false);
 }
@@ -406,24 +407,24 @@ function openTransfer(jobId) {
     
     document.getElementById('modal-transfer').style.display = 'flex';
 
-    // เมื่อกดยืนยันในหน้า Modal มอบหมาย/โอนงาน
     document.getElementById('btn-confirm-transfer').onclick = async () => {
         const newOwner = select.value;
         const reason = document.getElementById('transfer-reason').value;
 
         if(!newOwner) return alert("กรุณาเลือกเจ้าหน้าที่");
 
-        closeModal('modal-transfer'); // ปิดหน้าต่างเลือกชื่อ
+        // 1. ปิดหน้าต่างเลือกคนทันที (แต่หน้า Detail ด้านหลังยังอยู่)
+        closeModal('modal-transfer');
         
         const actionType = (role === 'BOSS') ? 'assign' : 'transfer';
         
-        // เรียกใช้ฟังก์ชันกลางเพื่อส่งข้อมูล
+        // 2. เรียก handleJobUI ซึ่งจะแสดง Loading และ Alert บนหน้า Detail
         await handleJobUI(jobId, actionType, { 
             NewOwner: newOwner, 
             Reason: reason 
         });
         
-        document.getElementById('transfer-reason').value = ""; // ล้างข้อมูล
+        document.getElementById('transfer-reason').value = "";
     };
 }
     function openITTicketForm() {

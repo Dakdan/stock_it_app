@@ -372,13 +372,41 @@
 }
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
-        document.querySelector('#modal-transfer h3').innerText = (currentUser.UserTypeID === 'Boss') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน";
+        const modalTitle = document.querySelector('#modal-transfer h3');
+        const role = String(currentUser.UserTypeID || '').toUpperCase(); // ปรับให้เป็นตัวพิมพ์ใหญ่เพื่อเช็คเงื่อนไขง่ายขึ้น
+
+        // เปลี่ยนหัวข้อตามสิทธิ์
+        modalTitle.innerText = (role === 'BOSS') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/จัดการงาน";
+        
+        // เติมรายชื่อเจ้าหน้าที่ใน Select
         select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        
         document.getElementById('modal-transfer').style.display = 'flex';
-        document.getElementById('btn-confirm-transfer').onclick = () => {
+
+        // เมื่อกดยืนยัน
+        document.getElementById('btn-confirm-transfer').onclick = async () => {
+            const newOwnerId = select.value;
             const reason = document.getElementById('transfer-reason').value;
-            handleJobUI(jobId, (currentUser.UserTypeID === 'Boss' ? 'assign' : 'transfer'), { NewOwner: select.value, Reason: reason });
+
+            if (!newOwnerId) {
+                alert("กรุณาเลือกเจ้าหน้าที่");
+                return;
+            }
+
+            // ปิด Modal มอบหมายก่อนเพื่อไม่ให้กดซ้ำ
             closeModal('modal-transfer');
+            
+            // กำหนด Action (ถ้าเป็น BOSS ใช้ 'assign' ถ้าเป็น IT ทั่วไปใช้ 'transfer')
+            const actionType = (role === 'BOSS') ? 'assign' : 'transfer';
+            
+            // เรียกใช้ฟังก์ชันส่งข้อมูล
+            await handleJobUI(jobId, actionType, { 
+                NewOwner: newOwnerId, 
+                Reason: reason 
+            });
+            
+            // ล้างค่าใน Form
+            document.getElementById('transfer-reason').value = "";
         };
     }
 

@@ -213,51 +213,50 @@
         return "text-slate-500 bg-slate-100 border border-slate-200";
     }
 
-   function renderDashboard() {
+  function renderDashboard() {
     const jobs = store.AllJobs || [];
     updateStats(jobs);
     
     document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
         const status = String(j.Status || '').trim();
         
-        // 1. กำหนดสีเงา (Shadow) และขอบ (Border) ตามสถานะ
+        // --- ส่วนที่เพิ่ม: ค้นหาชื่อผู้ดูแลจาก StaffList ---
+        const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(j.Owner).trim());
+        const ownerName = staff ? staff.name : (j.Owner && j.Owner !== "-" ? j.Owner : "ยังไม่มีผู้ดูแล");
+        // -------------------------------------------
+
         let shadowClass = "shadow-sm";
         let borderClass = "border-slate-200";
 
         if (status === 'รอรับงาน') {
-            shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.35)]"; // เงาสีชมพู
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.35)]";
             borderClass = "border-pink-500 status-pulse";
         } else if (status === 'กำลังดำเนินการ') {
-            shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]"; // เงาสีฟ้า
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]";
             borderClass = "border-blue-500";
         } else if (status === 'รออะไหล่') {
-            shadowClass = "shadow-[0_8px_20px_-5px_rgba(251,146,60,0.3)]"; // เงาสีส้ม
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(251,146,60,0.3)]";
             borderClass = "border-orange-400";
         } else if (status === 'เสร็จสิ้น') {
-            shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]"; // เงาสีเขียว
+            shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]";
             borderClass = "border-green-500";
         }
 
-        // 2. จัดการข้อมูลครุภัณฑ์ (แสดงเฉพาะเมื่อมี AssetCode และดึง AssetID มาโชว์)
         const assetInfo = (store.BackupData || []).find(a => String(a.NOID) === String(j.AssetCode));
         let assetBoxHTML = "";
-        
         if (j.AssetCode && j.AssetCode !== "" && j.AssetCode !== "-") {
             const displayID = assetInfo ? assetInfo.AssetID : j.AssetCode;
-            const displayName = assetInfo ? assetInfo.AssetName : "";
-            
             assetBoxHTML = `
                 <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 mt-2">
-                    <p class="text-[9px] text-slate-500 font-bold uppercase">📦 รหัสครุภัณฑ์: ${displayID}</p>
-                    ${displayName ? `<p class="text-[10px] text-slate-600 truncate">${displayName}</p>` : ''}
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">📦 ครุภัณฑ์: ${displayID}</p>
                 </div>`;
         }
 
         return `
-            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4 transition-all duration-300">
+            <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4">
                 <div class="flex justify-between items-start mb-3">
                     <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase">#${j.JobID}</span>
+                        <span class="text-[10px] font-bold text-slate-400">#${j.JobID}</span>
                         <span class="text-[9px] text-slate-400 ml-2">📅 ${j.CreateDate || ''}</span>
                     </div>
                     <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">
@@ -273,15 +272,19 @@
 
                     ${assetBoxHTML}
 
-                    <div class="flex justify-between items-center pt-1">
-                        <span class="text-[10px] font-bold text-slate-500">🏢 ${j.Department}</span>
-                        <span class="text-[10px] font-bold ${String(j.Priority).includes('ด่วน') ? 'text-red-500' : 'text-orange-500'}">${j.Priority}</span>
+                    <div class="flex justify-between items-end pt-2 border-t border-slate-50 mt-2">
+                        <div class="space-y-0.5">
+                            <p class="text-[8px] text-slate-400 uppercase font-bold">ผู้ดูแลงาน</p>
+                            <p class="text-[10px] font-bold text-slate-600 italic">👤 ${ownerName}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-bold text-slate-500">🏢 ${j.Department}</p>
+                        </div>
                     </div>
                 </div>
             </div>`;
     }).join('');
 }
-
     function renderMyJobs() {
         const myJobs = (store.AllJobs || []).filter(j => 
             String(j.Owner).trim() === String(currentUser.USERID).trim() && 

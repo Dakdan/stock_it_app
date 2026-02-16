@@ -28,7 +28,9 @@
             <p class="text-pink-600 font-bold text-xs text-center">กำลังโหลดข้อมูล...<br><span class="text-[9px] font-normal text-slate-400 italic">กรุณารอสักครู่</span></p>
         </div>
     </div>
+<button id="btn-confirm-transfer" class="...">ยืนยัน</button>
 
+<button id="btn-confirm-transfer" type="button" class="w-full pink-grad text-white rounded-xl font-bold py-3 shadow-lg">ยืนยันการมอบหมาย</button>
     <header class="pink-grad text-white px-6 py-6 sticky top-0 z-50 shadow-lg">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -370,45 +372,57 @@
     actions.innerHTML = btns;
     document.getElementById('modal-detail').style.display = 'flex';
 }
-    function openTransfer(jobId) {
-        const select = document.getElementById('select-staff');
-        const modalTitle = document.querySelector('#modal-transfer h3');
-        const role = String(currentUser.UserTypeID || '').toUpperCase(); // ปรับให้เป็นตัวพิมพ์ใหญ่เพื่อเช็คเงื่อนไขง่ายขึ้น
+   function openTransfer(jobId) {
+    const select = document.getElementById('select-staff');
+    const role = String(currentUser.UserTypeID || '').toUpperCase();
+    
+    document.querySelector('#modal-transfer h3').innerText = (role === 'BOSS') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน";
+    select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    
+    document.getElementById('modal-transfer').style.display = 'flex';
 
-        // เปลี่ยนหัวข้อตามสิทธิ์
-        modalTitle.innerText = (role === 'BOSS') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน/จัดการงาน";
+    document.getElementById('btn-confirm-transfer').onclick = async () => {
+        const newOwner = select.value;
+        const reason = document.getElementById('transfer-reason').value;
+
+        if(!newOwner) return alert("กรุณาเลือกเจ้าหน้าที่");
+
+        // 1. ปิด modal เลือกคนก่อน
+        closeModal('modal-transfer');
         
-        // เติมรายชื่อเจ้าหน้าที่ใน Select
-        select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-        
-        document.getElementById('modal-transfer').style.display = 'flex';
+        // 2. แสดง Loader หมุนๆ (Overlay)
+        showLoading(true);
 
-        // เมื่อกดยืนยัน
-        document.getElementById('btn-confirm-transfer').onclick = async () => {
-            const newOwnerId = select.value;
-            const reason = document.getElementById('transfer-reason').value;
-
-            if (!newOwnerId) {
-                alert("กรุณาเลือกเจ้าหน้าที่");
-                return;
-            }
-
-            // ปิด Modal มอบหมายก่อนเพื่อไม่ให้กดซ้ำ
-            closeModal('modal-transfer');
-            
-            // กำหนด Action (ถ้าเป็น BOSS ใช้ 'assign' ถ้าเป็น IT ทั่วไปใช้ 'transfer')
+        try {
             const actionType = (role === 'BOSS') ? 'assign' : 'transfer';
-            
-            // เรียกใช้ฟังก์ชันส่งข้อมูล
-            await handleJobUI(jobId, actionType, { 
-                NewOwner: newOwnerId, 
-                Reason: reason 
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'updateJobStatus',
+                    data: { 
+                        JobID: jobId, 
+                        type: actionType, 
+                        NewOwner: newOwner, 
+                        Reason: reason,
+                        By: currentUser.UserName,
+                        Owner: currentUser.USERID 
+                    }
+                })
             });
+            const result = await res.json();
             
-            // ล้างค่าใน Form
-            document.getElementById('transfer-reason').value = "";
-        };
-    }
+            if (result.success) {
+                // 3. แสดง Overlay สำเร็จ (หน้า Detail ต้องเปิดค้างไว้ถึงจะเห็น Alert นี้)
+                showInnerAlert('modal-detail', 'มอบหมายงานสำเร็จ!'); 
+                await loadData(); // โหลดข้อมูลใหม่
+            }
+        } catch (e) {
+            alert("เกิดข้อผิดพลาด: " + e.message);
+        } finally {
+            showLoading(false);
+        }
+    };
+}
 
     function openITTicketForm() {
         document.getElementById('it-job-type').innerHTML = (store.JobTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');

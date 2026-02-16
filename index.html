@@ -356,18 +356,16 @@ async function handleJobUI(jobId, type, extra = {}) {
     }
 }
     // --- คงฟังก์ชัน viewJobDetail และอื่นๆ ไว้ตามเดิมของคุณ ---
-  function viewJobDetail(jobId) {
+ function viewJobDetail(jobId) {
     const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
     if (!job) return;
 
-    // --- 1. ประกาศตัวแปรที่จำเป็น (รวมเบอร์โทรศัพท์) ---
+    // --- ประกาศตัวแปร (ใช้ชื่อคอลัมน์ phon ตามที่คุณระบุ) ---
     const status = String(job.Status || '').trim();
     const role = String(currentUser.UserTypeID).toUpperCase().trim();
     const isOwner = String(job.Owner).trim() === String(currentUser.USERID).trim();
-    
-    // ดึงเบอร์โทรจาก job (ตรวจสอบชื่อ Field ใน Sheet ของคุณว่าใช้ Phone หรือ Tel)
-    const phoneNumber = job.Phone || job.Tel || '-'; 
-    // ----------------------------------------------
+    const phoneDisplay = job.phon || '-'; // ดึงจากคอลัมน์ phon
+    // --------------------------------------------------
 
     const content = document.getElementById('detail-content');
     const actions = document.getElementById('detail-actions');
@@ -375,7 +373,6 @@ async function handleJobUI(jobId, type, extra = {}) {
     const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(job.Owner).trim());
     const ownerDisplayName = staff ? staff.name : (job.Owner || 'ยังไม่มี');
 
-    // ส่วนของ Asset (คงเดิม)
     let assetHTML = '';
     if (job.AssetCode && job.AssetCode !== "" && job.AssetCode !== "-") {
         const asset = (store.BackupData || []).find(a => String(a.NOID) === String(job.AssetCode));
@@ -391,7 +388,6 @@ async function handleJobUI(jobId, type, extra = {}) {
         }
     }
 
-    // --- 2. อัปเดต HTML (เพิ่มส่วนเบอร์โทรศัพท์เข้าไป) ---
     content.innerHTML = `
     <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
         <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
@@ -402,27 +398,25 @@ async function handleJobUI(jobId, type, extra = {}) {
         <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
         <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
         
-        <div class="col-span-2 border-t pt-2">
+        <div class="col-span-2 border-t pt-2 border-slate-100">
             <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">📞 เบอร์โทรศัพท์ติดต่อ</p>
-            <p class="font-bold text-blue-600 text-sm">${phoneNumber}</p>
+            <p class="font-bold text-blue-600 text-sm">${phoneDisplay}</p>
         </div>
 
-        <div class="col-span-2 border-t pt-2 mt-2">
+        <div class="col-span-2 border-t pt-2 border-slate-100 mt-1">
             <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">สถานะปัจจุบัน</p>
             <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
         </div>
-        <div class="col-span-2 pt-2"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">${ownerDisplayName}</p></div>
+        <div class="col-span-2 pt-1"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">👤 ${ownerDisplayName}</p></div>
     </div>`;
-
-    // ส่วนของปุ่ม Action (คงเดิม)
-    // ... โค้ดปุ่ม btns เดิมของคุณ ...
+     
     let btns = '';
     if (currentTab === 1) { 
         if (status === 'รอรับงาน') {
             if (role === 'IT') btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงาน</button>`;
             else if (role === 'BOSS') btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงาน</button>`;
         } else {
-            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl border border-dashed text-blue-500">งานนี้ดำเนินการโดย ${ownerDisplayName}</div>`;
+            btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl border border-dashed text-blue-500 font-bold">งานนี้ดำเนินการโดย ${ownerDisplayName}</div>`;
         }
     } else if (currentTab === 2 && isOwner && status === 'กำลังดำเนินการ') {
         btns = `<div class="grid grid-cols-2 gap-2">

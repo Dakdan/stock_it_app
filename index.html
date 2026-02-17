@@ -635,6 +635,70 @@
         const el = document.getElementById(id);
         if(el) el.style.display = 'none'; 
     }
+    function openServiceMAForm(jobId) {
+    const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
+    if (!job) return;
+
+    closeModal('modal-detail');
+
+    // AUTO DATA FROM JOBTICKET
+    document.getElementById('ma-jobid').value = job.JobID;
+    document.getElementById('ma-display-jobid').value = job.JobID;
+    document.getElementById('ma-createdate').value = job.CreateDate || '';
+    document.getElementById('ma-problem').value = job.Problem || '';
+    document.getElementById('ma-assetcode').value = job.AssetCode || '';
+    document.getElementById('ma-owner').value = job.Owner || '';
+
+    // Load JobType
+    document.getElementById('ma-jobtype').innerHTML =
+        (store.JobTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
+
+    // Load SubType
+    document.getElementById('ma-subtype').innerHTML =
+        (store.JobSubTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
+
+    document.getElementById('modal-service-ma').style.display = 'flex';
+}
+async function submitServiceMA() {
+
+    const payload = {
+        action: 'saveServiceMA',
+        data: {
+            JobID: document.getElementById('ma-jobid').value,
+            JobTypeName: document.getElementById('ma-jobtype').value,
+            SubTypeName: document.getElementById('ma-subtype').value,
+            JobStatus: document.getElementById('ma-status').value,
+            Comment: document.getElementById('ma-comment').value,
+            Remark: document.getElementById('ma-remark').value,
+            Jobeimag: document.getElementById('ma-image').value,
+            Owner: currentUser.USERID
+        }
+    };
+
+    showLoading(true);
+
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+            closeModal('modal-service-ma');
+            await handleJobUI(payload.data.JobID, 'done');
+        } else {
+            alert("Error: " + result.message);
+        }
+
+    } catch (err) {
+        alert("Connection error");
+    }
+
+    showLoading(false);
+}
+
 
     document.addEventListener('DOMContentLoaded', initApp);
     </script>

@@ -17,6 +17,7 @@
         .card-pro:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1); }
         .status-pulse { animation: pulse-pink 2s infinite; }
         @keyframes pulse-pink { 0% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(219, 39, 119, 0); } 100% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0); } }
+        .inner-alert { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.9); z-index:100; flex-direction:column; align-items:center; justify-content:center; border-radius: 2rem; }
     </style>
 </head>
 <body class="pb-10">
@@ -24,7 +25,7 @@
     <div id="loader" class="overlay">
         <div class="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center">
             <div class="animate-spin rounded-full h-10 w-10 border-4 border-pink-600 border-t-transparent mb-3"></div>
-            <p class="text-pink-600 font-bold text-xs text-center">กำลังโหลดข้อมูล...</p>
+            <p class="text-pink-600 font-bold text-xs text-center">กำลังโหลดข้อมูล...<br><span class="text-[9px] font-normal text-slate-400 italic">กรุณารอสักครู่</span></p>
         </div>
     </div>
 
@@ -34,7 +35,7 @@
                 <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
                 <div>
                     <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)</h1>
-                    <p class="text-[10px] opacity-80">เทคโนโลยีสารสนเทศ</p>
+                    <p class="text-[10px] opacity-80">ระบบจัดการงานซ่อมและบริการ กลุ่มงาน: เทคโนโลยีสารสนเทศ</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -49,217 +50,499 @@
 
     <nav class="bg-white/80 backdrop-blur-md sticky top-[88px] z-40 border-b border-pink-100">
         <div class="max-w-4xl mx-auto flex">
-            <button onclick="switchTab(1)" id="nav-t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600">Dashboard</button>
-            <button onclick="switchTab(2)" id="nav-t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">My Jobs</button>
-            <button onclick="switchTab(3)" id="nav-t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">Links</button>
+            <button onclick="switchTab(1)" id="nav-t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600 uppercase tracking-wider">Dashboard</button>
+            <button onclick="switchTab(2)" id="nav-t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">My Jobs</button>
+            <button onclick="switchTab(3)" id="nav-t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">Links</button>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto p-4 mt-4 space-y-6">
         <div id="tab1" class="tab-content active space-y-4">
-            <div class="grid grid-cols-5 gap-2 text-center">
-                <div class="bg-white p-3 rounded-2xl shadow-sm"><p class="text-[9px] text-slate-400">New</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm"><p class="text-[9px] text-slate-400">Doing</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm"><p class="text-[9px] text-slate-400">Spare</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm"><p class="text-[9px] text-slate-400">Done</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm"><p class="text-[9px] text-slate-400">Cancel</p><p id="count-cancel" class="text-lg font-black text-slate-300">0</p></div>
+            <div class="grid grid-cols-5 gap-2">
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">New</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Doing</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Spare</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Done</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Cancel</p><p id="count-cancel" class="text-lg font-black text-slate-300">0</p></div>
             </div>
             <div id="job-list-dashboard" class="space-y-3"></div>
         </div>
 
         <div id="tab2" class="tab-content space-y-4">
             <div id="job-list-myjob" class="space-y-3"></div>
-            <div class="flex justify-between items-center px-1 mt-6">
-                <h2 class="text-blue-600 font-bold text-sm">IT Ticket</h2>
-                <button onclick="openITTicketForm()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md">+ บันทึกงาน</button>
             </div>
-            <div id="it-ticket-list" class="space-y-3"></div>
-        </div>
-
-        <div id="tab3" class="tab-content grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
     </main>
 
     <div id="modal-detail" class="overlay">
         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl overflow-hidden relative">
-            <div class="p-6 text-left">
+            <div id="detail-alert" class="inner-alert">
+                <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">✅</span></div>
+                <p id="detail-alert-text" class="text-pink-600 font-bold">ดำเนินการสำเร็จ</p>
+            </div>
+            <div class="p-6">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
                     <h3 class="font-bold text-pink-600 text-lg">📄 รายละเอียดงาน</h3>
                     <button onclick="closeModal('modal-detail')" class="text-slate-400 text-3xl">&times;</button>
                 </div>
-                <div id="detail-content" class="space-y-4 max-h-[60vh] overflow-y-auto">
-                    </div>
-                <div id="detail-actions" class="mt-6 flex flex-col gap-3">
-                    </div>
+                <div id="detail-content" class="space-y-4 max-h-[60vh] overflow-y-auto"></div>
+                <div id="detail-actions" class="mt-6 flex flex-col gap-3"></div>
             </div>
         </div>
     </div>
 
     <div id="modal-close-job" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden p-6">
-            <h3 class="font-bold text-green-600 text-lg mb-4">✅ บันทึกรายละเอียดการปิดงาน</h3>
-            <div class="space-y-3 text-left">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">ประเภทงาน (JobTypeName)</label>
-                    <select id="close-job-type" class="w-full p-2 bg-slate-50 rounded-xl text-sm border border-slate-100" onchange="filterSubTypes(this.value)"></select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">งานย่อย (SubTypeName)</label>
-                    <select id="close-subtype" class="w-full p-2 bg-slate-50 rounded-xl text-sm border border-slate-100"></select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">รายละเอียดการแก้ไข (ServiceMA)</label>
-                    <textarea id="close-service-ma" class="w-full p-2 bg-slate-50 rounded-xl text-sm h-20" placeholder="ระบุสิ่งที่แก้ไข..."></textarea>
-                </div>
-                <div class="flex gap-2 pt-4">
-                    <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
-                    <button id="btn-confirm-save" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow-lg">ยืนยันบันทึก</button>
+        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
+            <div class="p-6 text-left">
+                <h3 class="font-bold text-green-600 text-lg mb-4 flex items-center gap-2">
+                    <span>✅</span> บันทึกรายละเอียดการปิดงาน
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน (JobTypeName)</label>
+                        <select id="close-job-type" class="w-full p-2 bg-slate-50 rounded-xl text-sm border border-slate-100 outline-none focus:border-green-500" onchange="filterSubTypes(this.value)"></select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">งานย่อย (SubTypeName)</label>
+                        <select id="close-subtype" class="w-full p-2 bg-slate-50 rounded-xl text-sm border border-slate-100 outline-none focus:border-green-500"></select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดการแก้ไข/หมายเหตุ</label>
+                        <textarea id="close-job-note" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24 border border-slate-100 focus:border-green-500 outline-none" placeholder="ระบุสิ่งที่แก้ไข..."></textarea>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
+                        <button id="btn-confirm-close" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow-lg">ยืนยันการปิดงาน</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
-        let store = { AllJobs: [], StaffList: [], JobTypeMaster: [], JobSubTypeMaster: [], ITTickets: [], SystemLink: [] };
-        let currentUser = null;
+       <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
+    let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [], BackupData: [], JobSubTypeMaster: [], };
+    let currentUser = null;
+    let currentTab = 1; 
 
-        async function initApp() {
-            const session = localStorage.getItem("it_session");
-            if (!session) { window.location.replace("./login.html"); return; }
-            currentUser = JSON.parse(session);
-            document.getElementById('u-fname').innerText = currentUser.UserName;
-            document.getElementById('u-type-name').innerText = currentUser.UserTypeName;
-            await loadData();
-        }
+    async function initApp() {
+        const session = localStorage.getItem("it_session");
+        if (!session) { window.location.replace("./login.html"); return; }
+        currentUser = JSON.parse(session);
+        document.getElementById('u-fname').innerText = currentUser.UserName + " " + (currentUser.UserSname || "");
+        document.getElementById('u-type-name').innerText = currentUser.UserTypeName || "Staff";
+        await loadData();
+    }
 
-        async function loadData() {
-            showLoading(true);
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getInitialData', data: { USERID: currentUser.USERID } }) });
-                const result = await res.json();
-                if (result.success) {
-                    store = result;
-                    renderDashboard();
-                    renderMyJobs();
-                }
-            } catch (e) { console.error(e); }
-            showLoading(false);
-        }
-
-        function filterSubTypes(jobTypeName) {
-            const subSelect = document.getElementById('close-subtype');
-            const jobType = store.JobTypeMaster.find(t => t.JobTypeName === jobTypeName);
-            if (!jobType) return;
-            
-            const filtered = store.JobSubTypeMaster.filter(s => s.JobTypeCode === jobType.JobTypeCode && s.Active === "TRUE");
-            subSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
-        }
-
-        function openCloseJobForm(jobId) {
-            closeModal('modal-detail');
-            const typeSelect = document.getElementById('close-job-type');
-            typeSelect.innerHTML = store.JobTypeMaster.filter(t => t.Active === "TRUE").map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`).join('');
-            
-            if (store.JobTypeMaster.length > 0) {
-                filterSubTypes(typeSelect.value);
+    async function loadData() {
+        showLoading(true);
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ 
+                    action: 'getInitialData', 
+                    data: { userName: currentUser.UserName, USERID: currentUser.USERID } 
+                }) 
+            });
+            const result = await res.json();
+            if (result.success) {
+                store = result;
+                renderDashboard();
+                renderMyJobs();
+                renderITTicketList();
+                renderSystemLinks();
             }
-            
-            document.getElementById('modal-close-job').style.display = 'flex';
-            document.getElementById('btn-confirm-save').onclick = () => saveCloseJob(jobId);
+        } catch (e) { console.error("Data error", e); }
+        showLoading(false);
+    }
+
+    // --- ฟังก์ชันใหม่: กรองงานย่อยตามประเภทงาน ---
+    function filterSubTypes(jobTypeName) {
+        const subSelect = document.getElementById('close-subtype');
+        if (!subSelect) return;
+
+        const jobTypeObj = (store.JobTypeMaster || []).find(t => t.JobTypeName === jobTypeName);
+        if (!jobTypeObj) {
+            subSelect.innerHTML = '<option value="">-- ไม่พบข้อมูล --</option>';
+            return;
         }
 
-        async function saveCloseJob(jobId) {
-            const data = {
-                JobID: jobId,
-                JobTypeName: document.getElementById('close-job-type').value,
-                SubTypeName: document.getElementById('close-subtype').value,
-                ServiceMA: document.getElementById('close-service-ma').value,
-                JobStatus: 'เสร็จสิ้น'
-            };
-            showLoading(true);
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: { ...data, type: 'done', Owner: currentUser.USERID } }) });
-                if ((await res.json()).success) { closeModal('modal-close-job'); await loadData(); }
-            } catch (e) { alert("Error"); }
-            showLoading(false);
-        }
+        const filtered = (store.JobSubTypeMaster || []).filter(s => 
+            String(s.JobTypeCode) === String(jobTypeObj.JobTypeCode) && 
+            (s.Active === "TRUE" || s.Active === true)
+        );
 
-        function viewJobDetail(jobId) {
-            const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
-            if (!job) return;
+        subSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
+    }
 
-            // เขียนเนื้อหา Detail กลับมาให้ครบ
-            document.getElementById('detail-content').innerHTML = `
-                <div class="bg-slate-50 p-4 rounded-2xl">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">ปัญหาที่แจ้ง</p>
-                    <p class="text-sm font-bold text-slate-700 mt-1">${job.Problem}</p>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-50 p-3 rounded-xl"><p class="text-[9px] text-slate-400">หน่วยงาน</p><p class="text-xs font-bold">${job.Department}</p></div>
-                    <div class="bg-slate-50 p-3 rounded-xl"><p class="text-[9px] text-slate-400">ความสำคัญ</p><p class="text-xs font-bold text-pink-600">${job.Priority}</p></div>
-                </div>
-            `;
+    function getStatusColor(status) {
+        const s = String(status || '').trim();
+        if (s === 'รอรับงาน') return "text-pink-600 bg-pink-50 border border-pink-200";
+        if (s === 'กำลังดำเนินการ') return "text-blue-600 bg-blue-50 border border-blue-200";
+        if (s === 'รออะไหล่') return "text-orange-600 bg-orange-50 border border-orange-200";
+        if (s === 'เสร็จสิ้น') return "text-green-600 bg-green-50 border border-green-200";
+        if (s === 'ยกเลิก') return "text-slate-400 bg-slate-50 border border-slate-200";
+        return "text-slate-500 bg-slate-100 border border-slate-200";
+    }
 
-            // เขียนปุ่ม Action กลับมาให้ครบ
-            let btns = '';
-            if (job.Status === 'รอรับงาน' && currentUser.UserTypeID === 'IT') {
-                btns = `<button onclick="handleStatus('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg">⚡ รับงานนี้</button>`;
-            } else if (job.Status === 'กำลังดำเนินการ' && String(job.Owner) === String(currentUser.USERID)) {
-                btns = `<button onclick="openCloseJobForm('${job.JobID}')" class="w-full py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">✅ บันทึกปิดงาน</button>`;
+    function renderDashboard() {
+        const jobs = store.AllJobs || [];
+        updateStats(jobs);
+        
+        document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
+            const status = String(j.Status || '').trim();
+            const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(j.Owner).trim());
+            const ownerName = staff ? staff.name : (j.Owner && j.Owner !== "-" ? j.Owner : "ยังไม่มีผู้ดูแล");
+
+            let shadowClass = "shadow-sm";
+            let borderClass = "border-slate-200";
+            if (status === 'รอรับงาน') {
+                shadowClass = "shadow-[0_8px_20px_-5px_rgba(219,39,119,0.35)]";
+                borderClass = "border-pink-500 status-pulse";
+            } else if (status === 'กำลังดำเนินการ') {
+                shadowClass = "shadow-[0_8px_20px_-5px_rgba(59,130,246,0.3)]";
+                borderClass = "border-blue-500";
+            } else if (status === 'รออะไหล่') {
+                shadowClass = "shadow-[0_8px_20px_-5px_rgba(251,146,60,0.3)]";
+                borderClass = "border-orange-400";
+            } else if (status === 'เสร็จสิ้น') {
+                shadowClass = "shadow-[0_8px_20px_-5px_rgba(34,197,94,0.2)]";
+                borderClass = "border-green-500";
             }
-            document.getElementById('detail-actions').innerHTML = btns;
-            document.getElementById('modal-detail').style.display = 'flex';
-        }
 
-        async function handleStatus(jobId, type) {
-            showLoading(true);
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: { JobID: jobId, type: type, Owner: currentUser.USERID } }) });
-                if ((await res.json()).success) { closeModal('modal-detail'); await loadData(); }
-            } catch (e) { alert("Error"); }
+            const assetInfo = (store.BackupData || []).find(a => String(a.NOID) === String(j.AssetCode));
+            let assetBoxHTML = "";
+            if (j.AssetCode && j.AssetCode !== "" && j.AssetCode !== "-") {
+                const displayID = assetInfo ? assetInfo.AssetID : j.AssetCode;
+                assetBoxHTML = `
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 mt-2">
+                        <p class="text-[9px] text-slate-500 font-bold uppercase">📦 ครุภัณฑ์: ${displayID}</p>
+                    </div>`;
+            }
+
+            return `
+                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} ${shadowClass} mb-4 transition-all duration-300">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400">#${j.JobID}</span>
+                            <span class="text-[9px] text-slate-400 ml-2">📅 ${j.CreateDate || ''}</span>
+                        </div>
+                        <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">
+                            ${status}
+                        </span>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <p class="text-[10px] font-bold text-pink-500 uppercase">${j.JobType || ''}</p>
+                            <h3 class="font-bold text-slate-700 text-sm leading-snug">${j.Problem}</h3>
+                        </div>
+                        ${assetBoxHTML}
+                        <div class="flex justify-between items-end pt-2 border-t border-slate-50 mt-2">
+                            <div class="space-y-1">
+                                <p class="text-[8px] text-slate-400 uppercase font-bold">ผู้ดูแลงาน</p>
+                                <p class="text-[10px] font-bold text-blue-600 italic leading-tight">👤 ${ownerName}</p>
+                            </div>
+                            <div class="text-right space-y-1">
+                                <p class="text-[9px] font-bold text-slate-500">🏢 ${j.Department}</p>
+                                <p class="text-[10px] font-bold ${String(j.Priority).includes('ด่วน') ? 'text-red-500' : 'text-orange-500'}">
+                                    ⚠️ ${j.Priority}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function renderMyJobs() {
+        const myJobs = (store.AllJobs || []).filter(j => 
+            String(j.Owner).trim() === String(currentUser.USERID).trim() && 
+            String(j.Status).trim() === 'กำลังดำเนินการ'
+        );
+        const container = document.getElementById('job-list-myjob');
+        if (myJobs.length > 0) {
+            container.innerHTML = myJobs.map(j => `
+                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 border-blue-500 mb-3 shadow-[0_8px_15px_-3px_rgba(59,130,246,0.2)]">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="text-[9px] text-slate-400 font-bold">${j.JobID}</p>
+                            <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                            <p class="text-[9px] text-blue-500 mt-1 font-bold">📍 ${j.Department}</p>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-lg ${getStatusColor(j.Status)} uppercase">
+                            ${j.Status}
+                        </span>
+                    </div>
+                </div>`).join('');
+        } else {
+            container.innerHTML = '<div class="p-8 text-center opacity-40 italic text-xs bg-white rounded-2xl border-dashed border border-slate-200">ไม่มีงานที่กำลังดำเนินการของคุณ</div>';
+        }
+    }
+
+    async function handleJobUI(jobId, type, extra = {}) {
+        closeModal('modal-detail');
+        closeModal('modal-transfer');
+        closeModal('modal-close-job');
+        showLoading(true);
+
+        const data = { 
+            JobID: jobId, 
+            type: type, 
+            Owner: currentUser.USERID, 
+            By: currentUser.UserName, 
+            ...extra 
+        }; 
+
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'updateJobStatus', data: data }) 
+            });
+            const result = await res.json();
+            if (result.success) { 
+                showLoading(false);
+                document.getElementById('success-text').innerText = "ดำเนินการสำเร็จ!";
+                document.getElementById('modal-success').style.display = 'flex';
+                await loadData(); 
+                setTimeout(() => { closeModal('modal-success'); }, 1500);
+            } else {
+                showLoading(false);
+                alert("ผิดพลาด: " + result.message);
+            }
+        } catch (e) { 
             showLoading(false);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ"); 
+        }
+    }
+
+    function viewJobDetail(jobId) {
+        const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
+        if (!job) return;
+
+        const status = String(job.Status || '').trim();
+        const role = String(currentUser.UserTypeID).toUpperCase().trim();
+        const isOwner = String(job.Owner).trim() === String(currentUser.USERID).trim();
+        const phoneDisplay = job.phon || '-'; 
+
+        const content = document.getElementById('detail-content');
+        const actions = document.getElementById('detail-actions');
+        const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(job.Owner).trim());
+        const ownerDisplayName = staff ? staff.name : (job.Owner || 'ยังไม่มี');
+
+        let assetHTML = '';
+        if (job.AssetCode && job.AssetCode !== "" && job.AssetCode !== "-") {
+            const asset = (store.BackupData || []).find(a => String(a.NOID) === String(job.AssetCode));
+            if (asset) {
+                assetHTML = `<div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
+                    <p class="text-[10px] font-bold text-blue-500 mb-2 uppercase tracking-wider">📦 ข้อมูลครุภัณฑ์ (AssetID: ${asset.AssetID || '-'})</p>
+                    <div class="space-y-1.5">
+                        <p class="text-xs text-slate-500">ชื่อรายการ: <span class="font-bold text-slate-700">${asset.AssetName || ''}</span></p>
+                        <p class="text-xs text-slate-500">สเปค/ยี่ห้อ: <span class="font-semibold text-slate-600">${asset.Spac || ''}</span></p>
+                    </div>
+                </div>`;
+            }
         }
 
-        function renderDashboard() {
-            const list = document.getElementById('job-list-dashboard');
-            list.innerHTML = store.AllJobs.map(j => `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-4 border-l-8 ${j.Status === 'เสร็จสิ้น' ? 'border-green-500' : 'border-pink-500'}">
-                    <p class="text-[9px] font-bold text-slate-400">#${j.JobID}</p>
-                    <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+        content.innerHTML = `
+        <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+            <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียดปัญหา [${job.JobType || 'ทั่วไป'}]</p>
+            <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
+        </div>
+        ${assetHTML}
+        <div class="grid grid-cols-2 gap-4 px-1 mt-4">
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority}</p></div>
+            <div class="col-span-2 border-t pt-2 border-slate-100">
+                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">📞 เบอร์โทรศัพท์ติดต่อ</p>
+                <p class="font-bold text-blue-600 text-sm">${phoneDisplay}</p>
+            </div>
+            <div class="col-span-2 border-t pt-2 border-slate-100 mt-1">
+                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">สถานะปัจจุบัน</p>
+                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
+            </div>
+            <div class="col-span-2 pt-1"><p class="text-[10px] text-slate-400 font-bold uppercase">ผู้ดูแลงาน</p><p class="font-bold text-slate-600 text-xs">👤 ${ownerDisplayName}</p></div>
+        </div>`;
+         
+        let btns = '';
+        if (currentTab === 1) { 
+            if (status === 'รอรับงาน') {
+                if (role === 'IT') btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">⚡ รับงาน</button>`;
+                else if (role === 'BOSS') btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg mb-2 active:scale-95 transition-all">📋 มอบหมายงาน</button>`;
+            } else {
+                btns = `<div class="p-4 text-center text-[10px] text-slate-400 italic bg-slate-50 rounded-xl border border-dashed text-blue-500 font-bold">งานนี้ดำเนินการโดย ${ownerDisplayName}</div>`;
+            }
+        } else if (currentTab === 2 && isOwner && status === 'กำลังดำเนินการ') {
+            btns = `<div class="grid grid-cols-2 gap-2">
+                        <button onclick="openCloseJobForm('${job.JobID}')" class="py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">✅ ปิดงาน</button>
+                        <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold italic text-sm border active:scale-95 transition-all">🔄 โอนงาน</button>
+                    </div>`;
+        }
+        btns += `<button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-[10px] mt-2 uppercase tracking-widest">Close Detail</button>`;
+        actions.innerHTML = btns;
+        document.getElementById('modal-detail').style.display = 'flex';
+    }
+
+    // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม (เพิ่ม Dropdown)
+    function openCloseJobForm(jobId) {
+        closeModal('modal-detail');
+        
+        // 1. โหลด JobTypeMaster ลง Select
+        const typeSelect = document.getElementById('close-job-type');
+        if (typeSelect) {
+            const activeTypes = (store.JobTypeMaster || []).filter(t => t.Active === "TRUE" || t.Active === true);
+            typeSelect.innerHTML = activeTypes.map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`).join('');
+            
+            // 2. สั่งกรอง SubType ทันที
+            if (activeTypes.length > 0) filterSubTypes(activeTypes[0].JobTypeName);
+        }
+
+        document.getElementById('close-job-note').value = "";
+        document.getElementById('modal-close-job').style.display = 'flex';
+        
+        document.getElementById('btn-confirm-close').onclick = async () => {
+            const jobType = document.getElementById('close-job-type').value;
+            const subType = document.getElementById('close-subtype').value;
+            const note = document.getElementById('close-job-note').value;
+            
+            if (!jobType || !subType) return alert("กรุณาเลือกประเภทงานและงานย่อย");
+            if (!note) return alert("กรุณาระบุรายละเอียดการซ่อม");
+
+            // ส่งค่าทั้งหมดไปกับ handleJobUI
+            await handleJobUI(jobId, 'done', { 
+                JobTypeName: jobType, 
+                SubTypeName: subType, 
+                Note: note 
+            });
+        };
+    }
+
+    function openTransfer(jobId) {
+        const select = document.getElementById('select-staff');
+        const role = String(currentUser.UserTypeID || '').toUpperCase();
+        document.querySelector('#modal-transfer h3').innerText = (role === 'BOSS') ? "📋 มอบหมายงานใหม่" : "🔄 โอนงาน";
+        select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        document.getElementById('modal-transfer').style.display = 'flex';
+        document.getElementById('btn-confirm-transfer').onclick = async () => {
+            const newOwner = select.value;
+            const reason = document.getElementById('transfer-reason').value;
+            if(!newOwner) return alert("กรุณาเลือกเจ้าหน้าที่");
+            await handleJobUI(jobId, (role === 'BOSS' ? 'assign' : 'transfer'), { NewOwner: newOwner, Reason: reason });
+            document.getElementById('transfer-reason').value = "";
+        };
+    }
+
+    function openITTicketForm() {
+        // แก้ไข: JobTypeMaster ในสโตร์ของคุณเป็น Array of Object ให้ดึงเฉพาะ JobTypeName
+        document.getElementById('it-job-type').innerHTML = (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`).join('');
+        document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
+        document.getElementById('modal-it-ticket').style.display = 'flex';
+    }
+
+    document.getElementById('form-it-ticket').onsubmit = async (e) => {
+        e.preventDefault();
+        showLoading(true);
+        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('it-job-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
+        try {
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+            const result = await res.json();
+            if (result.success) {
+                showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ');
+                document.getElementById('form-it-ticket').reset();
+                await loadData();
+            }
+        } catch (e) { alert("Error"); }
+        showLoading(false);
+    };
+
+    function renderITTicketList() {
+        const container = document.getElementById('it-ticket-list');
+        if (!store.ITTickets || store.ITTickets.length === 0) {
+            container.innerHTML = '<div class="text-center p-6 text-slate-400 text-[10px]">ไม่พบประวัติ</div>';
+            return;
+        }
+        container.innerHTML = store.ITTickets.map(it => `
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex justify-between items-center">
+                <div>
+                    <p class="text-[8px] text-blue-500 font-bold">${it.JobType}</p>
+                    <p class="text-xs font-bold text-slate-700">${it.Problem}</p>
+                    <p class="text-[8px] text-slate-400 mt-1">${it.Date || '-'} | ${it.Department}</p>
                 </div>
-            `).join('');
-            updateStats();
-        }
+                <span class="text-[8px] text-green-500 font-bold bg-green-50 px-2 py-1 rounded-full">Saved</span>
+            </div>`).join('');
+    }
 
-        function renderMyJobs() {
-            const list = document.getElementById('job-list-myjob');
-            const my = store.AllJobs.filter(j => String(j.Owner) === String(currentUser.USERID) && j.Status !== 'เสร็จสิ้น');
-            list.innerHTML = my.map(j => `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-4 border-l-8 border-blue-500">
-                    <p class="text-[10px] font-bold text-blue-500">${j.Status}</p>
-                    <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+    function renderSystemLinks() {
+        const tab3Container = document.getElementById('tab3');
+        if (!tab3Container) return;
+        if (currentTab !== 3) {
+            tab3Container.innerHTML = ''; 
+            tab3Container.style.display = 'none';
+            return;
+        }
+        tab3Container.style.display = 'grid';
+        const links = store.SystemLink || [];
+        if (links.length === 0) {
+            tab3Container.innerHTML = '<div class="col-span-full text-center p-10 text-slate-400 italic text-sm">ไม่มีข้อมูลลิงก์ระบบ</div>';
+            return;
+        }
+        tab3Container.innerHTML = links.filter(l => String(l.Active).toUpperCase() === "TRUE").map(l => `
+            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50 hover:bg-pink-50 transition-all active:scale-95">
+                <span class="text-2xl">${l.Linkicon || '🔗'}</span>
+                <div class="flex flex-col">
+                    <span class="font-bold text-slate-700 text-sm">${l.Name || 'ไม่ระบุชื่อ'}</span>
+                    <p class="text-[9px] text-slate-400 truncate w-40">${l.URL}</p>
                 </div>
-            `).join('');
+            </a>`).join('');
+    }
+
+    function updateStats(jobs) {
+        const getCount = (s) => jobs.filter(j => String(j.Status).trim() === s).length;
+        document.getElementById('count-wait').innerText = getCount('รอรับงาน');
+        document.getElementById('count-doing').innerText = getCount('กำลังดำเนินการ');
+        document.getElementById('count-spare').innerText = getCount('รออะไหล่');
+        document.getElementById('count-done').innerText = getCount('เสร็จสิ้น');
+        document.getElementById('count-cancel').innerText = getCount('ยกเลิก');
+    }   
+
+    function switchTab(n) {
+        currentTab = n; 
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab' + n).classList.add('active');
+        document.querySelectorAll('nav button').forEach((b, i) => { 
+            const isActive = (i + 1 === n);
+            b.classList.toggle('text-pink-600', isActive);
+            b.classList.toggle('border-pink-600', isActive);
+            b.classList.toggle('text-slate-400', !isActive);
+            b.classList.toggle('border-transparent', !isActive);
+        });
+        renderSystemLinks(); 
+    }
+
+    function showInnerAlert(modalId, text) {
+        const alertDiv = document.querySelector(`#${modalId} .inner-alert`);
+        if(alertDiv) {
+            alertDiv.querySelector('p').innerText = text;
+            alertDiv.style.display = 'flex';
+            setTimeout(() => { alertDiv.style.display = 'none'; closeModal(modalId); }, 1800);
         }
+    }
 
-        function updateStats() {
-            const count = (s) => store.AllJobs.filter(j => j.Status === s).length;
-            document.getElementById('count-wait').innerText = count('รอรับงาน');
-            document.getElementById('count-doing').innerText = count('กำลังดำเนินการ');
-            document.getElementById('count-done').innerText = count('เสร็จสิ้น');
-        }
+    function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
+    async function confirmLogout() {
+        document.getElementById('logout-alert').style.display = 'flex';
+        setTimeout(() => { localStorage.clear(); window.location.replace("./login.html"); }, 1500);
+    }
 
-        function switchTab(n) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById('tab' + n).classList.add('active');
-            document.querySelectorAll('nav button').forEach((b, i) => b.classList.toggle('border-pink-600', i+1===n));
-        }
+    function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
+    function closeModal(id) { 
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none'; 
+    }
 
-        function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { localStorage.clear(); window.location.replace("./login.html"); }
+    document.addEventListener('DOMContentLoaded', initApp);
+   
 
-        initApp();
+        // --- ส่วนที่เหลือ (initApp, loadData, viewJobDetail ฯลฯ) ให้ใช้ของเดิมของคุณได้เลย ---
     </script>
 </body>
 </html>

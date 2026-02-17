@@ -101,79 +101,79 @@
         </div>
     </div>
 
-    <div id="modal-service-ma" class="overlay">
-    <div class="bg-white rounded-[2rem] w-full max-w-2xl mx-4 shadow-2xl relative overflow-hidden">
-        <div class="p-6 max-h-[90vh] overflow-y-auto">
-            <h3 class="font-bold text-green-600 text-lg mb-4 flex items-center gap-2">
-                <span>🛠️</span> บันทึกงานซ่อม (ServiceMA)
-            </h3>
+        <!-- ========================= -->
+<!-- SERVICE MA MODAL -->
+<!-- ========================= -->
+<div id="modal-service-ma" class="fixed inset-0 bg-black/40 hidden items-end justify-center z-50">
+  <div class="bg-white w-full max-w-md rounded-t-3xl p-6 shadow-2xl animate-slideUp">
 
-            <div class="grid grid-cols-2 gap-4 text-xs">
+    <h3 class="text-lg font-bold text-slate-800 mb-4">
+      บันทึกข้อมูล Service / MA
+    </h3>
 
-                <!-- AUTO FROM JOBTICKET -->
-                <input type="hidden" id="ma-jobid">
+    <input type="hidden" id="ma-job-id">
 
-                <div>
-                    <label class="font-bold text-slate-400">JobID</label>
-                    <input id="ma-display-jobid" disabled class="w-full p-2 bg-slate-100 rounded-xl">
-                </div>
+    <div class="space-y-3">
 
-                <div>
-                    <label class="font-bold text-slate-400">CreateDate</label>
-                    <input id="ma-createdate" disabled class="w-full p-2 bg-slate-100 rounded-xl">
-                </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">ประเภทงาน</label>
+        <select id="ma-job-type"
+          class="w-full p-3 border rounded-xl text-sm focus:ring-2 focus:ring-blue-400">
+        </select>
+      </div>
 
-                <div class="col-span-2">
-                    <label class="font-bold text-slate-400">Problem</label>
-                    <textarea id="ma-problem" disabled class="w-full p-2 bg-slate-100 rounded-xl h-16"></textarea>
-                </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">หมวดงาน</label>
+        <select id="ma-job-subtype"
+          class="w-full p-3 border rounded-xl text-sm focus:ring-2 focus:ring-blue-400">
+        </select>
+      </div>
 
-                <div>
-                    <label class="font-bold text-slate-400">AssetCode</label>
-                    <input id="ma-assetcode" disabled class="w-full p-2 bg-slate-100 rounded-xl">
-                </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">การดำเนินการ</label>
+        <textarea id="ma-detail"
+          class="w-full p-3 border rounded-xl text-sm"
+          rows="3"
+          placeholder="รายละเอียดการแก้ไข..."></textarea>
+      </div>
 
-                <div>
-                    <label class="font-bold text-slate-400">Owner</label>
-                    <input id="ma-owner" disabled class="w-full p-2 bg-slate-100 rounded-xl">
-                </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">อะไหล่ที่ใช้</label>
+        <input id="ma-spare"
+          class="w-full p-3 border rounded-xl text-sm"
+          placeholder="เช่น RAM 8GB, สาย LAN">
+      </div>
 
-                <!-- NEW FIELDS -->
-                <div>
-                    <label class="font-bold text-slate-400">JobTypeName</label>
-                    <select id="ma-jobtype" class="w-full p-2 bg-slate-50 rounded-xl"></select>
-                </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">ค่าใช้จ่าย (บาท)</label>
+        <input id="ma-cost"
+          type="number"
+          class="w-full p-3 border rounded-xl text-sm"
+          placeholder="0">
+      </div>
 
-                <div>
-                    <label class="font-bold text-slate-400">SubTypeName</label>
-                    <select id="ma-subtype" class="w-full p-2 bg-slate-50 rounded-xl"></select>
-                </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">หมายเหตุ</label>
+        <textarea id="ma-note"
+          class="w-full p-3 border rounded-xl text-sm"
+          rows="2"></textarea>
+      </div>
 
-                <div>
-                    <label class="font-bold text-slate-400">JobStatus</label>
-                    <select id="ma-status" class="w-full p-2 bg-slate-50 rounded-xl">
-                        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-                        <option value="รออะไหล่">รออะไหล่</option>
-                        <option value="ยกเลิก">ยกเลิก</option>
-                    </select>
-                </div>
+    </div>
 
-                <div>
-                    <label class="font-bold text-slate-400">Comment</label>
-                    <input id="ma-comment" class="w-full p-2 bg-slate-50 rounded-xl">
-                </div>
+    <div class="flex gap-3 mt-6">
+      <button onclick="submitServiceMA()"
+        class="flex-1 py-3 bg-green-500 text-white rounded-2xl font-bold shadow active:scale-95">
+        บันทึกและปิดงาน
+      </button>
+      <button onclick="closeModal('modal-service-ma')"
+        class="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-bold">
+        ยกเลิก
+      </button>
+    </div>
 
-                <div class="col-span-2">
-                    <label class="font-bold text-slate-400">Remark</label>
-                    <textarea id="ma-remark" class="w-full p-2 bg-slate-50 rounded-xl h-16"></textarea>
-                </div>
-
-                <div class="col-span-2">
-                    <label class="font-bold text-slate-400">Jobeimag (URL)</label>
-                    <input id="ma-image" class="w-full p-2 bg-slate-50 rounded-xl">
-                </div>
-
-            </div>
+  </div>
+</div>
 
             <div class="flex gap-3 mt-6">
                 <button onclick="closeModal('modal-service-ma')" class="flex-1 py-3 text-slate-400 font-bold bg-slate-50 rounded-2xl">
@@ -623,6 +623,97 @@
             setTimeout(() => { alertDiv.style.display = 'none'; closeModal(modalId); }, 1800);
         }
     }
+      <script>
+
+// เปิด modal
+async function openServiceMAForm(jobId) {
+    document.getElementById('ma-job-id').value = jobId;
+    await loadMATypeData();
+    openModal('modal-service-ma');
+}
+
+// โหลดประเภทงาน + หมวดงาน
+async function loadMATypeData() {
+    const res = await apiFetch('getMATypeMaster');
+    const typeSelect = document.getElementById('ma-job-type');
+    const subSelect = document.getElementById('ma-job-subtype');
+
+    typeSelect.innerHTML = '';
+    subSelect.innerHTML = '';
+
+    if (!res.success) return;
+
+    const types = res.types;
+    const subs = res.subtypes;
+
+    types.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.TypeID;
+        opt.textContent = t.TypeName;
+        typeSelect.appendChild(opt);
+    });
+
+    typeSelect.onchange = () => {
+        const selected = typeSelect.value;
+        subSelect.innerHTML = '';
+
+        subs
+          .filter(s => s.TypeID === selected)
+          .forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.SubID;
+            opt.textContent = s.SubName;
+            subSelect.appendChild(opt);
+          });
+    };
+
+    typeSelect.dispatchEvent(new Event('change'));
+}
+
+// บันทึก Service MA
+async function submitServiceMA() {
+
+    const data = {
+        jobId: document.getElementById('ma-job-id').value,
+        jobType: document.getElementById('ma-job-type').value,
+        jobSubType: document.getElementById('ma-job-subtype').value,
+        detail: document.getElementById('ma-detail').value,
+        spare: document.getElementById('ma-spare').value,
+        cost: document.getElementById('ma-cost').value,
+        note: document.getElementById('ma-note').value
+    };
+
+    const result = await apiFetch('saveServiceMA', data);
+
+    if (!result.success) {
+        alert('❌ บันทึกไม่สำเร็จ');
+        return;
+    }
+
+    // เปลี่ยนสถานะงานเป็น เสร็จสิ้น
+    await apiFetch('updateJobStatus', {
+        jobId: data.jobId,
+        status: 'เสร็จสิ้น'
+    });
+
+    closeModal('modal-service-ma');
+    alert('✅ ปิดงานเรียบร้อย');
+
+    loadDashboard();
+}
+
+// helper modal
+function openModal(id){
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById(id).classList.add('flex');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.add('hidden');
+  document.getElementById(id).classList.remove('flex');
+}
+
+
 
     function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
     async function confirmLogout() {
@@ -635,70 +726,7 @@
         const el = document.getElementById(id);
         if(el) el.style.display = 'none'; 
     }
-    function openServiceMAForm(jobId) {
-    const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
-    if (!job) return;
-
-    closeModal('modal-detail');
-
-    // AUTO DATA FROM JOBTICKET
-    document.getElementById('ma-jobid').value = job.JobID;
-    document.getElementById('ma-display-jobid').value = job.JobID;
-    document.getElementById('ma-createdate').value = job.CreateDate || '';
-    document.getElementById('ma-problem').value = job.Problem || '';
-    document.getElementById('ma-assetcode').value = job.AssetCode || '';
-    document.getElementById('ma-owner').value = job.Owner || '';
-
-    // Load JobType
-    document.getElementById('ma-jobtype').innerHTML =
-        (store.JobTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
-
-    // Load SubType
-    document.getElementById('ma-subtype').innerHTML =
-        (store.JobSubTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
-
-    document.getElementById('modal-service-ma').style.display = 'flex';
-}
-async function submitServiceMA() {
-
-    const payload = {
-        action: 'saveServiceMA',
-        data: {
-            JobID: document.getElementById('ma-jobid').value,
-            JobTypeName: document.getElementById('ma-jobtype').value,
-            SubTypeName: document.getElementById('ma-subtype').value,
-            JobStatus: document.getElementById('ma-status').value,
-            Comment: document.getElementById('ma-comment').value,
-            Remark: document.getElementById('ma-remark').value,
-            Jobeimag: document.getElementById('ma-image').value,
-            Owner: currentUser.USERID
-        }
-    };
-
-    showLoading(true);
-
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-
-        if (result.success) {
-            closeModal('modal-service-ma');
-            await handleJobUI(payload.data.JobID, 'done');
-        } else {
-            alert("Error: " + result.message);
-        }
-
-    } catch (err) {
-        alert("Connection error");
-    }
-
-    showLoading(false);
-}
-
+   
 
     document.addEventListener('DOMContentLoaded', initApp);
     </script>

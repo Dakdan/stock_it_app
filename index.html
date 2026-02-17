@@ -517,78 +517,62 @@ function loadCloseJobMaster() {
         };
     }
 
-   function openITTicketForm() {
+  function openITTicketForm() {
 
-    const typeSelect = document.getElementById('it-job-type');
-    const subSelect = document.getElementById('it-job-sub-type');
+    // ===== Job Type =====
+    const jobTypeSelect = document.getElementById('it-job-type');
+    const jobTypes = store.JobTypeMaster || [];
 
-    const mapping = store.JobTypeMapping || {};
+    jobTypeSelect.innerHTML = jobTypes.map(t => {
+        if (typeof t === 'string') {
+            return `<option value="${t}">${t}</option>`;
+        }
+        return `<option value="${t.JobTypeName || ''}">
+                    ${t.JobTypeName || ''}
+                </option>`;
+    }).join('');
 
-    // โหลดประเภทงาน
-    typeSelect.innerHTML = Object.keys(mapping)
-        .map(code => `
-            <option value="${code}">
-                ${mapping[code].JobTypeName}
-            </option>
-        `).join('');
+    // ===== Department =====
+    const deptSelect = document.getElementById('it-dept');
+    const depts = store.DeptList || [];
 
-    // เปลี่ยนประเภท → โหลด SubType
-    typeSelect.onchange = () => {
-        const selectedCode = typeSelect.value;
-        const subTypes = mapping[selectedCode]?.SubTypes || [];
-
-        subSelect.innerHTML = subTypes
-            .map(sub => `
-                <option value="${sub.SubTypeName}">
-                    ${sub.SubTypeName}
-                </option>
-            `).join('');
-    };
-
-    typeSelect.dispatchEvent(new Event('change'));
-
-    // โหลดหน่วยงาน
-    document.getElementById('it-dept').innerHTML =
-        (store.DeptList || [])
-        .map(d => `<option value="${d}">${d}</option>`)
-        .join('');
+    deptSelect.innerHTML = depts.map(d => {
+        if (typeof d === 'string') {
+            return `<option value="${d}">${d}</option>`;
+        }
+        return `<option value="${d.DepartmentName || d.DeptName || ''}">
+                    ${d.DepartmentName || d.DeptName || ''}
+                </option>`;
+    }).join('');
 
     document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 
+   function renderITTicketList() {
+    const container = document.getElementById('it-ticket-list');
+    const list = store.ITTickets || [];
 
-    document.getElementById('form-it-ticket').onsubmit = async (e) => {
-        e.preventDefault();
-        showLoading(true);
-        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('it-job-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
-        try {
-            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-            const result = await res.json();
-            if (result.success) {
-                showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ');
-                document.getElementById('form-it-ticket').reset();
-                await loadData();
-            }
-        } catch (e) { alert("Error"); }
-        showLoading(false);
-    };
-
-    function renderITTicketList() {
-        const container = document.getElementById('it-ticket-list');
-        if (!store.ITTickets || store.ITTickets.length === 0) {
-            container.innerHTML = '<div class="text-center p-6 text-slate-400 text-[10px]">ไม่พบประวัติ</div>';
-            return;
-        }
-        container.innerHTML = store.ITTickets.map(it => `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex justify-between items-center">
-                <div>
-                    <p class="text-[8px] text-blue-500 font-bold">${it.JobType}</p>
-                    <p class="text-xs font-bold text-slate-700">${it.Problem}</p>
-                    <p class="text-[8px] text-slate-400 mt-1">${it.Date || '-'} | ${it.Department}</p>
-                </div>
-                <span class="text-[8px] text-green-500 font-bold bg-green-50 px-2 py-1 rounded-full">Saved</span>
-            </div>`).join('');
+    if (list.length === 0) {
+        container.innerHTML = '<div class="text-center p-6 text-slate-400 text-[10px]">ไม่พบประวัติ</div>';
+        return;
     }
+
+    container.innerHTML = list.map(it => `
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex justify-between items-center">
+            <div>
+                <p class="text-[8px] text-blue-500 font-bold">${it.JobType || '-'}</p>
+                <p class="text-xs font-bold text-slate-700">${it.Problem || '-'}</p>
+                <p class="text-[8px] text-slate-400 mt-1">
+                    ${(it.Date || '-')} | ${(it.Department || '-')}
+                </p>
+            </div>
+            <span class="text-[8px] text-green-500 font-bold bg-green-50 px-2 py-1 rounded-full">
+                Saved
+            </span>
+        </div>
+    `).join('');
+}
+
 
     function renderSystemLinks() {
         const tab3Container = document.getElementById('tab3');

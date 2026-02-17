@@ -120,6 +120,69 @@
             </div>
         </div>
     </div>
+    <!-- ตัดบางส่วน header ออกเพื่อไม่ให้คำตอบยาวเกิน -->
+<!-- ไฟล์เต็มของคุณเหมือนเดิมทุกบรรทัด จนถึง modal-close-job -->
+
+<!-- ============================= -->
+<!-- ===== NEW SERVICE MA MODAL ===== -->
+<!-- ============================= -->
+
+<div id="modal-service-ma" class="overlay">
+    <div class="bg-white rounded-[2rem] w-full max-w-lg mx-4 shadow-2xl relative overflow-hidden">
+        <div class="p-6 space-y-4">
+            <h3 class="font-bold text-green-600 text-lg">🛠 บันทึกงานซ่อม (Service MA)</h3>
+
+            <!-- Auto Info -->
+            <div class="bg-slate-50 p-4 rounded-xl text-xs space-y-1">
+                <p><b>JobID:</b> <span id="ma-jobid"></span></p>
+                <p><b>หน่วยงาน:</b> <span id="ma-dept"></span></p>
+                <p><b>ปัญหา:</b> <span id="ma-problem"></span></p>
+            </div>
+
+            <!-- JobType -->
+            <div>
+                <label class="text-[10px] font-bold uppercase text-slate-400">ประเภทงาน</label>
+                <select id="ma-jobtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+            </div>
+
+            <!-- SubType -->
+            <div>
+                <label class="text-[10px] font-bold uppercase text-slate-400">ประเภทย่อย</label>
+                <select id="ma-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label class="text-[10px] font-bold uppercase text-slate-400">สถานะงาน</label>
+                <select id="ma-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
+                    <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                    <option value="ยกเลิก">ยกเลิก</option>
+                </select>
+            </div>
+
+            <!-- Comment -->
+            <div>
+                <label class="text-[10px] font-bold uppercase text-slate-400">รายละเอียดการแก้ไข</label>
+                <textarea id="ma-comment" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24"></textarea>
+            </div>
+
+            <!-- Remark -->
+            <div>
+                <label class="text-[10px] font-bold uppercase text-slate-400">Remark</label>
+                <textarea id="ma-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
+            </div>
+
+            <div class="flex gap-2 pt-4">
+                <button onclick="closeModal('modal-service-ma')" class="flex-1 py-3 text-slate-400 font-bold text-sm">
+                    ยกเลิก
+                </button>
+                <button onclick="saveServiceMA()" class="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold">
+                    บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div id="modal-it-ticket" class="overlay">
         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
@@ -433,17 +496,37 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-    function openCloseJobForm(jobId) {
-        closeModal('modal-detail');
-        document.getElementById('close-job-note').value = "";
-        document.getElementById('modal-close-job').style.display = 'flex';
-        
-        document.getElementById('btn-confirm-close').onclick = async () => {
-            const note = document.getElementById('close-job-note').value;
-            if (!note) return alert("กรุณาระบุรายละเอียดการซ่อม");
-            await handleJobUI(jobId, 'done', { Note: note });
-        };
-    }
+   function openCloseJobForm(jobId) {
+    const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
+    if (!job) return;
+
+    closeModal('modal-detail');
+
+    // Auto fill
+    document.getElementById('ma-jobid').innerText = job.JobID;
+    document.getElementById('ma-dept').innerText = job.Department;
+    document.getElementById('ma-problem').innerText = job.Problem;
+
+    // Load JobType
+    const jobTypes = store.JobTypeMaster || [];
+    const subTypes = store.JobSubTypeMaster || [];
+
+    const jtSelect = document.getElementById('ma-jobtype');
+    const stSelect = document.getElementById('ma-subtype');
+
+    jtSelect.innerHTML = jobTypes.map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`).join('');
+
+    jtSelect.onchange = () => {
+        const selected = jtSelect.value;
+        const filtered = subTypes.filter(s => s.JobTypeName === selected);
+        stSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
+    };
+
+    jtSelect.dispatchEvent(new Event('change'));
+
+    document.getElementById('modal-service-ma').style.display = 'flex';
+}
+
 
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
@@ -555,6 +638,42 @@
             setTimeout(() => { alertDiv.style.display = 'none'; closeModal(modalId); }, 1800);
         }
     }
+        async function saveServiceMA() {
+    showLoading(true);
+
+    const data = {
+        action: 'saveServiceMA',
+        data: {
+            JobID: document.getElementById('ma-jobid').innerText,
+            JobTypeName: document.getElementById('ma-jobtype').value,
+            SubTypeName: document.getElementById('ma-subtype').value,
+            JobStatus: document.getElementById('ma-status').value,
+            Comment: document.getElementById('ma-comment').value,
+            Remark: document.getElementById('ma-remark').value,
+            Owner: currentUser.USERID
+        }
+    };
+
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            closeModal('modal-service-ma');
+            await handleJobUI(data.data.JobID, 'done');
+        } else {
+            alert(result.message);
+        }
+    } catch (e) {
+        alert("Error saving ServiceMA");
+    }
+
+    showLoading(false);
+}
+
 
     function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
     async function confirmLogout() {

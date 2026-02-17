@@ -156,7 +156,23 @@
                 <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                    <div class="mt-3">
+                   <!-- ประเภทงานหลัก -->
+<div class="mt-3">
+    <label class="block text-sm text-gray-600 mb-1">ประเภทงาน</label>
+    <select id="it-job-type"
+        class="w-full border rounded-lg px-3 py-2 text-sm">
+    </select>
+</div>
+
+<!-- ประเภทย่อย -->
+<div class="mt-3">
+    <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
+    <select id="it-job-sub-type"
+        class="w-full border rounded-lg px-3 py-2 text-sm">
+        <option value="">-- เลือกประเภทย่อย --</option>
+    </select>
+</div>
+
     <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
     <select id="it-job-sub-type"
         class="w-full border rounded-lg px-3 py-2 text-sm">
@@ -528,36 +544,32 @@ function loadCloseJobMaster() {
 
   function openITTicketForm() {
 
-    document.getElementById('it-job-type').innerHTML =
+    const typeSelect = document.getElementById('it-job-type');
+    const subSelect  = document.getElementById('it-job-sub-type');
+
+    typeSelect.innerHTML =
         (store.JobTypeMaster || [])
         .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
         .join('');
 
-    document.getElementById('it-dept').innerHTML =
-        (store.DeptList || [])
-        .map(d => `<option value="${d}">${d}</option>`)
-        .join('');
+    typeSelect.addEventListener('change', function () {
 
-    loadITSubType(); // ✅ ย้ายมาไว้ตรงนี้
+        const mapping = store.JobTypeMapping || {};
+        const subTypes = mapping[this.value]?.SubTypes || [];
+
+        subSelect.innerHTML =
+            '<option value="">-- เลือกประเภทย่อย --</option>' +
+            subTypes.map(s =>
+                `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`
+            ).join('');
+    });
+
+    // trigger รอบแรก
+    typeSelect.dispatchEvent(new Event('change'));
 
     document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 
-    document.getElementById('form-it-ticket').onsubmit = async (e) => {
-        e.preventDefault();
-        showLoading(true);
-        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('it-job-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
-        try {
-            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-            const result = await res.json();
-            if (result.success) {
-                showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ');
-                document.getElementById('form-it-ticket').reset();
-                await loadData();
-            }
-        } catch (e) { alert("Error"); }
-        showLoading(false);
-    };
 
     function renderITTicketList() {
         const container = document.getElementById('it-ticket-list');

@@ -469,24 +469,33 @@
     function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
+    
+    // ดึงข้อมูลจาก store ที่โหลดมาจาก Google Sheets
     const mapping = store.JobTypeMapping || {};
 
-    // 1. เติมข้อมูลประเภทงาน
-    let typeOptions = '<option value="" disabled selected>-- เลือกประเภท --</option>';
+    // 1. ล้างค่าเก่าและเพิ่มรายการ "ประเภทงาน"
+    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
     Object.keys(mapping).forEach(code => {
-        typeOptions += `<option value="${code}">${mapping[code].JobTypeName}</option>`;
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = mapping[code].JobTypeName;
+        typeSelect.appendChild(option);
     });
-    typeSelect.innerHTML = typeOptions;
 
-    // 2. เมื่อเลือกประเภท ให้เปลี่ยนหมวดหมู่ย่อยทันที
-    typeSelect.onchange = () => {
-        const selectedCode = typeSelect.value;
+    // 2. เมื่อมีการเลือก "ประเภทงาน" ให้แสดง "หมวดหมู่ย่อย" ที่สัมพันธ์กัน
+    typeSelect.onchange = function() {
+        const selectedCode = this.value;
         const subTypes = mapping[selectedCode]?.SubTypes || [];
         
+        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
+        
         if (subTypes.length > 0) {
-            subSelect.innerHTML = subTypes.map(sub => 
-                `<option value="${sub.SubTypeName}">${sub.SubTypeName}</option>`
-            ).join('');
+            subTypes.forEach(sub => {
+                const opt = document.createElement('option');
+                opt.value = sub.SubTypeName;
+                opt.textContent = sub.SubTypeName;
+                subSelect.appendChild(opt);
+            });
         } else {
             subSelect.innerHTML = '<option value="-">- ไม่มีหมวดหมู่ย่อย -</option>';
         }
@@ -495,28 +504,32 @@
 
 function openCloseJobForm(jobId) {
     closeModal('modal-detail');
-    // ล้างค่าเก่า
+    
+    // ล้างค่าใน Form ก่อนแสดง
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
-    document.getElementById('modal-close-job').style.display = 'flex';
+    document.getElementById('close-job-status').value = "เสร็จสิ้น";
     
-    loadCloseJobMaster(); // โหลด Dropdown
+    // โหลดข้อมูล Dropdown
+    loadCloseJobMaster();
+    
+    document.getElementById('modal-close-job').style.display = 'flex';
 
-    // แก้ไข Logic ปุ่มยืนยัน
+    // ตั้งค่าปุ่มยืนยัน
     document.getElementById('btn-confirm-close').onclick = async () => {
         const note = document.getElementById('close-job-note').value;
-        const typeEl = document.getElementById('close-job-type');
+        const typeSelect = document.getElementById('close-job-type');
         const subType = document.getElementById('close-job-subtype').value;
         const status = document.getElementById('close-job-status').value;
         const remark = document.getElementById('close-job-remark').value;
 
-        if (!note || typeEl.value === "") {
-            alert("กรุณาระบุรายละเอียดและเลือกประเภทงานให้ครบถ้วน");
-            return;
-        }
+        // ตรวจสอบว่าเลือกข้อมูลหรือยัง
+        if (!typeSelect.value) return alert("กรุณาเลือกประเภทงาน");
+        if (!subType) return alert("กรุณาเลือกหมวดหมู่ย่อย");
+        if (!note) return alert("กรุณากรอกรายละเอียดการซ่อม");
 
-        const typeName = typeEl.options[typeEl.selectedIndex].text;
-        
+        const typeName = typeSelect.options[typeSelect.selectedIndex].text;
+
         await handleJobUI(jobId, 'done', { 
             Note: note,
             JobType: typeName,

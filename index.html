@@ -614,54 +614,6 @@ function renderSystemLinks() {
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     document.addEventListener('DOMContentLoaded', initApp);
-     // ฟังก์ชันสำหรับเปิดหน้าบันทึกงานซ่อม (ที่คุณเพิ่ม HTML ไว้แล้ว)
-function openCloseJobForm(jobId) {
-    // ปิด Modal รายละเอียดเดิม
-    closeModal('modal-detail'); 
-    // ล้างข้อความในช่องบันทึก
-    document.getElementById('close-job-note').value = ""; 
-    // แสดงหน้าบันทึกปิดงาน
-    document.getElementById('modal-close-job').style.display = 'flex';
-    
-    // เมื่อกดปุ่ม "ยืนยันการปิดงาน" ในหน้าบันทึก
-    document.getElementById('btn-confirm-close').onclick = async () => {
-        const note = document.getElementById('close-job-note').value;
-        if (!note) {
-            alert("กรุณาระบุรายละเอียดการแก้ไขก่อนปิดงาน");
-            return;
-        }
-        // ปิดหน้าบันทึก
-        closeModal('modal-close-job');
-        // ส่งข้อมูลไปบันทึก (ใช้ฟังก์ชัน handleJobUI เดิมของคุณที่มีสีและ Loading อยู่แล้ว)
-        await handleJobUI(jobId, 'done', { Note: note });
-    };
-}
-
-// ฟังก์ชันปิด Modal (เพิ่มเข้าไปเผื่อของเดิมโดนตัดออก)
-function closeModal(id) {
-    const el = document.getElementById(id);
-    if(el) el.style.display = 'none';
-}
-
-// ฟังก์ชันแสดง Loading (ใช้ ID 'loader' ตามที่คุณตั้งไว้)
-function showLoading(show) {
-    const loader = document.getElementById('loader');
-    if(loader) loader.style.display = show ? 'flex' : 'none';
-}
-
-// แก้ไขฟังก์ชันสุดท้ายให้ปิดปีกกาครบ และสั่งรันแอป
-function showInnerAlert(modalId, text) {
-    const alert = document.querySelector(`#${modalId} .inner-alert`);
-    const alertText = document.querySelector(`#${modalId} .inner-alert p`);
-    if (alert && alertText) {
-        alertText.innerText = text;
-        alert.style.display = 'flex';
-        setTimeout(() => { alert.style.display = 'none'; }, 2000);
-    }
-}
-
-// บรรทัดสำคัญ: สั่งให้แอปเริ่มทำงานเมื่อโหลดหน้าเสร็จ
-window.onload = initApp;
 </script>
 </body>
 </html>

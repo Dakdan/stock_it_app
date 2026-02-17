@@ -101,25 +101,93 @@
         </div>
     </div>
 
-    <div id="modal-close-job" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
-            <div class="p-6">
-                <h3 class="font-bold text-green-600 text-lg mb-4 flex items-center gap-2">
-                    <span>✅</span> บันทึกรายละเอียดการปิดงาน
-                </h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดการแก้ไข/หมายเหตุ</label>
-                        <textarea id="close-job-note" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-32 border border-slate-100 focus:border-green-500 outline-none" placeholder="ระบุสิ่งที่แก้ไข หรือสาเหตุของปัญหา..."></textarea>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
-                        <button id="btn-confirm-close" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow-lg">ยืนยันการปิดงาน</button>
-                    </div>
+    <div id="modal-service-ma" class="overlay">
+    <div class="bg-white rounded-[2rem] w-full max-w-2xl mx-4 shadow-2xl relative overflow-hidden">
+        <div class="p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="font-bold text-green-600 text-lg mb-4 flex items-center gap-2">
+                <span>🛠️</span> บันทึกงานซ่อม (ServiceMA)
+            </h3>
+
+            <div class="grid grid-cols-2 gap-4 text-xs">
+
+                <!-- AUTO FROM JOBTICKET -->
+                <input type="hidden" id="ma-jobid">
+
+                <div>
+                    <label class="font-bold text-slate-400">JobID</label>
+                    <input id="ma-display-jobid" disabled class="w-full p-2 bg-slate-100 rounded-xl">
                 </div>
+
+                <div>
+                    <label class="font-bold text-slate-400">CreateDate</label>
+                    <input id="ma-createdate" disabled class="w-full p-2 bg-slate-100 rounded-xl">
+                </div>
+
+                <div class="col-span-2">
+                    <label class="font-bold text-slate-400">Problem</label>
+                    <textarea id="ma-problem" disabled class="w-full p-2 bg-slate-100 rounded-xl h-16"></textarea>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-400">AssetCode</label>
+                    <input id="ma-assetcode" disabled class="w-full p-2 bg-slate-100 rounded-xl">
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-400">Owner</label>
+                    <input id="ma-owner" disabled class="w-full p-2 bg-slate-100 rounded-xl">
+                </div>
+
+                <!-- NEW FIELDS -->
+                <div>
+                    <label class="font-bold text-slate-400">JobTypeName</label>
+                    <select id="ma-jobtype" class="w-full p-2 bg-slate-50 rounded-xl"></select>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-400">SubTypeName</label>
+                    <select id="ma-subtype" class="w-full p-2 bg-slate-50 rounded-xl"></select>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-400">JobStatus</label>
+                    <select id="ma-status" class="w-full p-2 bg-slate-50 rounded-xl">
+                        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                        <option value="รออะไหล่">รออะไหล่</option>
+                        <option value="ยกเลิก">ยกเลิก</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-400">Comment</label>
+                    <input id="ma-comment" class="w-full p-2 bg-slate-50 rounded-xl">
+                </div>
+
+                <div class="col-span-2">
+                    <label class="font-bold text-slate-400">Remark</label>
+                    <textarea id="ma-remark" class="w-full p-2 bg-slate-50 rounded-xl h-16"></textarea>
+                </div>
+
+                <div class="col-span-2">
+                    <label class="font-bold text-slate-400">Jobeimag (URL)</label>
+                    <input id="ma-image" class="w-full p-2 bg-slate-50 rounded-xl">
+                </div>
+
             </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('modal-service-ma')" class="flex-1 py-3 text-slate-400 font-bold bg-slate-50 rounded-2xl">
+                    ยกเลิก
+                </button>
+                <button onclick="submitServiceMA()" class="flex-1 py-3 bg-green-600 text-white rounded-2xl font-bold shadow-lg">
+                    💾 บันทึก
+                </button>
+            </div>
+
         </div>
     </div>
+</div>
+
 
     <div id="modal-it-ticket" class="overlay">
         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">

@@ -112,6 +112,31 @@
                         <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดการแก้ไข/หมายเหตุ</label>
                         <textarea id="close-job-note" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-32 border border-slate-100 focus:border-green-500 outline-none" placeholder="ระบุสิ่งที่แก้ไข หรือสาเหตุของปัญหา..."></textarea>
                     </div>
+                    <!-- ===== เพิ่มส่วน ServiceMA ===== -->
+
+<div>
+    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
+    <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+</div>
+
+<div>
+    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
+    <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+</div>
+
+<div>
+    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">สถานะงาน</label>
+    <select id="close-job-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
+        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+        <option value="ยกเลิก">ยกเลิก</option>
+    </select>
+</div>
+
+<div>
+    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมายเหตุเพิ่มเติม</label>
+    <textarea id="close-job-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
+</div>
+
                     <div class="flex gap-2">
                         <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
                         <button id="btn-confirm-close" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow-lg">ยืนยันการปิดงาน</button>
@@ -120,73 +145,6 @@
             </div>
         </div>
     </div>
-    <!-- ตัดบางส่วน header ออกเพื่อไม่ให้คำตอบยาวเกิน -->
-<!-- ไฟล์เต็มของคุณเหมือนเดิมทุกบรรทัด จนถึง modal-close-job -->
-
-<!-- ============================= -->
-<!-- ===== NEW SERVICE MA MODAL ===== -->
-<!-- ============================= -->
-
-                                <!-- Modal Service MA -->
-<div id="modal-service-ma" class="overlay fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
-
-    <div class="bg-white rounded-2xl w-full max-w-md mx-4 shadow-xl relative overflow-hidden max-h-[85vh] flex flex-col">
-
-        <!-- Header -->
-        <div class="bg-rose-600 text-white px-6 py-4 flex items-center justify-between">
-            <h2 class="text-lg font-semibold">บันทึกงาน Service MA</h2>
-            <button onclick="closeServiceMAModal()" class="text-white text-xl leading-none">&times;</button>
-        </div>
-
-        <!-- Content -->
-        <div class="p-6 space-y-4 overflow-y-auto">
-
-            <div>
-                <label class="block text-sm font-medium mb-1">ประเภทงาน</label>
-                <select class="w-full border rounded-lg px-3 py-2">
-                    <option>On-site Service / ออกหน้างาน</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">ประเภทงานย่อย</label>
-                <select class="w-full border rounded-lg px-3 py-2">
-                    <option value="">เลือกประเภทงานย่อย</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">สถานะงาน</label>
-                <select class="w-full border rounded-lg px-3 py-2">
-                    <option>เสร็จสิ้น</option>
-                    <option>กำลังดำเนินการ</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">รายละเอียดการแก้ไข</label>
-                <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">Remark</label>
-                <textarea class="w-full border rounded-lg px-3 py-2 h-20"></textarea>
-            </div>
-
-        </div>
-
-        <!-- Footer -->
-        <div class="px-6 py-4 border-t flex justify-end gap-3">
-            <button onclick="closeServiceMAModal()" class="px-4 py-2 rounded-lg border">
-                ยกเลิก
-            </button>
-            <button class="px-4 py-2 rounded-lg bg-rose-600 text-white">
-                บันทึก
-            </button>
-        </div>
-
-    </div>
-</div>
 
     <div id="modal-it-ticket" class="overlay">
         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
@@ -500,35 +458,34 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-   function openCloseJobForm(jobId) {
-    const job = store.AllJobs.find(j => String(j.JobID) === String(jobId));
-    if (!job) return;
+    function openCloseJobForm(jobId) {
+        closeModal('modal-detail');
+        document.getElementById('close-job-note').value = "";
+        document.getElementById('modal-close-job').style.display = 'flex';
+        loadCloseJobMaster();
 
-    closeModal('modal-detail');
+        document.getElementById('btn-confirm-close').onclick = async () => {
+            const note = document.getElementById('close-job-note').value;
+            if (!note) return alert("กรุณาระบุรายละเอียดการซ่อม");
+            await handleJobUI(jobId, 'done', { Note: note });
+        };
+    }
+        function loadCloseJobMaster() {
+    const typeSelect = document.getElementById('close-job-type');
+    const subSelect = document.getElementById('close-job-subtype');
 
-    // Auto fill
-    document.getElementById('ma-jobid').innerText = job.JobID;
-    document.getElementById('ma-dept').innerText = job.Department;
-    document.getElementById('ma-problem').innerText = job.Problem;
+    typeSelect.innerHTML = (store.JobTypeMaster || [])
+        .map(t => `<option value="${t}">${t}</option>`).join('');
 
-    // Load JobType
-    const jobTypes = store.JobTypeMaster || [];
-    const subTypes = store.JobSubTypeMaster || [];
-
-    const jtSelect = document.getElementById('ma-jobtype');
-    const stSelect = document.getElementById('ma-subtype');
-
-    jtSelect.innerHTML = jobTypes.map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`).join('');
-
-    jtSelect.onchange = () => {
-        const selected = jtSelect.value;
-        const filtered = subTypes.filter(s => s.JobTypeName === selected);
-        stSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
+    typeSelect.onchange = () => {
+        const selected = typeSelect.value;
+        const filtered = (store.JobSubTypeMaster || [])
+            .filter(s => s.includes(selected));
+        subSelect.innerHTML = filtered
+            .map(s => `<option value="${s}">${s}</option>`).join('');
     };
 
-    jtSelect.dispatchEvent(new Event('change'));
-
-    document.getElementById('modal-service-ma').style.display = 'flex';
+    typeSelect.dispatchEvent(new Event('change'));
 }
 
 
@@ -642,42 +599,6 @@
             setTimeout(() => { alertDiv.style.display = 'none'; closeModal(modalId); }, 1800);
         }
     }
-        async function saveServiceMA() {
-    showLoading(true);
-
-    const data = {
-        action: 'saveServiceMA',
-        data: {
-            JobID: document.getElementById('ma-jobid').innerText,
-            JobTypeName: document.getElementById('ma-jobtype').value,
-            SubTypeName: document.getElementById('ma-subtype').value,
-            JobStatus: document.getElementById('ma-status').value,
-            Comment: document.getElementById('ma-comment').value,
-            Remark: document.getElementById('ma-remark').value,
-            Owner: currentUser.USERID
-        }
-    };
-
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-        const result = await res.json();
-
-        if (result.success) {
-            closeModal('modal-service-ma');
-            await handleJobUI(data.data.JobID, 'done');
-        } else {
-            alert(result.message);
-        }
-    } catch (e) {
-        alert("Error saving ServiceMA");
-    }
-
-    showLoading(false);
-}
-
 
     function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
     async function confirmLogout() {

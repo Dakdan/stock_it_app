@@ -469,6 +469,7 @@
 function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
+    // อ้างอิงจากสิ่งที่ Backend ส่งมาเป๊ะๆ
     const typeData = store.JobTypeMaster || [];
     const subTypeData = store.JobSubTypeMaster || [];
 
@@ -496,27 +497,18 @@ function loadCloseJobMaster() {
 }
 
 function openCloseJobForm(jobId) {
-    // 1. ปิดหน้าต่างเดิมก่อน (ตามระบบเดิม)
-    closeModal('modal-detail');
-    
-    // 2. ล้างข้อมูลในฟอร์ม
+    closeModal('modal-detail'); // ปิดหน้าต่างเก่า
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
     
-    // 3. เรียกใช้ฟังก์ชันโหลดตัวเลือก
-    loadCloseJobMaster(); 
+    loadCloseJobMaster(); // โหลดข้อมูลเข้า Dropdown
+    document.getElementById('modal-close-job').style.display = 'flex'; // เปิด Overlay
 
-    // 4. แสดง Overlay (ใช้ ID เดิมที่คุณมี)
-    const modal = document.getElementById('modal-close-job');
-    modal.style.display = 'flex'; 
-
-    // 5. จัดการปุ่มยืนยัน (ID: btn-confirm-close)
     document.getElementById('btn-confirm-close').onclick = async () => {
         const note = document.getElementById('close-job-note').value;
         const typeSelect = document.getElementById('close-job-type');
         const subTypeSelect = document.getElementById('close-job-subtype');
 
-        // เช็คความครบถ้วน
         if (!typeSelect.value || !subTypeSelect.value || !note) {
             alert("กรุณาระบุข้อมูลให้ครบถ้วน");
             return;
@@ -524,19 +516,18 @@ function openCloseJobForm(jobId) {
 
         const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
 
-        // ส่งข้อมูลเข้า handleJobUI (ฟังก์ชันกลางเดิมของคุณ)
+        // ส่งผ่าน handleJobUI เพื่อให้ระบบ Overlay/Loading จัดการต่อเอง
         await handleJobUI(jobId, 'done', { 
             Note: note,
-            JobTypeName: typeNameText,     // ส่งให้ตรงกับ Apps Script
-            SubTypeName: subTypeSelect.value, // ส่งให้ตรงกับ Apps Script
+            JobTypeName: typeNameText,
+            SubTypeName: subTypeSelect.value,
             CloseStatus: document.getElementById('close-job-status').value,
             Remark: document.getElementById('close-job-remark').value,
             Owner: currentUser.USERID,
             By: currentUser.UserName 
         });
 
-        // ปิด Overlay เมื่อเสร็จ
-        modal.style.display = 'none';
+        document.getElementById('modal-close-job').style.display = 'none'; // ปิด Modal
     };
 }
     function openTransfer(jobId) {
@@ -595,7 +586,31 @@ document.getElementById('form-it-ticket').onsubmit = async (e) => {
         closeModal('modal-it-ticket'); // ปิด Modal หลังจากบันทึกสำเร็จ
     }
 };
+// ค้นหา ID form-it-ticket แล้วผูกการบันทึก
+if (document.getElementById('form-it-ticket')) {
+    document.getElementById('form-it-ticket').onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const jobType = document.getElementById('it-job-type').value;
+        const problem = document.getElementById('it-problem').value;
+        const dept = document.getElementById('it-dept').value;
 
+        if (!jobType || !problem) return alert("กรุณากรอกข้อมูลให้ครบ");
+
+        // ส่งผ่าน handleJobUI ตามกรอบเดิมของระบบคุณ
+        const success = await handleJobUI(null, 'saveITTicket', { 
+            jobType: jobType, 
+            problem: problem, 
+            dept: dept, 
+            owner: currentUser.USERID 
+        });
+
+        if (success) {
+            document.getElementById('form-it-ticket').reset();
+            document.getElementById('modal-it-ticket').style.display = 'none';
+        }
+    };
+}
     function renderITTicketList() {
         const container = document.getElementById('it-ticket-list');
         if (!store.ITTickets || store.ITTickets.length === 0) {

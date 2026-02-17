@@ -466,51 +466,66 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-    function openCloseJobForm(jobId) {
-        closeModal('modal-detail');
-        document.getElementById('close-job-note').value = "";
-        document.getElementById('modal-close-job').style.display = 'flex';
-        loadCloseJobMaster();
-
-        document.getElementById('btn-confirm-close').onclick = async () => {
-            const note = document.getElementById('close-job-note').value;
-            if (!note) return alert("กรุณาระบุรายละเอียดการซ่อม");
-            await handleJobUI(jobId, 'done', { Note: note });
-        };
-    }
-function loadCloseJobMaster() {
-
+    function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
-
     const mapping = store.JobTypeMapping || {};
 
-    // ===== โหลดประเภทงาน =====
-    typeSelect.innerHTML = Object.keys(mapping)
-        .map(code => `
-            <option value="${code}">
-                ${mapping[code].JobTypeName}
-            </option>
-        `).join('');
+    // 1. เติมข้อมูลประเภทงาน
+    let typeOptions = '<option value="" disabled selected>-- เลือกประเภท --</option>';
+    Object.keys(mapping).forEach(code => {
+        typeOptions += `<option value="${code}">${mapping[code].JobTypeName}</option>`;
+    });
+    typeSelect.innerHTML = typeOptions;
 
-    // ===== เมื่อเปลี่ยนประเภท =====
+    // 2. เมื่อเลือกประเภท ให้เปลี่ยนหมวดหมู่ย่อยทันที
     typeSelect.onchange = () => {
-
         const selectedCode = typeSelect.value;
         const subTypes = mapping[selectedCode]?.SubTypes || [];
-
-        subSelect.innerHTML = subTypes
-            .map(sub => `
-                <option value="${sub.SubTypeName}">
-                    ${sub.SubTypeName}
-                </option>
-            `).join('');
+        
+        if (subTypes.length > 0) {
+            subSelect.innerHTML = subTypes.map(sub => 
+                `<option value="${sub.SubTypeName}">${sub.SubTypeName}</option>`
+            ).join('');
+        } else {
+            subSelect.innerHTML = '<option value="-">- ไม่มีหมวดหมู่ย่อย -</option>';
+        }
     };
-
-    typeSelect.dispatchEvent(new Event('change'));
 }
 
+function openCloseJobForm(jobId) {
+    closeModal('modal-detail');
+    // ล้างค่าเก่า
+    document.getElementById('close-job-note').value = "";
+    document.getElementById('close-job-remark').value = "";
+    document.getElementById('modal-close-job').style.display = 'flex';
+    
+    loadCloseJobMaster(); // โหลด Dropdown
 
+    // แก้ไข Logic ปุ่มยืนยัน
+    document.getElementById('btn-confirm-close').onclick = async () => {
+        const note = document.getElementById('close-job-note').value;
+        const typeEl = document.getElementById('close-job-type');
+        const subType = document.getElementById('close-job-subtype').value;
+        const status = document.getElementById('close-job-status').value;
+        const remark = document.getElementById('close-job-remark').value;
+
+        if (!note || typeEl.value === "") {
+            alert("กรุณาระบุรายละเอียดและเลือกประเภทงานให้ครบถ้วน");
+            return;
+        }
+
+        const typeName = typeEl.options[typeEl.selectedIndex].text;
+        
+        await handleJobUI(jobId, 'done', { 
+            Note: note,
+            JobType: typeName,
+            JobSubType: subType,
+            CloseStatus: status,
+            Remark: remark
+        });
+    };
+}
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
         const role = String(currentUser.UserTypeID || '').toUpperCase();

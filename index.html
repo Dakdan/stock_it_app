@@ -127,60 +127,64 @@
 <!-- ===== NEW SERVICE MA MODAL ===== -->
 <!-- ============================= -->
 
-<div id="modal-service-ma" class="overlay">
-    <div class="bg-white rounded-[2rem] w-full max-w-lg mx-4 shadow-2xl relative overflow-hidden">
-        <div class="p-6 space-y-4">
-            <h3 class="font-bold text-green-600 text-lg">🛠 บันทึกงานซ่อม (Service MA)</h3>
+                                <!-- Modal Service MA -->
+<div id="modal-service-ma" class="overlay fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
 
-            <!-- Auto Info -->
-            <div class="bg-slate-50 p-4 rounded-xl text-xs space-y-1">
-                <p><b>JobID:</b> <span id="ma-jobid"></span></p>
-                <p><b>หน่วยงาน:</b> <span id="ma-dept"></span></p>
-                <p><b>ปัญหา:</b> <span id="ma-problem"></span></p>
-            </div>
+    <div class="bg-white rounded-2xl w-full max-w-md mx-4 shadow-xl relative overflow-hidden max-h-[85vh] flex flex-col">
 
-            <!-- JobType -->
+        <!-- Header -->
+        <div class="bg-rose-600 text-white px-6 py-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold">บันทึกงาน Service MA</h2>
+            <button onclick="closeServiceMAModal()" class="text-white text-xl leading-none">&times;</button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-4 overflow-y-auto">
+
             <div>
-                <label class="text-[10px] font-bold uppercase text-slate-400">ประเภทงาน</label>
-                <select id="ma-jobtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-            </div>
-
-            <!-- SubType -->
-            <div>
-                <label class="text-[10px] font-bold uppercase text-slate-400">ประเภทย่อย</label>
-                <select id="ma-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-            </div>
-
-            <!-- Status -->
-            <div>
-                <label class="text-[10px] font-bold uppercase text-slate-400">สถานะงาน</label>
-                <select id="ma-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
-                    <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-                    <option value="ยกเลิก">ยกเลิก</option>
+                <label class="block text-sm font-medium mb-1">ประเภทงาน</label>
+                <select class="w-full border rounded-lg px-3 py-2">
+                    <option>On-site Service / ออกหน้างาน</option>
                 </select>
             </div>
 
-            <!-- Comment -->
             <div>
-                <label class="text-[10px] font-bold uppercase text-slate-400">รายละเอียดการแก้ไข</label>
-                <textarea id="ma-comment" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24"></textarea>
+                <label class="block text-sm font-medium mb-1">ประเภทงานย่อย</label>
+                <select class="w-full border rounded-lg px-3 py-2">
+                    <option value="">เลือกประเภทงานย่อย</option>
+                </select>
             </div>
 
-            <!-- Remark -->
             <div>
-                <label class="text-[10px] font-bold uppercase text-slate-400">Remark</label>
-                <textarea id="ma-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
+                <label class="block text-sm font-medium mb-1">สถานะงาน</label>
+                <select class="w-full border rounded-lg px-3 py-2">
+                    <option>เสร็จสิ้น</option>
+                    <option>กำลังดำเนินการ</option>
+                </select>
             </div>
 
-            <div class="flex gap-2 pt-4">
-                <button onclick="closeModal('modal-service-ma')" class="flex-1 py-3 text-slate-400 font-bold text-sm">
-                    ยกเลิก
-                </button>
-                <button onclick="saveServiceMA()" class="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold">
-                    บันทึก
-                </button>
+            <div>
+                <label class="block text-sm font-medium mb-1">รายละเอียดการแก้ไข</label>
+                <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Remark</label>
+                <textarea class="w-full border rounded-lg px-3 py-2 h-20"></textarea>
+            </div>
+
         </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t flex justify-end gap-3">
+            <button onclick="closeServiceMAModal()" class="px-4 py-2 rounded-lg border">
+                ยกเลิก
+            </button>
+            <button class="px-4 py-2 rounded-lg bg-rose-600 text-white">
+                บันทึก
+            </button>
+        </div>
+
     </div>
 </div>
 

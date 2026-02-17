@@ -290,10 +290,10 @@
                         <div class="flex justify-between items-end pt-2 border-t border-slate-50 mt-2">
                             <div class="space-y-1">
                                 <p class="text-[8px] text-slate-400 uppercase font-bold">ผู้ดูแลงาน</p>
-                                <p class="text-[10px] font-bold text-blue-600 italic leading-tight">👤 ${ownerName}</p>
+                                <p class="text-[10px] font-bold text-blue-600 italic leading-tight">👷 ${ownerName}</p>
                             </div>
                             <div class="text-right space-y-1">
-                                <p class="text-[9px] font-bold text-slate-500">🏢 ${j.Department}</p>
+                                <p class="text-[9px] font-bold text-slate-500">🏨 ${j.Department}</p>
                                 <p class="text-[10px] font-bold ${String(j.Priority).includes('ด่วน') ? 'text-red-500' : 'text-orange-500'}">
                                     ⚠️ ${j.Priority}
                                 </p>
@@ -462,6 +462,7 @@
 
     function openITTicketForm() {
         document.getElementById('it-job-type').innerHTML = (store.JobTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
+        document.getElementById('it-job-sub-type').innerHTML = (store.JobSubTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
         document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
         document.getElementById('modal-it-ticket').style.display = 'flex';
     }

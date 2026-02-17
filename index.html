@@ -526,7 +526,7 @@ function loadCloseJobMaster() {
         };
     }
 
-   function openITTicketForm() {
+  function openITTicketForm() {
 
     document.getElementById('it-job-type').innerHTML =
         (store.JobTypeMaster || [])
@@ -538,9 +538,10 @@ function loadCloseJobMaster() {
         .map(d => `<option value="${d}">${d}</option>`)
         .join('');
 
+    loadITSubType(); // ✅ ย้ายมาไว้ตรงนี้
+
     document.getElementById('modal-it-ticket').style.display = 'flex';
 }
-loadITSubType();
 
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
@@ -598,7 +599,7 @@ loadITSubType();
                 </div>
             </a>`).join('');
     }
-        function loadITSubType() {
+       function loadITSubType() {
 
     const typeSelect = document.getElementById('it-job-type');
     const subSelect = document.getElementById('it-job-sub-type');
@@ -612,14 +613,19 @@ loadITSubType();
         const selected = typeSelect.value;
         const subTypes = mapping[selected]?.SubTypes || [];
 
-        subSelect.innerHTML = '<option value="">-- เลือกประเภทย่อย --</option>' +
+        subSelect.innerHTML =
+            '<option value="">-- เลือกประเภทย่อย --</option>' +
             subTypes.map(s => `
                 <option value="${s.SubTypeName}">
                     ${s.SubTypeName}
                 </option>
             `).join('');
     };
+
+    // ✅ บังคับให้โหลดรอบแรก
+    typeSelect.dispatchEvent(new Event('change'));
 }
+
 
 
     function updateStats(jobs) {

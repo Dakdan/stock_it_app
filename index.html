@@ -547,8 +547,10 @@ function openCloseJobForm(jobId) {
 
  // 1. ฟังก์ชันเปิดฟอร์มและจัดการ Dropdown IT Ticket
 function openITTicketForm() {
-    // โหลดประเภทงานหลัก
     const typeSelect = document.getElementById('it-job-type');
+    const subSelect = document.getElementById('it-job-subtype');
+    
+    // โหลดประเภทงานหลัก
     typeSelect.innerHTML = (store.JobTypeMaster || [])
         .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
         .join('');
@@ -558,8 +560,7 @@ function openITTicketForm() {
         .map(d => `<option value="${d}">${d}</option>`)
         .join('');
 
-    // ฟังก์ชันย่อยสำหรับกรองประเภทย่อย (เชื่อม JobTypeCode จาก code.gs)
-    const subSelect = document.getElementById('it-job-subtype');
+    // ฟังก์ชันกรองประเภทย่อยตาม JobTypeCode
     const updateSub = () => {
         const typeObj = (store.JobTypeMaster || []).find(t => t.JobTypeName === typeSelect.value);
         const code = typeObj ? typeObj.JobTypeCode : '';
@@ -571,11 +572,13 @@ function openITTicketForm() {
     };
 
     typeSelect.onchange = updateSub; // ผูกเหตุการณ์เปลี่ยนค่า
-    updateSub(); // รันครั้งแรก
+    updateSub(); // เรียกทำงานครั้งแรก
     
-    document.getElementById('modal-it-ticket').style.display = 'flex'; // เปิด Overlay
+    document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 
+// ผูก Event ปุ่มบันทึกข้อมูล (onsubmit) เพียงที่เดียว
+document.
 // 2. ฟังก์ชันบันทึกข้อมูล IT Ticket (ผูก Event ครั้งเดียวจบ)
 if (document.getElementById('form-it-ticket')) {
     document.getElementById('form-it-ticket').onsubmit = async (e) => {

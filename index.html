@@ -545,89 +545,58 @@ function openCloseJobForm(jobId) {
         };
     }
 
-  function openITTicketForm() {
-
-    document.getElementById('it-job-type').innerHTML =
-        (store.JobTypeMaster || [])
+ // 1. ฟังก์ชันเปิดฟอร์มและจัดการ Dropdown IT Ticket
+function openITTicketForm() {
+    // โหลดประเภทงานหลัก
+    const typeSelect = document.getElementById('it-job-type');
+    typeSelect.innerHTML = (store.JobTypeMaster || [])
         .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
         .join('');
 
-    document.getElementById('it-dept').innerHTML =
-        (store.DeptList || [])
+    // โหลดหน่วยงาน
+    document.getElementById('it-dept').innerHTML = (store.DeptList || [])
         .map(d => `<option value="${d}">${d}</option>`)
         .join('');
 
-    loadITSubType(); // ✅ ย้ายมาไว้ตรงนี้
+    // ฟังก์ชันย่อยสำหรับกรองประเภทย่อย (เชื่อม JobTypeCode จาก code.gs)
+    const subSelect = document.getElementById('it-job-subtype');
+    const updateSub = () => {
+        const typeObj = (store.JobTypeMaster || []).find(t => t.JobTypeName === typeSelect.value);
+        const code = typeObj ? typeObj.JobTypeCode : '';
+        const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(code));
+        
+        subSelect.innerHTML = filtered.length > 0 
+            ? filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('')
+            : '<option value="">-- ไม่มีประเภทย่อย --</option>';
+    };
 
-    document.getElementById('modal-it-ticket').style.display = 'flex';
+    typeSelect.onchange = updateSub; // ผูกเหตุการณ์เปลี่ยนค่า
+    updateSub(); // รันครั้งแรก
+    
+    document.getElementById('modal-it-ticket').style.display = 'flex'; // เปิด Overlay
 }
 
-  // ค้นหาบรรทัดที่มี document.getElementById('form-it-ticket') แล้ววางทับด้วยโค้ดนี้
-document.getElementById('form-it-ticket').onsubmit = async (e) => {
-    e.preventDefault();
-    
-    // ดึงค่าจากฟอร์มตาม ID ที่คุณมีใน HTML
-    const jobType = document.getElementById('it-job-type').value;
-    const problem = document.getElementById('it-problem').value;
-    const dept = document.getElementById('it-dept').value;
-
-    if (!jobType || !problem) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-    // เรียกใช้ handleJobUI เพื่อให้ระบบจัดการ Overlay และบันทึกลง Apps Script ให้เอง
-    const success = await handleJobUI(null, 'saveITTicket', { 
-        jobType: jobType, 
-        problem: problem, 
-        dept: dept, 
-        owner: currentUser.USERID 
-    });
-
-    if (success) {
-        document.getElementById('form-it-ticket').reset();
-        closeModal('modal-it-ticket'); // ปิด Modal หลังจากบันทึกสำเร็จ
-    }
-};
-// ค้นหา ID form-it-ticket แล้วผูกการบันทึก
+// 2. ฟังก์ชันบันทึกข้อมูล IT Ticket (ผูก Event ครั้งเดียวจบ)
 if (document.getElementById('form-it-ticket')) {
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
-        
-        const jobType = document.getElementById('it-job-type').value;
-        const problem = document.getElementById('it-problem').value;
-        const dept = document.getElementById('it-dept').value;
-
-        if (!jobType || !problem) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-        // ส่งผ่าน handleJobUI ตามกรอบเดิมของระบบคุณ
-        const success = await handleJobUI(null, 'saveITTicket', { 
-            jobType: jobType, 
-            problem: problem, 
-            dept: dept, 
+        const payload = {
+            jobType: document.getElementById('it-job-type').value,
+            problem: document.getElementById('it-problem').value,
+            dept: document.getElementById('it-dept').value,
             owner: currentUser.USERID 
-        });
+        };
 
+        if (!payload.jobType || !payload.problem) return alert("กรุณากรอกข้อมูลให้ครบ");
+
+        // ส่งเข้า handleJobUI ตามโครงสร้างเดิมเพื่อให้ระบบจัดการต่อ
+        const success = await handleJobUI(null, 'saveITTicket', payload);
         if (success) {
             document.getElementById('form-it-ticket').reset();
-            document.getElementById('modal-it-ticket').style.display = 'none';
+            closeModal('modal-it-ticket');
         }
     };
 }
-    function renderITTicketList() {
-        const container = document.getElementById('it-ticket-list');
-        if (!store.ITTickets || store.ITTickets.length === 0) {
-            container.innerHTML = '<div class="text-center p-6 text-slate-400 text-[10px]">ไม่พบประวัติ</div>';
-            return;
-        }
-        container.innerHTML = store.ITTickets.map(it => `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex justify-between items-center">
-                <div>
-                    <p class="text-[8px] text-blue-500 font-bold">${it.JobType}</p>
-                    <p class="text-xs font-bold text-slate-700">${it.Problem}</p>
-                    <p class="text-[8px] text-slate-400 mt-1">${it.Date || '-'} | ${it.Department}</p>
-                </div>
-                <span class="text-[8px] text-green-500 font-bold bg-green-50 px-2 py-1 rounded-full">Saved</span>
-            </div>`).join('');
-    }
-
     function renderSystemLinks() {
         const tab3Container = document.getElementById('tab3');
         if (!tab3Container) return;
@@ -651,31 +620,30 @@ if (document.getElementById('form-it-ticket')) {
                 </div>
             </a>`).join('');
     }
-       function loadITSubType() {
-
+   function loadITSubType() {
     const typeSelect = document.getElementById('it-job-type');
-    const subSelect = document.getElementById('it-job-sub-type');
-
+    const subSelect = document.getElementById('it-job-subtype');
     if (!typeSelect || !subSelect) return;
 
-    const mapping = store.JobTypeMapping || {};
+    const typeData = store.JobTypeMaster || []; 
+    const subTypeData = store.JobSubTypeMaster || []; 
 
-    typeSelect.onchange = () => {
+    const updateSubOptions = () => {
+        const selectedTypeName = typeSelect.value;
+        // ค้นหา Code เพื่อเอาไปกรองประเภทย่อย
+        const typeObj = typeData.find(t => t.JobTypeName === selectedTypeName);
+        const selectedCode = typeObj ? typeObj.JobTypeCode : '';
 
-        const selected = typeSelect.value;
-        const subTypes = mapping[selected]?.SubTypes || [];
+        // กรองข้อมูลที่ Code ตรงกัน
+        const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
 
-        subSelect.innerHTML =
-            '<option value="">-- เลือกประเภทย่อย --</option>' +
-            subTypes.map(s => `
-                <option value="${s.SubTypeName}">
-                    ${s.SubTypeName}
-                </option>
-            `).join('');
+        subSelect.innerHTML = filtered.length > 0 
+            ? filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('')
+            : '<option value="">-- ไม่มีประเภทย่อย --</option>';
     };
 
-    // ✅ บังคับให้โหลดรอบแรก
-    typeSelect.dispatchEvent(new Event('change'));
+    typeSelect.onchange = updateSubOptions; // ผูกเหตุการณ์เมื่อเปลี่ยนค่า
+    updateSubOptions(); // รันครั้งแรกทันที
 }
 
 

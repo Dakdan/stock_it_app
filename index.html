@@ -518,12 +518,20 @@ function loadCloseJobMaster() {
         };
     }
 
-    function openITTicketForm() {
-        document.getElementById('it-job-type').innerHTML = (store.JobTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
-        document.getElementById('it-job-sub-type').innerHTML = (store.JobSubTypeMaster || []).map(t => `<option value="${t}">${t}</option>`).join('');
-        document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
-        document.getElementById('modal-it-ticket').style.display = 'flex';
-    }
+   function openITTicketForm() {
+
+    document.getElementById('it-job-type').innerHTML =
+        (store.JobTypeMaster || [])
+        .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
+        .join('');
+
+    document.getElementById('it-dept').innerHTML =
+        (store.DeptList || [])
+        .map(d => `<option value="${d}">${d}</option>`)
+        .join('');
+
+    document.getElementById('modal-it-ticket').style.display = 'flex';
+}
 
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();

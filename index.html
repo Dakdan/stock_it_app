@@ -466,74 +466,67 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-    function loadCloseJobMaster() {
+   function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
-    
-    // ดึงข้อมูลจาก store ที่โหลดมาจาก Google Sheets
-    const mapping = store.JobTypeMapping || {};
+    const mapping = store.JobTypeMapping || {}; // อ้างอิงจากคอลัมน์ JobTypeMapping ใน store
 
-    // 1. ล้างค่าเก่าและเพิ่มรายการ "ประเภทงาน"
-    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
+    // 1. ล้างค่าและเติม "ประเภทงาน"
+    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภท --</option>';
+    subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
+
     Object.keys(mapping).forEach(code => {
-        const option = document.createElement('option');
-        option.value = code;
-        option.textContent = mapping[code].JobTypeName;
-        typeSelect.appendChild(option);
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = mapping[code].JobTypeName; // ใช้ชื่อจากคอลัมน์ JobTypeName
+        typeSelect.appendChild(opt);
     });
 
-    // 2. เมื่อมีการเลือก "ประเภทงาน" ให้แสดง "หมวดหมู่ย่อย" ที่สัมพันธ์กัน
+    // 2. เมื่อเลือกประเภทงาน ให้หมวดหมู่ย่อยเปลี่ยนตามจริง
     typeSelect.onchange = function() {
         const selectedCode = this.value;
-        const subTypes = mapping[selectedCode]?.SubTypes || [];
+        const subData = mapping[selectedCode]?.SubTypes || [];
         
         subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
         
-        if (subTypes.length > 0) {
-            subTypes.forEach(sub => {
-                const opt = document.createElement('option');
-                opt.value = sub.SubTypeName;
-                opt.textContent = sub.SubTypeName;
-                subSelect.appendChild(opt);
-            });
-        } else {
-            subSelect.innerHTML = '<option value="-">- ไม่มีหมวดหมู่ย่อย -</option>';
-        }
+        subData.forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub.SubTypeName; // ใช้ชื่อจากคอลัมน์ SubTypeName
+            opt.textContent = sub.SubTypeName;
+            subSelect.appendChild(opt);
+        });
     };
 }
 
 function openCloseJobForm(jobId) {
     closeModal('modal-detail');
     
-    // ล้างค่าใน Form ก่อนแสดง
+    // ล้างค่าข้อมูลเดิม
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
-    document.getElementById('close-job-status').value = "เสร็จสิ้น";
     
-    // โหลดข้อมูล Dropdown
+    // โหลดข้อมูลเข้า Dropdown ทันที
     loadCloseJobMaster();
     
     document.getElementById('modal-close-job').style.display = 'flex';
 
-    // ตั้งค่าปุ่มยืนยัน
+    // บันทึกข้อมูลเมื่อกดปุ่ม "ยืนยันการปิดงาน" (ID: btn-confirm-close)
     document.getElementById('btn-confirm-close').onclick = async () => {
         const note = document.getElementById('close-job-note').value;
         const typeSelect = document.getElementById('close-job-type');
-        const subType = document.getElementById('close-job-subtype').value;
+        const subTypeSelect = document.getElementById('close-job-subtype');
         const status = document.getElementById('close-job-status').value;
         const remark = document.getElementById('close-job-remark').value;
 
-        // ตรวจสอบว่าเลือกข้อมูลหรือยัง
-        if (!typeSelect.value) return alert("กรุณาเลือกประเภทงาน");
-        if (!subType) return alert("กรุณาเลือกหมวดหมู่ย่อย");
-        if (!note) return alert("กรุณากรอกรายละเอียดการซ่อม");
-
-        const typeName = typeSelect.options[typeSelect.selectedIndex].text;
+        if (!typeSelect.value || !subTypeSelect.value || !note) {
+            alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
+            return;
+        }
 
         await handleJobUI(jobId, 'done', { 
             Note: note,
-            JobType: typeName,
-            JobSubType: subType,
+            JobType: typeSelect.options[typeSelect.selectedIndex].text,
+            JobSubType: subTypeSelect.value,
             CloseStatus: status,
             Remark: remark
         });

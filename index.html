@@ -466,27 +466,24 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-  function loadCloseJobMaster() {
+function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
     
-    // ดึงข้อมูลจาก store ที่ Backend ส่งมา (JobTypeMaster และ JobSubTypeMaster)
+    // อ้างอิงตามชื่อตัวแปรที่ Apps Script ส่งมาใน result
     const typeData = store.JobTypeMaster || [];
     const subTypeData = store.JobSubTypeMaster || [];
 
-    // ล้างค่าเดิมและใส่ Option เริ่มต้น
     typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
     subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
 
-    // เติมข้อมูลประเภทงาน
     typeData.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = item.JobTypeCode; // ใช้เชื่อมโยงกับ SubType
+        opt.value = item.JobTypeCode; // ใช้เชื่อมโยง
         opt.textContent = item.JobTypeName; 
         typeSelect.appendChild(opt);
     });
 
-    // เมื่อเปลี่ยนประเภทงาน ให้กรองหมวดหมู่ย่อยทันที
     typeSelect.onchange = function() {
         const selectedCode = this.value;
         const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
@@ -494,7 +491,7 @@
         subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
         filtered.forEach(sub => {
             const opt = document.createElement('option');
-            opt.value = sub.SubTypeName; // ค่าที่จะส่งไปบันทึกใน ServiceMA
+            opt.value = sub.SubTypeName; 
             opt.textContent = sub.SubTypeName;
             subSelect.appendChild(opt);
         });
@@ -502,53 +499,46 @@
 }
 
 function openCloseJobForm(jobId) {
+    // 1. ปิดหน้าต่างเดิมก่อน (ธีมเดิม)
     closeModal('modal-detail');
     
-    // ล้างค่าฟอร์ม
+    // 2. ล้างข้อมูลและโหลด Dropdown
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
-    
-    // โหลด Dropdown
-    loadCloseJobMaster();
-    
-    document.getElementById('modal-close-job').style.display = 'flex';
+    loadCloseJobMaster(); 
 
-    // แก้ไขปุ่มยืนยัน (ID: btn-confirm-close)
+    // 3. เปิด Modal ด้วยฟังก์ชันระบบเดิมของคุณ
+    showModal('modal-close-job'); 
+
+    // 4. ปุ่มยืนยัน (ID: btn-confirm-close)
     document.getElementById('btn-confirm-close').onclick = async () => {
         const note = document.getElementById('close-job-note').value;
         const typeSelect = document.getElementById('close-job-type');
         const subTypeSelect = document.getElementById('close-job-subtype');
-        const status = document.getElementById('close-job-status').value;
-        const remark = document.getElementById('close-job-remark').value;
-
-        // 1. ตรวจสอบความครบถ้วนก่อนทำงาน
+        
+        // ตรวจสอบความครบถ้วนตามเงื่อนไขเดิม
         if (!typeSelect.value || !subTypeSelect.value || !note) {
-            alert("กรุณาเลือกประเภทงาน หมวดหมู่ย่อย และกรอกรายละเอียดการแก้ไข");
+            alert("กรุณาระบุข้อมูลให้ครบถ้วน");
             return;
         }
 
-        // 2. เตรียมข้อมูลให้ตรงกับที่ Backend (saveToServiceMA) รอรับ
         const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
 
-        try {
-            // 3. ส่งข้อมูลไปที่ handleJobUI เพียงครั้งเดียว
-            await handleJobUI(jobId, 'done', { 
-                Note: note,
-                JobTypeName: typeNameText,     // ตรงกับ Backend: d.JobTypeName
-                SubTypeName: subTypeSelect.value, // ตรงกับ Backend: d.SubTypeName
-                CloseStatus: status,
-                Remark: remark,
-                Owner: store.user.USERID,      // ข้อมูลผู้ปิดงาน
-                By: store.user.UserName        // ชื่อผู้บันทึก
-            });
-            
-            // ปิด Modal เมื่อสำเร็จ
-            closeModal('modal-close-job');
-        } catch (err) {
-            console.error("Confirm Close Error:", err);
-            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-        }
+        // ส่งค่าไปบันทึกตามคอลัมน์ที่ Apps Script (saveToServiceMA) รอรับ
+        await handleJobUI(jobId, 'done', { 
+            Note: note,
+            JobTypeName: typeNameText, // d.JobTypeName
+            SubTypeName: subTypeSelect.value, // d.SubTypeName
+            CloseStatus: document.getElementById('close-job-status').value,
+            Remark: document.getElementById('close-job-remark').value,
+            Owner: store.user.USERID,
+            By: store.user.UserName 
+        });
+
+        // ปิด Modal เมื่อเสร็จสิ้น (ใช้ระบบเดิม)
+        closeModal('modal-close-job');
     };
+
 }
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');

@@ -549,18 +549,16 @@ function openCloseJobForm(jobId) {
 function openITTicketForm() {
     const typeSelect = document.getElementById('it-job-type');
     const subSelect = document.getElementById('it-job-subtype');
-    
-    // โหลดประเภทงานหลัก
+
+    // 1. ใส่ข้อมูลประเภทงานหลัก
     typeSelect.innerHTML = (store.JobTypeMaster || [])
-        .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
-        .join('');
+        .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`).join('');
 
-    // โหลดหน่วยงาน
+    // 2. ใส่ข้อมูลหน่วยงาน
     document.getElementById('it-dept').innerHTML = (store.DeptList || [])
-        .map(d => `<option value="${d}">${d}</option>`)
-        .join('');
+        .map(d => `<option value="${d}">${d}</option>`).join('');
 
-    // ฟังก์ชันกรองประเภทย่อยตาม JobTypeCode
+    // 3. ฟังก์ชันกรองประเภทย่อย (หัวใจสำคัญที่ทำให้เลือกได้)
     const updateSub = () => {
         const typeObj = (store.JobTypeMaster || []).find(t => t.JobTypeName === typeSelect.value);
         const code = typeObj ? typeObj.JobTypeCode : '';
@@ -571,35 +569,28 @@ function openITTicketForm() {
             : '<option value="">-- ไม่มีประเภทย่อย --</option>';
     };
 
-    typeSelect.onchange = updateSub; // ผูกเหตุการณ์เปลี่ยนค่า
-    updateSub(); // เรียกทำงานครั้งแรก
-    
+    typeSelect.onchange = updateSub; 
+    updateSub(); // รันตอนเปิด Modal ทันที
     document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 
-// ผูก Event ปุ่มบันทึกข้อมูล (onsubmit) เพียงที่เดียว
-document.
-// 2. ฟังก์ชันบันทึกข้อมูล IT Ticket (ผูก Event ครั้งเดียวจบ)
-if (document.getElementById('form-it-ticket')) {
-    document.getElementById('form-it-ticket').onsubmit = async (e) => {
-        e.preventDefault();
-        const payload = {
-            jobType: document.getElementById('it-job-type').value,
-            problem: document.getElementById('it-problem').value,
-            dept: document.getElementById('it-dept').value,
-            owner: currentUser.USERID 
-        };
-
-        if (!payload.jobType || !payload.problem) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-        // ส่งเข้า handleJobUI ตามโครงสร้างเดิมเพื่อให้ระบบจัดการต่อ
-        const success = await handleJobUI(null, 'saveITTicket', payload);
-        if (success) {
-            document.getElementById('form-it-ticket').reset();
-            closeModal('modal-it-ticket');
-        }
+// ผูก Event ปุ่มบันทึก (ทำครั้งเดียว)
+document.getElementById('form-it-ticket').onsubmit = async (e) => {
+    e.preventDefault();
+    const payload = {
+        jobType: document.getElementById('it-job-type').value,
+        problem: document.getElementById('it-problem').value,
+        dept: document.getElementById('it-dept').value,
+        owner: currentUser.USERID 
     };
-}
+    if (!payload.jobType || !payload.problem) return alert("กรุณากรอกข้อมูลให้ครบ");
+
+    const success = await handleJobUI(null, 'saveITTicket', payload);
+    if (success) {
+        document.getElementById('form-it-ticket').reset();
+        closeModal('modal-it-ticket');
+    }
+};
     function renderSystemLinks() {
         const tab3Container = document.getElementById('tab3');
         if (!tab3Container) return;

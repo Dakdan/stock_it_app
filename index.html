@@ -466,32 +466,32 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-   function loadCloseJobMaster() {
+  function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
-    const mapping = store.JobTypeMapping || {}; // อ้างอิงจากคอลัมน์ JobTypeMapping ใน store
+    
+    // ดึงข้อมูลจาก store ตามชื่อที่ Backend ส่งมา
+    const typeData = store.JobTypeMaster || []; 
+    const subTypeData = store.JobSubTypeMaster || []; 
 
-    // 1. ล้างค่าและเติม "ประเภทงาน"
-    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภท --</option>';
-    subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
-
-    Object.keys(mapping).forEach(code => {
+    // 1. เติม "ประเภทงาน"
+    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
+    typeData.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = code;
-        opt.textContent = mapping[code].JobTypeName; // ใช้ชื่อจากคอลัมน์ JobTypeName
+        opt.value = item.JobTypeCode; // อ้างอิง JobTypeCode เพื่อใช้เชื่อมโยง
+        opt.textContent = item.JobTypeName; // แสดงชื่อตามคอลัมน์ JobTypeName
         typeSelect.appendChild(opt);
     });
 
-    // 2. เมื่อเลือกประเภทงาน ให้หมวดหมู่ย่อยเปลี่ยนตามจริง
+    // 2. เมื่อเลือกประเภทงาน ให้กรองหมวดหมู่ย่อยที่สัมพันธ์กัน
     typeSelect.onchange = function() {
         const selectedCode = this.value;
-        const subData = mapping[selectedCode]?.SubTypes || [];
+        const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
         
         subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
-        
-        subData.forEach(sub => {
+        filtered.forEach(sub => {
             const opt = document.createElement('option');
-            opt.value = sub.SubTypeName; // ใช้ชื่อจากคอลัมน์ SubTypeName
+            opt.value = sub.SubTypeName; // ใช้ SubTypeName ตามหัวตาราง ServiceMA
             opt.textContent = sub.SubTypeName;
             subSelect.appendChild(opt);
         });
@@ -501,16 +501,16 @@
 function openCloseJobForm(jobId) {
     closeModal('modal-detail');
     
-    // ล้างค่าข้อมูลเดิม
+    // 1. ล้างค่าข้อมูลเดิม
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
     
-    // โหลดข้อมูลเข้า Dropdown ทันที
+    // 2. โหลดข้อมูลเข้า Dropdown (ดึงจาก JobTypeMaster/JobSubTypeMaster)
     loadCloseJobMaster();
     
     document.getElementById('modal-close-job').style.display = 'flex';
 
-    // บันทึกข้อมูลเมื่อกดปุ่ม "ยืนยันการปิดงาน" (ID: btn-confirm-close)
+    // 3. จัดการการคลิกปุ่มยืนยัน
     document.getElementById('btn-confirm-close').onclick = async () => {
         const note = document.getElementById('close-job-note').value;
         const typeSelect = document.getElementById('close-job-type');
@@ -518,17 +518,24 @@ function openCloseJobForm(jobId) {
         const status = document.getElementById('close-job-status').value;
         const remark = document.getElementById('close-job-remark').value;
 
+        // --- ตรวจสอบความถูกต้องก่อนส่ง (Validation) ---
         if (!typeSelect.value || !subTypeSelect.value || !note) {
             alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
             return;
         }
 
+        // ดึงชื่อประเภทงานมาเก็บไว้ (ใช้สำหรับ JobTypeName)
+        const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
+
+        // --- ส่งข้อมูลไปยัง handleJobUpdate (Apps Script) ---
         await handleJobUI(jobId, 'done', { 
             Note: note,
-            JobType: typeSelect.options[typeSelect.selectedIndex].text,
-            JobSubType: subTypeSelect.value,
+            JobTypeName: typeNameText,     // ตรงกับ Backend: d.JobTypeName
+            SubTypeName: subTypeSelect.value, // ตรงกับ Backend: d.SubTypeName
             CloseStatus: status,
-            Remark: remark
+            Remark: remark,
+            Owner: store.user.USERID,      // ส่งไปให้ saveToServiceMA ใช้บันทึก
+            By: store.user.UserName        // ส่งไปเข้าคอลัมน์ USER
         });
     };
 }

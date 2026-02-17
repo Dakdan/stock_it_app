@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Service And Mainternance - รพ.อุดรธานี</title>
+    <title>IT Service - รพ.อุดรธานี</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Kanit', sans-serif; background: #fdf2f8; position: relative; min-height: 100vh; }
-        body::before { content: "IT UDON HOSP"; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 8rem; color: rgba(0,0,0,0.03); font-weight: 900; pointer-events: none; z-index: -1; }
         .pink-grad { background: linear-gradient(135deg, #be185d 0%, #db2777 100%); }
         .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card-pro { background: white; border-radius: 1.2rem; border: 1px solid #fce7f3; transition: 0.3s; cursor: pointer; }
-        .card-pro:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1); }
         .status-pulse { animation: pulse-pink 2s infinite; }
         @keyframes pulse-pink { 0% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(219, 39, 119, 0); } 100% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0); } }
         .inner-alert { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.9); z-index:100; flex-direction:column; align-items:center; justify-content:center; border-radius: 2rem; }
@@ -25,7 +23,7 @@
     <div id="loader" class="overlay">
         <div class="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center">
             <div class="animate-spin rounded-full h-10 w-10 border-4 border-pink-600 border-t-transparent mb-3"></div>
-            <p class="text-pink-600 font-bold text-xs text-center">กำลังโหลดข้อมูล...<br><span class="text-[9px] font-normal text-slate-400 italic">กรุณารอสักครู่</span></p>
+            <p class="text-pink-600 font-bold text-xs text-center">กำลังโหลดข้อมูล...</p>
         </div>
     </div>
 
@@ -35,11 +33,11 @@
                 <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
                 <div>
                     <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)</h1>
-                    <p class="text-[10px] opacity-80">ระบบจัดการงานซ่อมและบริการ กลุ่มงาน: เทคโนโลยีสารสนเทศ</p>
+                    <p class="text-[10px] opacity-80">ระบบจัดการงานซ่อมและบริการ</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <div class="text-right hidden sm:block">
+                <div class="text-right">
                     <p id="u-fname" class="text-xs font-bold leading-none"></p>
                     <p id="u-type-name" class="text-[9px] opacity-70"></p>
                 </div>
@@ -50,33 +48,30 @@
 
     <nav class="bg-white/80 backdrop-blur-md sticky top-[88px] z-40 border-b border-pink-100">
         <div class="max-w-4xl mx-auto flex">
-            <button onclick="switchTab(1)" id="nav-t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600 uppercase tracking-wider">Dashboard</button>
-            <button onclick="switchTab(2)" id="nav-t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">My Jobs</button>
-            <button onclick="switchTab(3)" id="nav-t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400 uppercase tracking-wider">Links</button>
+            <button onclick="switchTab(1)" id="nav-t1" class="flex-1 py-4 text-xs font-bold border-b-4 border-pink-600 text-pink-600">Dashboard</button>
+            <button onclick="switchTab(2)" id="nav-t2" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">My Jobs</button>
+            <button onclick="switchTab(3)" id="nav-t3" class="flex-1 py-4 text-xs font-bold border-b-4 border-transparent text-slate-400">Links</button>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto p-4 mt-4 space-y-6">
         <div id="tab1" class="tab-content active space-y-4">
             <div class="grid grid-cols-5 gap-2">
-                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">New</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
-                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Doing</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
-                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Spare</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
-                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Done</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
-                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">Cancel</p><p id="count-cancel" class="text-lg font-black text-slate-300">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">รอรับงาน</p><p id="count-wait" class="text-lg font-black text-pink-600">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">กำลังทำ</p><p id="count-doing" class="text-lg font-black text-blue-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">รออะไหล่</p><p id="count-spare" class="text-lg font-black text-orange-400">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">เสร็จสิ้น</p><p id="count-done" class="text-lg font-black text-green-500">0</p></div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm"><p class="text-[9px] text-slate-400 font-bold uppercase">ยกเลิก</p><p id="count-cancel" class="text-lg font-black text-slate-300">0</p></div>
             </div>
             <div id="job-list-dashboard" class="space-y-3"></div>
         </div>
 
         <div id="tab2" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-3xl flex justify-between items-center shadow-sm border-l-4 border-pink-500">
-                <h2 class="text-pink-600 font-bold text-sm">งานที่รับผิดชอบ (กำลังทำ)</h2>
-            </div>
             <div id="job-list-myjob" class="space-y-3"></div>
-            <hr class="border-pink-100 my-4">
+            <hr class="my-4 border-pink-100">
             <div class="flex justify-between items-center px-1">
-                <h2 class="text-blue-600 font-bold text-sm border-l-4 border-blue-500 pl-2 uppercase tracking-wide">IT Ticket (บันทึกงานอื่นๆ)</h2>
-                <button onclick="openITTicketForm()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-all">+ บันทึกงาน</button>
+                <h2 class="text-blue-600 font-bold text-sm border-l-4 border-blue-500 pl-2">IT Ticket (บันทึกงานอื่นๆ)</h2>
+                <button onclick="openITTicketForm()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold">+ บันทึกงาน</button>
             </div>
             <div id="it-ticket-list" class="space-y-3"></div>
         </div>
@@ -85,141 +80,79 @@
     </main>
 
     <div id="modal-detail" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl overflow-hidden relative">
-            <div id="detail-alert" class="inner-alert">
-                <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">✅</span></div>
-                <p id="detail-alert-text" class="text-pink-600 font-bold">ดำเนินการสำเร็จ</p>
-            </div>
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="font-bold text-pink-600 text-lg">📄 รายละเอียดงาน</h3>
-                    <button onclick="closeModal('modal-detail')" class="text-slate-400 text-3xl">&times;</button>
-                </div>
-                <div id="detail-content" class="space-y-4 max-h-[60vh] overflow-y-auto"></div>
-                <div id="detail-actions" class="mt-6 flex flex-col gap-3"></div>
-            </div>
+        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl overflow-hidden p-6 relative">
+            <div id="detail-alert" class="inner-alert"><p class="text-pink-600 font-bold">ดำเนินการสำเร็จ</p></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-pink-600 text-lg">📄 รายละเอียดงาน</h3><button onclick="closeModal('modal-detail')" class="text-slate-400 text-3xl">&times;</button></div>
+            <div id="detail-content" class="space-y-4 max-h-[60vh] overflow-y-auto"></div>
+            <div id="detail-actions" class="mt-6 flex flex-col gap-3"></div>
         </div>
     </div>
 
     <div id="modal-close-job" class="overlay">
-        <div class="bg-white rounded-[2.5rem] w-full max-w-md mx-4 shadow-2xl overflow-hidden border border-green-100">
-            <div class="bg-green-50 px-6 py-4 border-b border-green-100 flex justify-between items-center">
-                <h3 class="font-bold text-green-700 text-lg flex items-center gap-2">
-                    <span class="bg-green-500 text-white w-7 h-7 flex items-center justify-center rounded-full text-xs">✓</span>
-                    บันทึกการปิดงาน
-                </h3>
-                <button onclick="closeModal('modal-close-job')" class="text-slate-400 text-2xl">&times;</button>
-            </div>
-            <div class="p-6 space-y-5">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md mx-4 shadow-2xl overflow-hidden border border-green-100 p-6">
+            <h3 class="font-bold text-green-700 text-lg mb-4 flex items-center gap-2">✅ บันทึกการปิดงาน</h3>
+            <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">ประเภทงาน</label>
-                        <select id="close-job-type" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 focus:ring-2 focus:ring-green-500 outline-none transition-all"></select>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase">ประเภทงาน</label>
+                        <select id="close-job-type" class="w-full p-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"></select>
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">หมวดหมู่ย่อย</label>
-                        <select id="close-job-subtype" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 focus:ring-2 focus:ring-green-500 outline-none transition-all"></select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">สถานะหลังแก้ไข</label>
-                        <select id="close-job-status" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-green-600 outline-none">
-                            <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-                            <option value="ยกเลิก">ยกเลิก</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">หมายเหตุ (ถ้ามี)</label>
-                        <input type="text" id="close-job-remark" placeholder="..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs outline-none">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase">หมวดหมู่ย่อย</label>
+                        <select id="close-job-subtype" class="w-full p-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"></select>
                     </div>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">รายละเอียดการแก้ไข</label>
-                    <textarea id="close-job-note" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-[1.5rem] text-sm h-28 focus:ring-2 focus:ring-green-500 outline-none transition-all" placeholder="ระบุสิ่งที่ได้ดำเนินการแก้ไข..."></textarea>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase">รายละเอียดการแก้ไข</label>
+                    <textarea id="close-job-note" class="w-full p-4 bg-slate-50 border rounded-[1.5rem] text-sm h-28" placeholder="ระบุสิ่งที่ได้ดำเนินการ..."></textarea>
                 </div>
-                <div class="flex gap-3 pt-2">
-                    <button onclick="closeModal('modal-close-job')" class="flex-1 py-4 text-slate-500 font-bold text-sm">ยกเลิก</button>
-                    <button id="btn-confirm-close" class="flex-[2] py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">บันทึกปิดงาน</button>
+                <div class="flex gap-3">
+                    <button onclick="closeModal('modal-close-job')" class="flex-1 py-4 text-slate-500 font-bold">ยกเลิก</button>
+                    <button id="btn-confirm-close" class="flex-[2] py-4 bg-green-500 text-white rounded-2xl font-bold">บันทึกปิดงาน</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="modal-it-ticket" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
-            <div id="it-alert" class="inner-alert">
-                <div class="bg-blue-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">📝</span></div>
-                <p class="text-blue-600 font-bold">บันทึกข้อมูลเรียบร้อย</p>
-            </div>
-            <form id="form-it-ticket" class="p-6 space-y-4">
-                <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
+        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl p-6 overflow-hidden">
+            <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
+            <form id="form-it-ticket" class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                        <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทย่อย</label>
-                        <select id="it-job-sub-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"><option value="">-- เลือก --</option></select>
-                    </div>
+                    <select id="it-job-type" class="w-full p-3 bg-white rounded-xl text-sm border cursor-pointer" required></select>
+                    <select id="it-job-sub-type" class="w-full p-3 bg-white rounded-xl text-sm border cursor-pointer"><option value="">-- ประเภทย่อย --</option></select>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
-                    <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หน่วยงาน</label>
-                    <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
-                </div>
-                <div class="flex gap-2 pt-4">
-                    <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
-                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">บันทึกข้อมูล</button>
+                <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24 border" placeholder="รายละเอียดปัญหา..." required></textarea>
+                <select id="it-dept" class="w-full p-3 bg-white rounded-xl text-sm border cursor-pointer" required></select>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold">ยกเลิก</button>
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">บันทึก</button>
                 </div>
             </form>
         </div>
     </div>
 
     <div id="modal-transfer" class="overlay">
-        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl">
-            <h3 class="font-bold text-pink-600 mb-4">🔄 จัดการงาน</h3>
-            <div class="space-y-3">
-                <select id="select-staff" class="w-full p-3 bg-slate-50 rounded-xl text-sm border"></select>
-                <textarea id="transfer-reason" placeholder="เหตุผล/หมายเหตุ..." class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20 border"></textarea>
-                <button id="btn-confirm-transfer" class="w-full pink-grad text-white rounded-xl font-bold py-3 shadow-lg">ยืนยัน</button>
-                <button onclick="closeModal('modal-transfer')" class="w-full py-3 text-slate-400 text-xs uppercase font-bold">ยกเลิก</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-logout" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl text-center p-8">
-            <div id="logout-alert" class="inner-alert">
-                <div class="bg-pink-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">👋</span></div>
-                <p class="text-pink-600 font-bold">ออกจากระบบสำเร็จ</p>
-            </div>
-            <div class="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🚪</div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ยืนยันการออกจากระบบ?</h3>
-            <div class="flex gap-3 mt-8">
-                <button onclick="closeModal('modal-logout')" class="flex-1 py-3 text-slate-400 font-bold text-sm bg-slate-50 rounded-2xl">ยกเลิก</button>
-                <button onclick="confirmLogout()" class="flex-1 py-3 pink-grad text-white rounded-2xl font-bold">ยืนยัน</button>
-            </div>
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl">
+            <h3 class="font-bold text-pink-600 mb-4">🔄 มอบหมาย/โอนงาน</h3>
+            <select id="select-staff" class="w-full p-3 bg-white border rounded-xl mb-3 cursor-pointer"></select>
+            <textarea id="transfer-reason" placeholder="หมายเหตุ..." class="w-full p-3 bg-slate-50 border rounded-xl h-20 mb-3"></textarea>
+            <button id="btn-confirm-transfer" class="w-full pink-grad text-white rounded-xl py-3 font-bold">ยืนยัน</button>
+            <button onclick="closeModal('modal-transfer')" class="w-full py-2 text-slate-400 text-xs mt-2 uppercase">ยกเลิก</button>
         </div>
     </div>
 
     <div id="modal-success" class="overlay">
         <div class="bg-white rounded-[2rem] p-8 text-center shadow-2xl mx-4">
-            <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 status-pulse"><span class="text-4xl">✅</span></div>
             <h3 id="success-text" class="text-xl font-bold text-slate-800">ดำเนินการสำเร็จ</h3>
-            <p class="text-slate-400 text-xs mt-2">ระบบบันทึกข้อมูลเรียบร้อยแล้ว</p>
         </div>
     </div>
 
     <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
-    let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [], BackupData: [], JobSubTypeMaster: [], SeviceMA: [], JobTypeMapping: {} };
+    let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMapping: {} };
     let currentUser = null;
-    let currentTab = 1; 
+    let currentTab = 1;
 
     async function initApp() {
         const session = localStorage.getItem("it_session");
@@ -233,22 +166,16 @@
     async function loadData() {
         showLoading(true);
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ 
-                    action: 'getInitialData', 
-                    data: { userName: currentUser.UserName, USERID: currentUser.USERID } 
-                }) 
-            });
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getInitialData', data: { userName: currentUser.UserName, USERID: currentUser.USERID } }) });
             const result = await res.json();
-            if (result.success) {
-                store = result;
-                renderDashboard();
-                renderMyJobs();
-                renderITTicketList();
-                renderSystemLinks();
+            if (result.success) { 
+                store = result; 
+                renderDashboard(); 
+                renderMyJobs(); 
+                renderITTicketList(); 
+                renderSystemLinks(); 
             }
-        } catch (e) { console.error("Data error", e); }
+        } catch (e) { console.error("Error", e); }
         showLoading(false);
     }
 
@@ -256,9 +183,7 @@
         const s = String(status || '').trim();
         if (s === 'รอรับงาน') return "text-pink-600 bg-pink-50 border border-pink-200";
         if (s === 'กำลังดำเนินการ') return "text-blue-600 bg-blue-50 border border-blue-200";
-        if (s === 'รออะไหล่') return "text-orange-600 bg-orange-50 border border-orange-200";
         if (s === 'เสร็จสิ้น') return "text-green-600 bg-green-50 border border-green-200";
-        if (s === 'ยกเลิก') return "text-slate-400 bg-slate-50 border border-slate-200";
         return "text-slate-500 bg-slate-100 border border-slate-200";
     }
 
@@ -269,47 +194,30 @@
             const status = String(j.Status || '').trim();
             const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(j.Owner).trim());
             const ownerName = staff ? staff.name : (j.Owner && j.Owner !== "-" ? j.Owner : "ยังไม่มีผู้ดูแล");
-            
-            let borderClass = "border-slate-200";
-            if (status === 'รอรับงาน') borderClass = "border-pink-500 status-pulse";
-            else if (status === 'กำลังดำเนินการ') borderClass = "border-blue-500";
-            else if (status === 'เสร็จสิ้น') borderClass = "border-green-500";
+            let borderClass = status === 'รอรับงาน' ? "border-pink-500 status-pulse" : (status === 'กำลังดำเนินการ' ? "border-blue-500" : "border-slate-200");
 
-            const assetInfo = (store.BackupData || []).find(a => String(a.NOID) === String(j.AssetCode));
-            let assetBoxHTML = j.AssetCode && j.AssetCode !== "-" ? `
-                <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 mt-2">
-                    <p class="text-[9px] text-slate-500 font-bold uppercase">📦 ครุภัณฑ์: ${assetInfo ? assetInfo.AssetID : j.AssetCode}</p>
-                </div>` : "";
-
-            return `
-                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} mb-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div><span class="text-[10px] font-bold text-slate-400">#${j.JobID}</span></div>
-                        <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-[10px] font-bold text-pink-500 uppercase">${j.JobType || ''}</p>
-                        <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
-                        ${assetBoxHTML}
-                        <div class="flex justify-between items-end pt-2 border-t mt-2">
-                            <div><p class="text-[8px] text-slate-400 font-bold uppercase">ผู้ดูแล</p><p class="text-[10px] font-bold text-blue-600">👷 ${ownerName}</p></div>
-                            <div class="text-right"><p class="text-[9px] font-bold text-slate-500">🏨 ${j.Department}</p></div>
-                        </div>
-                    </div>
-                </div>`;
+            return `<div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} mb-3 shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-[10px] font-bold text-slate-400">#${j.JobID}</span>
+                    <span class="text-[10px] font-black uppercase px-2 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
+                </div>
+                <p class="text-[10px] font-bold text-pink-500">${j.JobType || ''}</p>
+                <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                <div class="flex justify-between items-end pt-2 border-t mt-2">
+                    <div><p class="text-[8px] text-slate-400 font-bold uppercase">ผู้ดูแล</p><p class="text-[10px] font-bold text-blue-600">👷 ${ownerName}</p></div>
+                    <p class="text-[9px] font-bold text-slate-500">🏨 ${j.Department}</p>
+                </div>
+            </div>`;
         }).join('');
     }
 
     function renderMyJobs() {
         const myJobs = (store.AllJobs || []).filter(j => String(j.Owner).trim() === String(currentUser.USERID).trim() && String(j.Status).trim() === 'กำลังดำเนินการ');
-        const container = document.getElementById('job-list-myjob');
-        container.innerHTML = myJobs.length ? myJobs.map(j => `
+        document.getElementById('job-list-myjob').innerHTML = myJobs.length ? myJobs.map(j => `
             <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 border-blue-500 mb-3">
-                <div class="flex justify-between">
-                    <div><p class="text-[9px] text-slate-400 font-bold">${j.JobID}</p><h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3></div>
-                    <span class="text-[10px] font-bold px-2 py-1 rounded-lg ${getStatusColor(j.Status)}">${j.Status}</span>
-                </div>
-            </div>`).join('') : '<div class="p-8 text-center opacity-40 text-xs">ไม่มีงานค้าง</div>';
+                <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                <p class="text-[9px] text-blue-500 mt-1 font-bold">📍 ${j.Department}</p>
+            </div>`).join('') : '<div class="p-8 text-center text-xs text-slate-400">ไม่มีงานที่กำลังดำเนินการ</div>';
     }
 
     function viewJobDetail(jobId) {
@@ -318,133 +226,143 @@
         const status = String(job.Status || '').trim();
         const role = String(currentUser.UserTypeID).toUpperCase().trim();
         const isOwner = String(job.Owner).trim() === String(currentUser.USERID).trim();
-        const staff = (store.StaffList || []).find(s => String(s.id).trim() === String(job.Owner).trim());
+        const phoneDisplay = job.phon || '-';
 
-        let assetHTML = "";
-        if (job.AssetCode && job.AssetCode !== "-") {
+        let assetHTML = '';
+        if (job.AssetCode && job.AssetCode !== "" && job.AssetCode !== "-") {
             const asset = (store.BackupData || []).find(a => String(a.NOID) === String(job.AssetCode));
-            if (asset) assetHTML = `<div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4 text-xs">
-                <p class="text-[10px] font-bold text-blue-500 mb-1">📦 ข้อมูลครุภัณฑ์</p>
-                <p><b>ชื่อ:</b> ${asset.AssetName}</p><p><b>สเปค:</b> ${asset.Spac}</p>
-            </div>`;
+            if (asset) assetHTML = `<div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-xs mt-2"><b>📦 ครุภัณฑ์:</b> ${asset.AssetName}</div>`;
         }
 
         document.getElementById('detail-content').innerHTML = `
             <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-                <p class="text-[10px] font-bold text-pink-400 uppercase">ปัญหา [${job.JobType}]</p>
-                <p class="font-bold text-slate-800">${job.Problem}</p>
+                <p class="text-[10px] font-bold text-pink-400 mb-1 uppercase">รายละเอียด [${job.JobType || 'ทั่วไป'}]</p>
+                <p class="font-bold text-base text-slate-800 leading-tight">${job.Problem}</p>
             </div>
             ${assetHTML}
-            <div class="grid grid-cols-2 gap-4 mt-4 text-xs">
-                <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p>${job.Department}</p></div>
-                <div><p class="text-[10px] text-slate-400 font-bold uppercase">เบอร์ติดต่อ</p><p class="text-blue-600 font-bold">${job.phon || '-'}</p></div>
-                <div class="col-span-2 border-t pt-2"><p class="text-[10px] text-slate-400 font-bold">ผู้ดูแล: ${staff ? staff.name : (job.Owner || 'ยังไม่มี')}</p></div>
+            <div class="grid grid-cols-2 gap-4 px-1 mt-4">
+                <div><p class="text-[10px] text-slate-400 font-bold uppercase">หน่วยงาน</p><p class="font-semibold text-slate-700 text-xs">${job.Department}</p></div>
+                <div><p class="text-[10px] text-slate-400 font-bold uppercase">ความสำคัญ</p><p class="font-semibold text-pink-600 text-xs">${job.Priority || '-'}</p></div>
+                <div class="col-span-2 border-t pt-2 border-slate-100">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">📞 เบอร์โทรศัพท์ติดต่อ</p>
+                    <p class="font-bold text-blue-600 text-sm">${phoneDisplay}</p>
+                </div>
             </div>`;
 
-        let btns = "";
+        let btns = '';
         if (currentTab === 1) {
             if (status === 'รอรับงาน') {
                 if (role === 'IT') btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold">⚡ รับงาน</button>`;
                 else if (role === 'BOSS') btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold">📋 มอบหมายงาน</button>`;
             }
         } else if (currentTab === 2 && isOwner && status === 'กำลังดำเนินการ') {
-            btns = `<div class="grid grid-cols-2 gap-2">
-                <button onclick="openCloseJobForm('${job.JobID}')" class="py-4 bg-green-500 text-white rounded-2xl font-bold">✅ ปิดงาน</button>
-                <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold border">🔄 โอนงาน</button>
-            </div>`;
+            btns = `<div class="grid grid-cols-2 gap-2"><button onclick="openCloseJobForm('${job.JobID}')" class="py-4 bg-green-500 text-white rounded-2xl font-bold">✅ ปิดงาน</button><button onclick="openTransfer('${job.JobID}')" class="py-4 bg-slate-100 rounded-2xl font-bold border">🔄 โอนงาน</button></div>`;
         }
-        document.getElementById('detail-actions').innerHTML = btns + `<button onclick="closeModal('modal-detail')" class="w-full py-2 text-slate-400 text-[10px] uppercase font-bold">ปิดหน้าต่าง</button>`;
+        document.getElementById('detail-actions').innerHTML = btns + `<button onclick="closeModal('modal-detail')" class="w-full py-2 text-slate-400 text-[10px] font-bold uppercase">ปิด</button>`;
         document.getElementById('modal-detail').style.display = 'flex';
     }
 
-    // ฟังก์ชันใหม่: เปิดหน้าบันทึกปิดงานพร้อม Dropdown สัมพันธ์
-    function openCloseJobForm(jobId) {
-        closeModal('modal-detail');
-        document.getElementById('close-job-note').value = "";
-        document.getElementById('modal-close-job').style.display = 'flex';
-        
-        const typeSelect = document.getElementById('close-job-type');
-        const subSelect = document.getElementById('close-job-subtype');
+    // ฟังก์ชันสำหรับจัดการ Dropdown สัมพันธ์ (ใช้งานร่วมกันหลายที่)
+    function setupJobTypeDropdown(typeElemId, subElemId) {
+        const typeSelect = document.getElementById(typeElemId);
+        const subSelect = document.getElementById(subElemId);
         const mapping = store.JobTypeMapping || {};
 
-        typeSelect.innerHTML = Object.keys(mapping).map(code => `<option value="${code}">${mapping[code].JobTypeName}</option>`).join('');
-        typeSelect.onchange = () => {
-            const subTypes = mapping[typeSelect.value]?.SubTypes || [];
-            subSelect.innerHTML = subTypes.map(sub => `<option value="${sub.SubTypeName}">${sub.SubTypeName}</option>`).join('');
-        };
-        typeSelect.dispatchEvent(new Event('change'));
+        // ล้างข้อมูลเก่า
+        typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภท --</option>';
+        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
 
-        document.getElementById('btn-confirm-close').onclick = async () => {
-            const note = document.getElementById('close-job-note').value;
-            if (!note) return alert("กรุณาระบุรายละเอียดการซ่อม");
-            await handleJobUI(jobId, 'done', { 
-                Note: note, 
-                Status: document.getElementById('close-job-status').value,
-                JobType: typeSelect.options[typeSelect.selectedIndex].text,
-                JobSubType: subSelect.value,
-                Remark: document.getElementById('close-job-remark').value
+        // เพิ่มข้อมูลประเภทงาน
+        Object.keys(mapping).forEach(code => {
+            const opt = document.createElement('option');
+            opt.value = code;
+            opt.textContent = mapping[code].JobTypeName;
+            typeSelect.appendChild(opt);
+        });
+
+        // เมื่อเปลี่ยนประเภทงาน
+        typeSelect.onchange = () => {
+            const selectedCode = typeSelect.value;
+            const subs = mapping[selectedCode]?.SubTypes || [];
+            subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
+            subs.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.SubTypeName;
+                opt.textContent = s.SubTypeName;
+                subSelect.appendChild(opt);
             });
         };
     }
 
-    async function handleJobUI(jobId, type, extra = {}) {
-        closeModal('modal-detail'); closeModal('modal-transfer'); closeModal('modal-close-job');
-        showLoading(true);
-        try {
-            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: { JobID: jobId, type: type, Owner: currentUser.USERID, By: currentUser.UserName, ...extra } }) });
-            const result = await res.json();
-            if (result.success) {
-                showLoading(false);
-                document.getElementById('modal-success').style.display = 'flex';
-                await loadData();
-                setTimeout(() => closeModal('modal-success'), 1500);
+    function openCloseJobForm(jobId) {
+        closeModal('modal-detail');
+        setupJobTypeDropdown('close-job-type', 'close-job-subtype');
+        
+        document.getElementById('btn-confirm-close').onclick = async () => {
+            const typeSelect = document.getElementById('close-job-type');
+            const subSelect = document.getElementById('close-job-subtype');
+            const note = document.getElementById('close-job-note').value;
+            
+            if (!typeSelect.value || !subSelect.value || !note) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
             }
-        } catch (e) { showLoading(false); alert("Error"); }
+
+            await handleJobUI(jobId, 'done', { 
+                Note: note, 
+                JobType: typeSelect.options[typeSelect.selectedIndex].text, 
+                JobSubType: subSelect.value 
+            });
+        };
+        document.getElementById('modal-close-job').style.display = 'flex';
     }
 
     function openITTicketForm() {
-        const typeSelect = document.getElementById('it-job-type');
-        const subSelect = document.getElementById('it-job-sub-type');
-        const mapping = store.JobTypeMapping || {};
-
-        typeSelect.innerHTML = Object.keys(mapping).map(code => `<option value="${code}">${mapping[code].JobTypeName}</option>`).join('');
-        typeSelect.onchange = () => {
-            const subTypes = mapping[typeSelect.value]?.SubTypes || [];
-            subSelect.innerHTML = '<option value="">-- เลือก --</option>' + subTypes.map(sub => `<option value="${sub.SubTypeName}">${sub.SubTypeName}</option>`).join('');
-        };
-        typeSelect.dispatchEvent(new Event('change'));
-
+        setupJobTypeDropdown('it-job-type', 'it-job-sub-type');
         document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
         document.getElementById('modal-it-ticket').style.display = 'flex';
+    }
+
+    async function handleJobUI(jobId, type, extra = {}) {
+        showLoading(true);
+        try {
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: { JobID: jobId, type: type, Owner: currentUser.USERID, By: currentUser.UserName, ...extra } }) });
+            if ((await res.json()).success) { 
+                closeModal('modal-detail'); closeModal('modal-close-job'); closeModal('modal-transfer');
+                document.getElementById('modal-success').style.display = 'flex'; await loadData(); 
+                setTimeout(() => closeModal('modal-success'), 1500); 
+            }
+        } catch (e) { alert("การเชื่อมต่อผิดพลาด"); }
+        showLoading(false);
     }
 
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
         showLoading(true);
-        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('it-job-type').selectedOptions[0].text, subType: document.getElementById('it-job-sub-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
-        try {
-            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-            if ((await res.json()).success) { showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ'); await loadData(); }
+        const data = { action: 'saveITTicket', data: { 
+            jobType: document.getElementById('it-job-type').selectedOptions[0].text, 
+            subType: document.getElementById('it-job-sub-type').value, 
+            problem: document.getElementById('it-problem').value, 
+            dept: document.getElementById('it-dept').value, 
+            owner: currentUser.USERID 
+        }};
+        try { 
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) }); 
+            if ((await res.json()).success) { await loadData(); closeModal('modal-it-ticket'); } 
         } catch (e) { alert("Error"); }
         showLoading(false);
     };
 
     function renderITTicketList() {
-        document.getElementById('it-ticket-list').innerHTML = (store.ITTickets || []).map(it => `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex justify-between items-center">
-                <div><p class="text-[8px] text-blue-500 font-bold">${it.JobType} > ${it.JobSubType || '-'}</p><p class="text-xs font-bold text-slate-700">${it.Problem}</p></div>
-                <span class="text-[8px] text-green-500 font-bold">Saved</span>
-            </div>`).join('');
+        document.getElementById('it-ticket-list').innerHTML = (store.ITTickets || []).map(it => `<div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm"><div><p class="text-[8px] text-blue-500 font-bold">${it.JobType}</p><p class="text-xs font-bold text-slate-700">${it.Problem}</p></div><span class="text-[8px] text-green-500 font-bold">Saved</span></div>`).join('');
     }
 
     function renderSystemLinks() {
         const tab3 = document.getElementById('tab3');
-        if (currentTab !== 3) { tab3.style.display = 'none'; return; }
-        tab3.style.display = 'grid';
         tab3.innerHTML = (store.SystemLink || []).filter(l => String(l.Active).toUpperCase() === "TRUE").map(l => `
             <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border hover:bg-pink-50 transition-all">
                 <span class="text-2xl">${l.Linkicon || '🔗'}</span>
-                <div><span class="font-bold text-slate-700 text-sm">${l.Name}</span><p class="text-[9px] text-slate-400 truncate w-40">${l.URL}</p></div>
+                <div><span class="font-bold text-slate-700 text-sm">${l.Name}</span></div>
             </a>`).join('');
     }
 
@@ -466,24 +384,19 @@
             b.classList.toggle('text-pink-600', isActive); b.classList.toggle('border-pink-600', isActive);
             b.classList.toggle('text-slate-400', !isActive); b.classList.toggle('border-transparent', !isActive);
         });
-        if (n === 3) renderSystemLinks();
     }
 
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
-        select.innerHTML = (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        select.innerHTML = '<option value="" disabled selected>-- เลือกเจ้าหน้าที่ --</option>' + (store.StaffList || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
         document.getElementById('modal-transfer').style.display = 'flex';
-        document.getElementById('btn-confirm-transfer').onclick = () => handleJobUI(jobId, 'transfer', { NewOwner: select.value, Reason: document.getElementById('transfer-reason').value });
+        document.getElementById('btn-confirm-transfer').onclick = () => {
+            if(!select.value) return alert("กรุณาเลือกเจ้าหน้าที่");
+            handleJobUI(jobId, 'transfer', { NewOwner: select.value, Reason: document.getElementById('transfer-reason').value });
+        }
     }
 
-    function showInnerAlert(modalId, text) {
-        const alertDiv = document.querySelector(`#${modalId} .inner-alert`);
-        alertDiv.querySelector('p').innerText = text; alertDiv.style.display = 'flex';
-        setTimeout(() => { alertDiv.style.display = 'none'; closeModal(modalId); }, 1500);
-    }
-
-    function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
-    function confirmLogout() { document.getElementById('logout-alert').style.display = 'flex'; setTimeout(() => { localStorage.clear(); window.location.replace("./login.html"); }, 1000); }
+    function logout() { localStorage.clear(); window.location.replace("./login.html"); }
     function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     document.addEventListener('DOMContentLoaded', initApp);

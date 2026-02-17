@@ -1,129 +1,126 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Service Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Service And Mainternance - รพ.อุดรธานี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #fdf2f8; position: relative; min-height: 100vh; }
+        body::before { content: "IT UDON HOSP"; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 8rem; color: rgba(0,0,0,0.03); font-weight: 900; pointer-events: none; z-index: -1; }
+        .pink-grad { background: linear-gradient(135deg, #be185d 0%, #db2777 100%); }
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card-pro { background: white; border-radius: 1.2rem; border: 1px solid #fce7f3; transition: 0.3s; cursor: pointer; }
+        .card-pro:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1); }
+        .status-pulse { animation: pulse-pink 2s infinite; }
+        @keyframes pulse-pink { 0% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(219, 39, 119, 0); } 100% { box-shadow: 0 0 0 0 rgba(219, 39, 119, 0); } }
+        .inner-alert { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.9); z-index:100; flex-direction:column; align-items:center; justify-content:center; border-radius: 2rem; }
+    </style>
 </head>
+<body class="pb-10">
 
-<body class="bg-gray-100">
+<!-- (เนื้อหาทั้งหมดส่วนบนเหมือนเดิมทุกอย่าง ไม่ได้แก้ไข) -->
 
-<div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">My Jobs</h1>
-    <div id="jobList" class="grid gap-4"></div>
-</div>
+<!-- ===================== -->
+<!-- เพิ่ม SubType ตรงนี้ -->
+<!-- ===================== -->
 
-<!-- ================= MODAL SERVICE MA ================= -->
-<div id="modal-service-ma" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-  <div class="bg-white w-full max-w-lg rounded-lg shadow-lg p-6">
-    <h2 class="text-xl font-bold mb-4">Service MA Report</h2>
+<div id="modal-it-ticket" class="overlay">
+    <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
+        <div id="it-alert" class="inner-alert">
+            <div class="bg-blue-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">📝</span></div>
+            <p class="text-blue-600 font-bold">บันทึกข้อมูลเรียบร้อย</p>
+        </div>
+        <form id="form-it-ticket" class="p-6 space-y-4">
+            <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
 
-    <input type="hidden" id="serviceJobId">
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
+                <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
+            </div>
 
-    <div class="mb-3">
-      <label class="block mb-1">รายละเอียดงาน</label>
-      <textarea id="serviceDetail" class="w-full border rounded p-2"></textarea>
+            <!-- ✅ เพิ่มใหม่ -->
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทย่อย</label>
+                <select id="it-job-sub-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
+                <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" required></textarea>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หน่วยงาน</label>
+                <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
+            </div>
+
+            <div class="flex gap-2 pt-4">
+                <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
+                <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">บันทึกข้อมูล</button>
+            </div>
+        </form>
     </div>
-
-    <div class="mb-3">
-      <label class="block mb-1">อะไหล่ที่ใช้</label>
-      <input type="text" id="serviceSparePart" class="w-full border rounded p-2">
-    </div>
-
-    <div class="mb-3">
-      <label class="block mb-1">ค่าใช้จ่าย</label>
-      <input type="number" id="serviceCost" class="w-full border rounded p-2">
-    </div>
-
-    <div class="flex gap-3 mt-6">
-      <button onclick="submitServiceMA()" class="bg-blue-600 text-white px-4 py-2 rounded">บันทึก</button>
-      <button onclick="closeModal('modal-service-ma')" class="bg-gray-400 text-white px-4 py-2 rounded">ยกเลิก</button>
-    </div>
-  </div>
 </div>
 
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec";
+function openITTicketForm() {
+    document.getElementById('it-job-type').innerHTML =
+        (store.JobTypeMaster || []).map(t =>
+            `<option value="${t}">${t}</option>`
+        ).join('');
 
-/* ================= API ================= */
+    document.getElementById('it-job-sub-type').innerHTML =
+        (store.JobSubTypeMaster || []).map(t =>
+            `<option value="${t}">${t}</option>`
+        ).join('');
 
-async function apiFetch(action, data = {}) {
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action, data })
-    });
-    return await res.json();
+    document.getElementById('it-dept').innerHTML =
+        (store.DeptList || []).map(d =>
+            `<option value="${d}">${d}</option>`
+        ).join('');
+
+    document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 
-/* ================= LOAD DATA ================= */
-
-async function loadData() {
-    const res = await apiFetch("getMyJobs");
-    renderJobs(res.data || []);
-}
-
-function renderJobs(jobs) {
-    const container = document.getElementById("jobList");
-    container.innerHTML = "";
-
-    jobs.forEach(job => {
-        container.innerHTML += `
-            <div class="bg-white p-4 rounded shadow">
-                <div class="font-bold">${job.JobID}</div>
-                <div>${job.Description || ""}</div>
-                <button onclick="openServiceMAForm('${job.JobID}')" 
-                    class="mt-3 bg-green-600 text-white px-3 py-1 rounded">
-                    ปิดงาน
-                </button>
-            </div>
-        `;
-    });
-}
-
-/* ================= MODAL CONTROL ================= */
-
-function openServiceMAForm(jobId) {
-    document.getElementById("serviceJobId").value = jobId;
-    document.getElementById("modal-service-ma").classList.remove("hidden");
-    document.getElementById("modal-service-ma").classList.add("flex");
-}
-
-function closeModal(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.add("hidden");
-    el.classList.remove("flex");
-}
-
-/* ================= SUBMIT SERVICE MA ================= */
-
-async function submitServiceMA() {
-
-    const jobId = document.getElementById("serviceJobId").value;
+document.getElementById('form-it-ticket').onsubmit = async (e) => {
+    e.preventDefault();
+    showLoading(true);
 
     const data = {
-        JobID: jobId,
-        Detail: document.getElementById("serviceDetail").value,
-        SparePart: document.getElementById("serviceSparePart").value,
-        Cost: document.getElementById("serviceCost").value
+        action: 'saveITTicket',
+        data: {
+            jobType: document.getElementById('it-job-type').value,
+            jobSubType: document.getElementById('it-job-sub-type').value, // ✅ เพิ่มส่งค่า
+            problem: document.getElementById('it-problem').value,
+            dept: document.getElementById('it-dept').value,
+            owner: currentUser.USERID
+        }
     };
 
-    const res = await apiFetch("saveServiceMA", data);
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
 
-    if (res.success) {
-        alert("บันทึกสำเร็จ");
-        closeModal("modal-service-ma");
-        await loadData();
-    } else {
-        alert("เกิดข้อผิดพลาด");
+        const result = await res.json();
+
+        if (result.success) {
+            showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ');
+            document.getElementById('form-it-ticket').reset();
+            await loadData();
+        }
+    } catch (e) {
+        alert("Error");
     }
-}
 
-/* ================= INIT ================= */
-
-document.addEventListener("DOMContentLoaded", loadData);
+    showLoading(false);
+};
 
 </script>
 

@@ -117,11 +117,10 @@
 <div>
     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
     <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-</div>
-
+    </div>
 <div>
     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
-    <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+    <select id="it-job-sub-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
 </div>
 
 <div>
@@ -520,11 +519,35 @@ function loadCloseJobMaster() {
 
    function openITTicketForm() {
 
-    document.getElementById('it-job-type').innerHTML =
-        (store.JobTypeMaster || [])
-        .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
-        .join('');
+    const typeSelect = document.getElementById('it-job-type');
+    const subSelect = document.getElementById('it-job-sub-type');
 
+    const mapping = store.JobTypeMapping || {};
+
+    // โหลดประเภทงาน
+    typeSelect.innerHTML = Object.keys(mapping)
+        .map(code => `
+            <option value="${code}">
+                ${mapping[code].JobTypeName}
+            </option>
+        `).join('');
+
+    // เปลี่ยนประเภท → โหลด SubType
+    typeSelect.onchange = () => {
+        const selectedCode = typeSelect.value;
+        const subTypes = mapping[selectedCode]?.SubTypes || [];
+
+        subSelect.innerHTML = subTypes
+            .map(sub => `
+                <option value="${sub.SubTypeName}">
+                    ${sub.SubTypeName}
+                </option>
+            `).join('');
+    };
+
+    typeSelect.dispatchEvent(new Event('change'));
+
+    // โหลดหน่วยงาน
     document.getElementById('it-dept').innerHTML =
         (store.DeptList || [])
         .map(d => `<option value="${d}">${d}</option>`)
@@ -532,6 +555,7 @@ function loadCloseJobMaster() {
 
     document.getElementById('modal-it-ticket').style.display = 'flex';
 }
+
 
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();

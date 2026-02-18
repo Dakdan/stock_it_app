@@ -82,6 +82,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
+<button class="btn-login" id="loginBtn">
+  🛡️ เข้าสู่ระบบ
+</button>
+
+<div class="card-footer" style="text-align:center; margin-top:20px; font-size: 0.9rem; color: #666;">
+  ยังไม่มีบัญชีผู้ใช้งาน? 
+  <a href="register.html" style="font-weight: 600;">ลงทะเบียนที่นี่</a>
+</div>
+
+</main>
+</div>
+
+<script src="./js/main.js"></script>
+<script src="./js/api.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const btn = document.getElementById("loginBtn");
+
+  btn.addEventListener("click", async () => {
+
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+
+    if (!user || !pass) {
+      showModal("ข้อมูลไม่ครบ", "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", "warning");
+      return;
+    }
+
+    Loader.show();
+
+    try {
+      const result = await ApiService.login(user, pass);
+
+      if (result.success) {
+        showModal("สำเร็จ!", "ยินดีต้อนรับเข้าสู่ระบบ", "success");
+        Auth.setSession(result.user);
+        setTimeout(() => { window.location.href = "index.html"; }, 1500);
+      } else {
+        Loader.hide();
+        showModal("เข้าสู่ระบบไม่สำเร็จ", result.message || "ข้อมูลไม่ถูกต้อง", "error");
+      }
+
+    } catch (error) {
+      Loader.hide();
+      showModal("เกิดข้อผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error");
+    }
+
+  });
+
+});
+</script>
 
 
 </body>

@@ -27,7 +27,7 @@ function showModal(title, message, type = 'success') {
     const pBox = document.querySelector('.popup-box');
 
     if (popup && pTitle && pMsg) {
-        // เปลี่ยนสีแถบตามประเภท
+
         if (pBox) {
             pBox.classList.remove('success', 'error', 'warning');
             pBox.classList.add(type);
@@ -40,10 +40,10 @@ function showModal(title, message, type = 'success') {
 
         pTitle.innerHTML = `<span style="font-size: 2.5rem; display: block; margin-bottom: 10px;">${icon}</span>${title}`;
         pMsg.innerText = message;
-        
+
         popup.style.display = 'flex';
+
     } else {
-        // Fallback กรณีหา Element ไม่เจอ
         alert(`${title}: ${message}`);
     }
 }
@@ -53,14 +53,13 @@ function closePopup() {
     if (popup) popup.style.display = 'none';
 }
 
-// 3. จัดการ Session ผู้ใช้
+// 3. จัดการ Session ผู้ใช้ (แก้ให้เหลือ Auth ก้อนเดียว)
 const Auth = {
-    // บันทึกข้อมูล (ชื่อ key ต้องตรงกับที่เรียกใน index.html)
+
     setSession: (userData) => {
         localStorage.setItem("it_session", JSON.stringify(userData));
     },
 
-    // ดึงข้อมูล
     getUser: () => {
         const data = localStorage.getItem("it_session");
         try {
@@ -71,30 +70,12 @@ const Auth = {
         }
     },
 
-    // ออกจากระบบ (ล้างค่าและเปลี่ยนหน้า)
-   // แก้ไขส่วน Auth.logout ในไฟล์ js/main.js
-const Auth = {
-    // ... ฟังก์ชันอื่นๆ (setSession, getUser) ...
-
     logout: () => {
         console.log("ล้างข้อมูล Session...");
-        // ลบข้อมูลทั้งหมดใน LocalStorage
-        localStorage.clear(); 
-        
-        // ใช้ชื่อไฟล์ให้ตรงกับใน GitHub (login.html ตัวเล็กทั้งหมด)
-        // ระบุ path แบบชัดเจนด้วย ./
-        window.location.href = "./login.html"; 
+        localStorage.clear();
+        window.location.href = "./login.html";
     },
 
-    checkAuth: () => {
-        if (!Auth.getUser()) {
-            window.location.href = "./login.html";
-        }
-    }
-};
-}
-
-    // ตรวจสอบสิทธิ์เข้าหน้าเว็บ
     checkAuth: () => {
         const user = Auth.getUser();
         if (!user) {

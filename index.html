@@ -131,10 +131,10 @@
                         </select>
 </div>
 
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมายเหตุเพิ่มเติม</label>
-    <textarea id="close-job-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
-</div>
+                      <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมายเหตุเพิ่มเติม</label>
+                        <textarea id="close-job-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
+                     </div>
 
                     <div class="flex gap-2">
                         <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
@@ -155,16 +155,10 @@
                 <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
+                     <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
                     <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>                    
-    <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
-    <select id="it-job-sub-type"
-        class="w-full border rounded-lg px-3 py-2 text-sm">
-        <option value="">-- เลือกประเภทย่อย --</option>
-    </select>
-</div>
-
-                    <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
-                </div>
+                    <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
+                    <select id="it-job-sub-type"class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">-- เลือกประเภทย่อย --</option></select>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
                     <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>

@@ -188,13 +188,12 @@
         </div>
     </div>
 
-   <script>
+ <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
     let store = { AllJobs: [], ITTickets: [], StaffList: [], SystemLink: [], DeptList: [], JobTypeMaster: [], BackupData: [], JobSubTypeMaster: [] };
     let currentUser = null;
     let currentTab = 1; 
 
-    // 1. เริ่มระบบ
     async function initApp() {
         const session = localStorage.getItem("it_session");
         if (!session) { window.location.replace("./login.html"); return; }
@@ -204,104 +203,118 @@
         await loadData();
     }
 
-    // 2. โหลดข้อมูล
     async function loadData() {
         showLoading(true);
         try {
             const res = await fetch(API_URL, { 
                 method: 'POST', 
-                body: JSON.stringify({ action: 'getInitialData', data: { USERID: currentUser.USERID } }) 
+                body: JSON.stringify({ 
+                    action: 'getInitialData', 
+                    data: { userName: currentUser.UserName, USERID: currentUser.USERID } 
+                }) 
             });
             const result = await res.json();
             if (result.success) {
                 store = result;
                 renderDashboard();
                 renderMyJobs();
+                renderITTicketList();
                 renderSystemLinks();
             }
-        } catch (e) { console.error("Load Data Error", e); }
+        } catch (e) { console.error("Data error", e); }
         showLoading(false);
     }
 
-    // 3. จัดการ IT Ticket (แก้ ID ให้ตรงกับ HTML: it-job-sub-type)
-    function openITTicketForm() {
-        const typeSelect = document.getElementById('it-job-type');
-        const subSelect = document.getElementById('it-job-sub-type'); // เพิ่มขีดตาม HTML คุณ
-        const deptSelect = document.getElementById('it-dept');
-
-        // ใส่ข้อมูลประเภทงานหลัก
-        typeSelect.innerHTML = '<option value="">-- เลือกประเภทงาน --</option>' + 
-            (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeCode}">${t.JobTypeName}</option>`).join('');
-
-        // ใส่ข้อมูลหน่วยงาน
-        deptSelect.innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
-
-        // เมื่อเปลี่ยนประเภทงานหลัก ให้กรองประเภทย่อย
-        typeSelect.onchange = () => {
-            const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(typeSelect.value));
-            subSelect.innerHTML = filtered.length > 0 
-                ? filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('')
-                : '<option value="">-- ไม่มีประเภทย่อย --</option>';
-        };
-
-        openModal('modal-it-ticket');
-    }
-
-    // 4. ฟังก์ชันเปิดบันทึกปิดงาน (ServiceMA)
-    function openCloseJobForm(jobId) {
-        closeModal('modal-detail');
-        const typeSelect = document.getElementById('close-job-type');
-        const subSelect = document.getElementById('close-job-subtype');
-
-        typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>' +
-            (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeCode}">${t.JobTypeName}</option>`).join('');
-
-        typeSelect.onchange = () => {
-            const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(typeSelect.value));
-            subSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
-        };
-        
-        openModal('modal-close-job');
-
-        // ปุ่มยืนยันปิดงาน
-        document.getElementById('btn-confirm-close').onclick = async () => {
-            const payload = {
-                Note: document.getElementById('close-job-note').value,
-                SubTypeName: subSelect.value,
-                CloseStatus: document.getElementById('close-job-status').value,
-                Remark: document.getElementById('close-job-remark').value
-            };
-            if(!payload.Note || !subSelect.value) return alert("กรุณากรอกข้อมูลให้ครบ");
-            await handleJobUI(jobId, 'done', payload);
-        };
-    }
-
-    // 5. ฟังก์ชันมาตรฐาน (รักษา Modal เดิมของคุณ)
-    function logout() { openModal('modal-logout'); }
-    
+    // --- ฟังก์ชัน Logout (ใช้ Modal เดิม 100%) ---
+    function logout() { document.getElementById('modal-logout').style.display = 'flex'; }
     async function confirmLogout() {
         document.getElementById('logout-alert').style.display = 'flex';
         setTimeout(() => { localStorage.clear(); window.location.replace("./login.html"); }, 1500);
     }
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
+    // --- ฟังก์ชัน Dashboard & Stats ---
+    function updateStats(jobs) {
+        const getCount = (s) => jobs.filter(j => String(j.Status).trim() === s).length;
+        document.getElementById('count-wait').innerText = getCount('รอรับงาน');
+        document.getElementById('count-doing').innerText = getCount('กำลังดำเนินการ');
+        document.getElementById('count-spare').innerText = getCount('รออะไหล่');
+        document.getElementById('count-done').innerText = getCount('เสร็จสิ้น');
+        document.getElementById('count-cancel').innerText = getCount('ยกเลิก');
+    }
 
-    // ฟังก์ชันจัดการ Tab
+    function getStatusColor(status) {
+        const s = String(status || '').trim();
+        if (s === 'รอรับงาน') return "text-pink-600 bg-pink-50 border border-pink-200";
+        if (s === 'กำลังดำเนินการ') return "text-blue-600 bg-blue-50 border border-blue-200";
+        if (s === 'รออะไหล่') return "text-orange-600 bg-orange-50 border border-orange-200";
+        if (s === 'เสร็จสิ้น') return "text-green-600 bg-green-50 border border-green-200";
+        return "text-slate-400 bg-slate-50 border border-slate-200";
+    }
+
+    function renderDashboard() {
+        const jobs = store.AllJobs || [];
+        updateStats(jobs);
+        document.getElementById('job-list-dashboard').innerHTML = jobs.map(j => {
+            const status = String(j.Status || '').trim();
+            let borderClass = status === 'รอรับงาน' ? "border-pink-500 status-pulse" : "border-slate-200";
+            return `
+                <div onclick="viewJobDetail('${j.JobID}')" class="card-pro p-5 border-l-8 ${borderClass} mb-4 shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[10px] font-bold text-slate-400">#${j.JobID}</span>
+                        <span class="text-[10px] font-black px-2 py-1 rounded-lg ${getStatusColor(status)}">${status}</span>
+                    </div>
+                    <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                    <div class="flex justify-between mt-3 pt-2 border-t border-slate-50">
+                        <p class="text-[10px] text-blue-600 font-bold">📍 ${j.Department}</p>
+                        <p class="text-[10px] text-slate-400 italic">👷 ${j.OwnerName || 'รอมอบหมาย'}</p>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    // --- ฟังก์ชัน IT Ticket (จัดการ Dropdown ประเภทย่อย) ---
+    function openITTicketForm() {
+        const typeSelect = document.getElementById('it-job-type');
+        const subSelect = document.getElementById('it-job-sub-type'); // ตรงกับ ID ใน HTML คุณ
+        
+        typeSelect.innerHTML = '<option value="">-- เลือกประเภทงาน --</option>' + 
+            (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeCode}">${t.JobTypeName}</option>`).join('');
+        
+        document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
+
+        typeSelect.onchange = () => {
+            const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(typeSelect.value));
+            subSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
+        };
+        document.getElementById('modal-it-ticket').style.display = 'flex';
+    }
+
+    // --- ฟังก์ชันพื้นฐานอื่นๆ ---
     function switchTab(n) {
         currentTab = n;
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.getElementById('tab' + n).classList.add('active');
         document.querySelectorAll('nav button').forEach((b, i) => {
             const isActive = (i + 1 === n);
-            b.classList.toggle('text-pink-600', isActive);
-            b.classList.toggle('border-pink-600', isActive);
-            b.classList.toggle('text-slate-400', !isActive);
-            b.classList.toggle('border-transparent', !isActive);
+            b.classList.toggle('text-pink-600', isActive); b.classList.toggle('border-pink-600', isActive);
+            b.classList.toggle('text-slate-400', !isActive); b.classList.toggle('border-transparent', !isActive);
         });
         if(n === 3) renderSystemLinks();
     }
+
+    function renderSystemLinks() {
+        const container = document.getElementById('tab3');
+        container.innerHTML = (store.SystemLink || []).filter(l => String(l.Active).toUpperCase() === "TRUE").map(l => `
+            <a href="${l.URL}" target="_blank" class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-pink-50">
+                <span class="text-2xl">${l.Linkicon || '🔗'}</span>
+                <div><p class="font-bold text-slate-700 text-sm">${l.Name}</p><p class="text-[9px] text-slate-400 truncate w-40">${l.URL}</p></div>
+            </a>`).join('');
+    }
+
+    function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function viewJobDetail(id) { /* ใส่โค้ดแสดงรายละเอียดงานตามที่คุณมี */ openModal('modal-detail'); }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 
     document.addEventListener('DOMContentLoaded', initApp);
 </script>

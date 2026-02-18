@@ -42,10 +42,10 @@
             </div>
             <div class="flex items-center gap-3">
                 <div class="text-right hidden sm:block">
-                    <p id="u-fname" class="text-xs font-bold leading-none">Loading...</p>
+                    <p id="u-fname" class="text-xs font-bold leading-none"></p>
                     <p id="u-type-name" class="text-[9px] opacity-70"></p>
                 </div>
-                <button onclick="openLogoutModal()" class="bg-white/20 p-2 rounded-xl">🚪</button>
+                <button onclick="openModal('modal-logout')" class="bg-white/20 p-2 rounded-xl">🚪</button>
             </div>
         </div>
     </header>
@@ -83,8 +83,7 @@
             <div id="it-ticket-list" class="space-y-3"></div>
         </div>
 
-        <div id="tab3" class="tab-content grid grid-cols-1 sm:grid-cols-2 gap-4">
-            </div>
+        <div id="tab3" class="tab-content grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
     </main>
 
     <div id="modal-detail" class="overlay">
@@ -112,6 +111,10 @@
                 </h3>
                 <div class="space-y-4">
                     <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดการแก้ไข/หมายเหตุ</label>
+                        <textarea id="close-job-note" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-32 border border-slate-100 focus:border-green-500 outline-none" placeholder="ระบุสิ่งที่แก้ไข หรือสาเหตุของปัญหา..."></textarea>
+                    </div>
+                    <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
                         <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-100"></select>
                     </div>
@@ -120,17 +123,18 @@
                         <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-100"></select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดการแก้ไข/หมายเหตุ</label>
-                        <textarea id="close-job-note" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-32 border border-slate-100 focus:border-green-500 outline-none" placeholder="ระบุสิ่งที่แก้ไข หรือสาเหตุของปัญหา..."></textarea>
-                    </div>
-                    <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">สถานะงาน</label>
                         <select id="close-job-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-100">
                             <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                            <option value="รออะไหล่">รออะไหล่</option>
                             <option value="ยกเลิก">ยกเลิก</option>
                         </select>
                     </div>
-                    <div class="flex gap-2 pt-2">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมายเหตุเพิ่มเติม</label>
+                        <textarea id="close-job-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20 border border-slate-100"></textarea>
+                    </div>
+                    <div class="flex gap-2">
                         <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
                         <button id="btn-confirm-close" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow-lg">ยืนยันการปิดงาน</button>
                     </div>
@@ -152,9 +156,9 @@
                     <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-100" required></select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทย่อย</label>
                     <select id="it-job-sub-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-100">
-                        <option value="">-- เลือกหมวดหมู่ย่อย --</option>
+                        <option value="">-- เลือกประเภทย่อย --</option>
                     </select>
                 </div>
                 <div>
@@ -173,13 +177,23 @@
         </div>
     </div>
 
+    <div id="modal-logout" class="overlay">
+        <div class="bg-white rounded-[2rem] w-full max-w-sm mx-4 shadow-2xl relative overflow-hidden p-8 text-center">
+            <div class="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4"><span class="text-4xl">🚪</span></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ยืนยันการออกจากระบบ?</h3>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal('modal-logout')" class="flex-1 py-3 text-slate-400 font-bold text-sm bg-slate-50 rounded-2xl">ยกเลิก</button>
+                <button onclick="confirmLogout()" class="flex-1 py-3 pink-grad text-white rounded-2xl font-bold shadow-lg">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
-        let store = { AllJobs: [], JobTypeMaster: [], JobSubTypeMaster: [], DeptList: [] };
+        let store = { AllJobs: [], ITTickets: [], JobTypeMaster: [], JobSubTypeMaster: [], DeptList: [] };
         let currentUser = null;
         let currentJobId = null;
 
-        // เริ่มต้นแอป
         async function initApp() {
             const session = localStorage.getItem("it_session");
             if (!session) { window.location.replace("./login.html"); return; }
@@ -189,7 +203,6 @@
             await loadData();
         }
 
-        // โหลดข้อมูล
         async function loadData() {
             showLoading(true);
             try {
@@ -203,28 +216,37 @@
                     renderDashboard();
                     renderMyJobs();
                 }
-            } catch (e) { console.error("Load Data Error:", e); }
+            } catch (e) { console.error(e); }
             showLoading(false);
         }
 
-        // แสดงหน้า Dashboard
         function renderDashboard() {
             const jobs = store.AllJobs || [];
             updateStats(jobs);
             const list = document.getElementById('job-list-dashboard');
-            list.innerHTML = jobs.length ? jobs.map(j => `
-                <div onclick="openJobDetail('${j.JobID}')" class="card-pro p-4 border-l-4 ${getStatusColor(j.Status)}">
-                    <div class="flex justify-between items-start">
+            list.innerHTML = jobs.filter(j => j.Status === 'รอรับงาน').map(j => `
+                <div onclick="openJobDetail('${j.JobID}')" class="card-pro p-4 border-l-4 border-pink-500">
+                    <div class="flex justify-between items-start mb-1">
                         <span class="text-[10px] font-bold text-slate-400 italic">#${j.JobID}</span>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 font-bold">${j.Status}</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 font-bold">New</span>
                     </div>
-                    <h3 class="font-bold text-slate-700 text-sm mt-1">${j.Problem}</h3>
+                    <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
                     <p class="text-[10px] text-slate-400 mt-2">📍 ${j.Department || '-'}</p>
                 </div>
-            `).join('') : '<p class="text-center text-slate-300 py-10 text-xs italic font-bold">ไม่มีรายการงานใหม่</p>';
+            `).join('') || '<p class="text-center text-slate-300 py-10 text-xs italic">ไม่มีงานใหม่</p>';
         }
 
-        // อัปเดตตัวเลข Stats
+        function renderMyJobs() {
+            const myJobs = (store.AllJobs || []).filter(j => j.Status !== 'รอรับงาน' && j.Status !== 'เสร็จสิ้น' && j.Status !== 'ยกเลิก');
+            document.getElementById('job-list-myjob').innerHTML = myJobs.map(j => `
+                <div onclick="openJobDetail('${j.JobID}')" class="card-pro p-4 border-l-4 border-blue-500">
+                    <span class="text-[10px] font-bold text-slate-400 italic">#${j.JobID}</span>
+                    <h3 class="font-bold text-slate-700 text-sm">${j.Problem}</h3>
+                    <div class="flex justify-between mt-2"><span class="text-[9px] text-blue-600 font-bold uppercase">${j.Status}</span></div>
+                </div>
+            `).join('') || '<p class="text-center text-slate-300 py-5 text-xs">ไม่มีงานที่กำลังทำ</p>';
+        }
+
         function updateStats(jobs) {
             const count = (s) => jobs.filter(j => j.Status === s).length;
             document.getElementById('count-wait').innerText = count('รอรับงาน');
@@ -234,24 +256,53 @@
             document.getElementById('count-cancel').innerText = count('ยกเลิก');
         }
 
-        // จัดการ Modal แจ้งซ่อม (IT Ticket)
+        function openJobDetail(id) {
+            const job = store.AllJobs.find(j => j.JobID === id);
+            if(!job) return;
+            currentJobId = id;
+            let actions = '';
+            if(job.Status === 'รอรับงาน') actions = `<button onclick="handleJobUI('${id}','accept')" class="w-full py-4 pink-grad text-white rounded-2xl font-bold shadow-lg">รับงาน (ACCEPT)</button>`;
+            else actions = `<button onclick="openCloseJobForm('${id}')" class="w-full py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg">ปิดงาน/อัปเดตสถานะ</button>`;
+            
+            document.getElementById('detail-content').innerHTML = `<div class="p-2 space-y-2"><p class="text-xs"><b>อาการ:</b> ${job.Problem}</p><p class="text-xs"><b>สถานที่:</b> ${job.Department}</p></div>`;
+            document.getElementById('detail-actions').innerHTML = actions;
+            openModal('modal-detail');
+        }
+
+        function openCloseJobForm(id) {
+            closeModal('modal-detail');
+            const typeSelect = document.getElementById('close-job-type');
+            typeSelect.innerHTML = (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeCode}">${t.JobTypeName}</option>`).join('');
+            typeSelect.onchange = () => {
+                const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(typeSelect.value));
+                document.getElementById('close-job-subtype').innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
+            };
+            typeSelect.onchange();
+            openModal('modal-close-job');
+        }
+
+        document.getElementById('btn-confirm-close').onclick = async () => {
+            const payload = {
+                Note: document.getElementById('close-job-note').value,
+                JobTypeName: document.getElementById('close-job-type').options[document.getElementById('close-job-type').selectedIndex].text,
+                SubTypeName: document.getElementById('close-job-subtype').value,
+                CloseStatus: document.getElementById('close-job-status').value,
+                Remark: document.getElementById('close-job-remark').value
+            };
+            await handleJobUI(currentJobId, 'done', payload);
+            closeModal('modal-close-job');
+        };
+
         function openITTicketForm() {
             const typeSelect = document.getElementById('it-job-type');
             const subSelect = document.getElementById('it-job-sub-type');
-            const deptSelect = document.getElementById('it-dept');
-
-            typeSelect.innerHTML = '<option value="">-- เลือกประเภทงาน --</option>' + 
-                (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeCode}">${t.JobTypeName}</option>`).join('');
-            
-            deptSelect.innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
-
+            typeSelect.innerHTML = '<option value="">-- เลือกประเภทงาน --</option>' + (store.JobTypeMaster || []).map(t => `<option value="${t.JobTypeCode}">${t.JobTypeName}</option>`).join('');
+            document.getElementById('it-dept').innerHTML = (store.DeptList || []).map(d => `<option value="${d}">${d}</option>`).join('');
             typeSelect.onchange = () => {
                 const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(typeSelect.value));
-                subSelect.innerHTML = '<option value="">-- เลือกหมวดหมู่ย่อย --</option>' + 
-                    filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
+                subSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
             };
-
-            document.getElementById('modal-it-ticket').style.display = 'flex';
+            openModal('modal-it-ticket');
         }
 
         document.getElementById('form-it-ticket').onsubmit = async (e) => {
@@ -261,49 +312,39 @@
                 subType: document.getElementById('it-job-sub-type').value,
                 problem: document.getElementById('it-problem').value,
                 dept: document.getElementById('it-dept').value,
-                owner: currentUser.USERID 
+                owner: currentUser.USERID
             };
-            showLoading(true);
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateJobStatus', data: { type: 'saveITTicket', ...payload } }) });
-                const result = await res.json();
-                if(result.success) {
-                    document.getElementById('it-alert').style.display = 'flex';
-                    setTimeout(() => { 
-                        document.getElementById('it-alert').style.display = 'none';
-                        closeModal('modal-it-ticket');
-                        loadData();
-                    }, 1500);
-                }
-            } catch (e) { alert("Error!"); }
-            showLoading(false);
+            await handleJobUI(null, 'saveITTicket', payload);
+            closeModal('modal-it-ticket');
         };
 
-        // ฟังก์ชันช่วยเหลือ
+        async function handleJobUI(jobId, actionType, extra) {
+            showLoading(true);
+            try {
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'updateJobStatus', data: { JobID: jobId, type: actionType, Owner: currentUser.USERID, ...extra } }) 
+                });
+                if ((await res.json()).success) await loadData();
+            } catch (e) { alert("Error!"); }
+            showLoading(false);
+        }
+
         function switchTab(idx) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(`tab${idx}`).classList.add('active');
             document.querySelectorAll('nav button').forEach((b, i) => {
-                if(i === idx-1) {
-                    b.classList.add('border-pink-600', 'text-pink-600');
-                    b.classList.remove('border-transparent', 'text-slate-400');
-                } else {
-                    b.classList.remove('border-pink-600', 'text-pink-600');
-                    b.classList.add('border-transparent', 'text-slate-400');
-                }
+                b.classList.toggle('border-pink-600', i === idx-1);
+                b.classList.toggle('text-pink-600', i === idx-1);
+                b.classList.toggle('border-transparent', i !== idx-1);
+                b.classList.toggle('text-slate-400', i !== idx-1);
             });
         }
 
-        function getStatusColor(s) {
-            if(s === 'รอรับงาน') return 'border-pink-500';
-            if(s === 'กำลังดำเนินการ') return 'border-blue-500';
-            if(s === 'เสร็จสิ้น') return 'border-green-500';
-            return 'border-slate-300';
-        }
-
         function showLoading(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function openLogoutModal() { /* logic logout */ localStorage.clear(); window.location.replace("./login.html"); }
+        function confirmLogout() { localStorage.clear(); window.location.replace("./login.html"); }
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>

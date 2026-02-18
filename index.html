@@ -34,7 +34,7 @@
             <div class="flex items-center gap-3">
                 <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)</h1>
+                    <h1 class="font-bold text-lg leading-tight">โรงพยาบาลอุดรธานี(ITSM)</h1>
                     <p class="text-[10px] opacity-80">ระบบจัดการงานซ่อมและบริการ กลุ่มงาน: เทคโนโลยีสารสนเทศ</p>
                 </div>
             </div>
@@ -114,22 +114,21 @@
                     </div>
                     <!-- ===== เพิ่มส่วน ServiceMA ===== -->
 
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-    <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-</div>
+                    <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
+                            <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    </div>
+                    <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
+                            <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    </div>
 
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
-    <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-</div>
-
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">สถานะงาน</label>
-    <select id="close-job-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
-        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-        <option value="ยกเลิก">ยกเลิก</option>
-    </select>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">สถานะงาน</label>
+                        <select id="close-job-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
+                        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                        <option value="ยกเลิก">ยกเลิก</option>
+                        </select>
 </div>
 
 <div>
@@ -156,7 +155,7 @@
                 <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                    <div class="mt-3">
+                    <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>                    
     <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
     <select id="it-job-sub-type"
         class="w-full border rounded-lg px-3 py-2 text-sm">

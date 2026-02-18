@@ -494,43 +494,48 @@
 
 function openCloseJobForm(jobId) {
     closeModal('modal-detail');
-    
-    // 1. ล้างค่าข้อมูลเดิม
+
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
-    
-    // 2. โหลดข้อมูลเข้า Dropdown (ดึงจาก JobTypeMaster/JobSubTypeMaster)
+
     loadCloseJobMaster();
-    
     document.getElementById('modal-close-job').style.display = 'flex';
 
-    // 3. จัดการการคลิกปุ่มยืนยัน
     document.getElementById('btn-confirm-close').onclick = async () => {
+
         const note = document.getElementById('close-job-note').value;
         const typeSelect = document.getElementById('close-job-type');
         const subTypeSelect = document.getElementById('close-job-subtype');
         const status = document.getElementById('close-job-status').value;
         const remark = document.getElementById('close-job-remark').value;
 
-        // --- ตรวจสอบความถูกต้องก่อนส่ง (Validation) ---
         if (!typeSelect.value || !subTypeSelect.value || !note) {
             alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
             return;
         }
 
-        // ดึงชื่อประเภทงานมาเก็บไว้ (ใช้สำหรับ JobTypeName)
         const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
 
-        // --- ส่งข้อมูลไปยัง handleJobUpdate (Apps Script) ---
-        await handleJobUI(jobId, 'done', { 
-            Note: note,
-            JobTypeName: typeNameText,     // ตรงกับ Backend: d.JobTypeName
-            SubTypeName: subTypeSelect.value, // ตรงกับ Backend: d.SubTypeName
-            CloseStatus: status,
-            Remark: remark,
-            Owner: store.user.USERID,      // ส่งไปให้ saveToServiceMA ใช้บันทึก
-            By: store.user.UserName        // ส่งไปเข้าคอลัมน์ USER
-        });
+        // ✅ แสดงแจ้งเตือนตาม style ที่มีอยู่ทันที
+        document.getElementById('success-text').innerText = "ดำเนินการสำเร็จ";
+        document.getElementById('modal-success').style.display = 'flex';
+
+        setTimeout(async () => {
+
+            closeModal('modal-success');
+
+            await handleJobUI(jobId, 'done', { 
+                Note: note,
+                JobTypeName: typeNameText,
+                SubTypeName: subTypeSelect.value,
+                CloseStatus: status,
+                Remark: remark,
+                Owner: currentUser.USERID,
+                By: currentUser.UserName
+            });
+
+        }, 1200);
+
     };
 }
     function openTransfer(jobId) {

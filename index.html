@@ -493,12 +493,14 @@
 }
 
 function openCloseJobForm(jobId) {
+
     closeModal('modal-detail');
 
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
 
     loadCloseJobMaster();
+
     document.getElementById('modal-close-job').style.display = 'flex';
 
     document.getElementById('btn-confirm-close').onclick = async () => {
@@ -516,25 +518,19 @@ function openCloseJobForm(jobId) {
 
         const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
 
-        // ✅ แสดงแจ้งเตือนตาม style ที่มีอยู่ทันที
-        document.getElementById('success-text').innerText = "ดำเนินการสำเร็จ";
-        document.getElementById('modal-success').style.display = 'flex';
+        // ✅ ปิด modal ปิดงานก่อน
+        closeModal('modal-close-job');
 
-        setTimeout(async () => {
-
-            closeModal('modal-success');
-
-            await handleJobUI(jobId, 'done', { 
-                Note: note,
-                JobTypeName: typeNameText,
-                SubTypeName: subTypeSelect.value,
-                CloseStatus: status,
-                Remark: remark,
-                Owner: currentUser.USERID,
-                By: currentUser.UserName
-            });
-
-        }, 1200);
+        // ✅ ให้ handleJobUI เป็นคนจัดการ success modal ตามระบบเดิม
+        await handleJobUI(jobId, 'done', { 
+            Note: note,
+            JobTypeName: typeNameText,
+            SubTypeName: subTypeSelect.value,
+            CloseStatus: status,
+            Remark: remark,
+            Owner: currentUser.USERID,
+            By: currentUser.UserName
+        });
 
     };
 }

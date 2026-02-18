@@ -158,7 +158,7 @@
                      <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
                     <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>                    
                     <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
-                    <select id="close-job-type"class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">-- เลือกประเภทย่อย --</option></select>
+                    <select id="close-job-subtype"class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">-- 555ลือกประเภทย่อย --</option></select>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
                     <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
@@ -468,7 +468,7 @@
     const subTypeData = store.JobSubTypeMaster || []; 
 
     // 1. เติม "ประเภทงาน"
-    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
+    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน88 --</option>';
     typeData.forEach(item => {
         const opt = document.createElement('option');
         opt.value = item.JobTypeCode; // อ้างอิง JobTypeCode เพื่อใช้เชื่อมโยง
@@ -481,7 +481,7 @@
         const selectedCode = this.value;
         const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
         
-        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
+        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย99 --</option>';
         filtered.forEach(sub => {
             const opt = document.createElement('option');
             opt.value = sub.SubTypeName; // ใช้ SubTypeName ตามหัวตาราง ServiceMA
@@ -635,7 +635,7 @@ function openCloseJobForm(jobId) {
         const subTypes = mapping[selected]?.SubTypes || [];
 
         subSelect.innerHTML =
-            '<option value="">-- เลือกประเภทย่อย --</option>' +
+            '<option value="">-- เลือกประเภทย่อย -999-</option>' +
             subTypes.map(s => `
                 <option value="${s.SubTypeName}">
                     ${s.SubTypeName}

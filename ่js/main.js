@@ -53,7 +53,7 @@ function closePopup() {
     if (popup) popup.style.display = 'none';
 }
 
-// 3. จัดการ Session ผู้ใช้ (แก้ให้เหลือ Auth ก้อนเดียว)
+// 3. จัดการ Session ผู้ใช้
 const Auth = {
 
     setSession: (userData) => {
@@ -79,7 +79,7 @@ const Auth = {
     checkAuth: () => {
         const user = Auth.getUser();
         if (!user) {
-            window.location.replace("login.html");
+            window.location.replace("./login.html");
         }
     }
 };

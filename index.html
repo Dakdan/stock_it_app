@@ -34,7 +34,7 @@
             <div class="flex items-center gap-3">
                 <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)v5</h1>
+                    <h1 class="font-bold text-lg leading-tight">โรงพยาบาลอุดรธานี(ITSM)v6</h1>
                     <p class="text-[10px] opacity-80">ระบบจัดการงานซ่อมและบริการ กลุ่มงาน: เทคโนโลยีสารสนเทศ</p>
                 </div>
             </div>
@@ -114,28 +114,27 @@
                     </div>
                     <!-- ===== เพิ่มส่วน ServiceMA ===== -->
 
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-    <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
+                            <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    </div>
+                    <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
+                            <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">สถานะงาน</label>
+                        <select id="close-job-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
+                        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                        <option value="ยกเลิก">ยกเลิก</option>
+                        </select>
 </div>
 
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
-    <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-</div>
-
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">สถานะงาน</label>
-    <select id="close-job-status" class="w-full p-3 bg-slate-50 rounded-xl text-sm">
-        <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-        <option value="ยกเลิก">ยกเลิก</option>
-    </select>
-</div>
-
-<div>
-    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมายเหตุเพิ่มเติม</label>
-    <textarea id="close-job-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
-</div>
+                      <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมายเหตุเพิ่มเติม</label>
+                        <textarea id="close-job-remark" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-20"></textarea>
+                     </div>
 
                     <div class="flex gap-2">
                         <button onclick="closeModal('modal-close-job')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
@@ -156,16 +155,10 @@
                 <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                    <div class="mt-3">
-    <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
-    <select id="it-job-sub-type"
-        class="w-full border rounded-lg px-3 py-2 text-sm">
-        <option value="">-- เลือกประเภทย่อย --</option>
-    </select>
-</div>
-
-                    <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
-                </div>
+                     <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
+                    <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>                    
+                    <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
+                    <select id="it-job-sub-type"class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">-- เลือกประเภทย่อย --</option></select>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
                     <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
@@ -466,30 +459,32 @@
     }
 
     // ฟังก์ชันใหม่: เปิดหน้าบันทึกซ่อม
-function loadCloseJobMaster() {
+  function loadCloseJobMaster() {
     const typeSelect = document.getElementById('close-job-type');
     const subSelect = document.getElementById('close-job-subtype');
-    // อ้างอิงจากสิ่งที่ Backend ส่งมาเป๊ะๆ
-    const typeData = store.JobTypeMaster || [];
-    const subTypeData = store.JobSubTypeMaster || [];
+    
+    // ดึงข้อมูลจาก store ตามชื่อที่ Backend ส่งมา
+    const typeData = store.JobTypeMaster || []; 
+    const subTypeData = store.JobSubTypeMaster || []; 
 
+    // 1. เติม "ประเภทงาน"
     typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
-    subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
-
     typeData.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = item.JobTypeCode; 
-        opt.textContent = item.JobTypeName; 
+        opt.value = item.JobTypeCode; // อ้างอิง JobTypeCode เพื่อใช้เชื่อมโยง
+        opt.textContent = item.JobTypeName; // แสดงชื่อตามคอลัมน์ JobTypeName
         typeSelect.appendChild(opt);
     });
 
+    // 2. เมื่อเลือกประเภทงาน ให้กรองหมวดหมู่ย่อยที่สัมพันธ์กัน
     typeSelect.onchange = function() {
         const selectedCode = this.value;
         const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
+        
         subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
         filtered.forEach(sub => {
             const opt = document.createElement('option');
-            opt.value = sub.SubTypeName; 
+            opt.value = sub.SubTypeName; // ใช้ SubTypeName ตามหัวตาราง ServiceMA
             opt.textContent = sub.SubTypeName;
             subSelect.appendChild(opt);
         });
@@ -497,37 +492,44 @@ function loadCloseJobMaster() {
 }
 
 function openCloseJobForm(jobId) {
-    closeModal('modal-detail'); // ปิดหน้าต่างเก่า
+    closeModal('modal-detail');
+    
+    // 1. ล้างค่าข้อมูลเดิม
     document.getElementById('close-job-note').value = "";
     document.getElementById('close-job-remark').value = "";
     
-    loadCloseJobMaster(); // โหลดข้อมูลเข้า Dropdown
-    document.getElementById('modal-close-job').style.display = 'flex'; // เปิด Overlay
+    // 2. โหลดข้อมูลเข้า Dropdown (ดึงจาก JobTypeMaster/JobSubTypeMaster)
+    loadCloseJobMaster();
+    
+    document.getElementById('modal-close-job').style.display = 'flex';
 
+    // 3. จัดการการคลิกปุ่มยืนยัน
     document.getElementById('btn-confirm-close').onclick = async () => {
         const note = document.getElementById('close-job-note').value;
         const typeSelect = document.getElementById('close-job-type');
         const subTypeSelect = document.getElementById('close-job-subtype');
+        const status = document.getElementById('close-job-status').value;
+        const remark = document.getElementById('close-job-remark').value;
 
+        // --- ตรวจสอบความถูกต้องก่อนส่ง (Validation) ---
         if (!typeSelect.value || !subTypeSelect.value || !note) {
-            alert("กรุณาระบุข้อมูลให้ครบถ้วน");
+            alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
             return;
         }
 
+        // ดึงชื่อประเภทงานมาเก็บไว้ (ใช้สำหรับ JobTypeName)
         const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
 
-        // ส่งผ่าน handleJobUI เพื่อให้ระบบ Overlay/Loading จัดการต่อเอง
+        // --- ส่งข้อมูลไปยัง handleJobUpdate (Apps Script) ---
         await handleJobUI(jobId, 'done', { 
             Note: note,
-            JobTypeName: typeNameText,
-            SubTypeName: subTypeSelect.value,
-            CloseStatus: document.getElementById('close-job-status').value,
-            Remark: document.getElementById('close-job-remark').value,
-            Owner: currentUser.USERID,
-            By: currentUser.UserName 
+            JobTypeName: typeNameText,     // ตรงกับ Backend: d.JobTypeName
+            SubTypeName: subTypeSelect.value, // ตรงกับ Backend: d.SubTypeName
+            CloseStatus: status,
+            Remark: remark,
+            Owner: store.user.USERID,      // ส่งไปให้ saveToServiceMA ใช้บันทึก
+            By: store.user.UserName        // ส่งไปเข้าคอลัมน์ USER
         });
-
-        document.getElementById('modal-close-job').style.display = 'none'; // ปิด Modal
     };
 }
     function openTransfer(jobId) {
@@ -545,58 +547,56 @@ function openCloseJobForm(jobId) {
         };
     }
 
- // 1. ฟังก์ชันเปิดฟอร์มและจัดการ Dropdown IT Ticket
-function openITTicketForm() {
-    // โหลดประเภทงานหลัก
-    const typeSelect = document.getElementById('it-job-type');
-    typeSelect.innerHTML = (store.JobTypeMaster || [])
+  function openITTicketForm() {
+
+    document.getElementById('it-job-type').innerHTML =
+        (store.JobTypeMaster || [])
         .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
         .join('');
 
-    // โหลดหน่วยงาน
-    document.getElementById('it-dept').innerHTML = (store.DeptList || [])
+    document.getElementById('it-dept').innerHTML =
+        (store.DeptList || [])
         .map(d => `<option value="${d}">${d}</option>`)
         .join('');
 
-    // ฟังก์ชันย่อยสำหรับกรองประเภทย่อย (เชื่อม JobTypeCode จาก code.gs)
-    const subSelect = document.getElementById('it-job-subtype');
-    const updateSub = () => {
-        const typeObj = (store.JobTypeMaster || []).find(t => t.JobTypeName === typeSelect.value);
-        const code = typeObj ? typeObj.JobTypeCode : '';
-        const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(code));
-        
-        subSelect.innerHTML = filtered.length > 0 
-            ? filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('')
-            : '<option value="">-- ไม่มีประเภทย่อย --</option>';
-    };
+    loadITSubType(); // ✅ ย้ายมาไว้ตรงนี้
 
-    typeSelect.onchange = updateSub; // ผูกเหตุการณ์เปลี่ยนค่า
-    updateSub(); // รันครั้งแรก
-    
-    document.getElementById('modal-it-ticket').style.display = 'flex'; // เปิด Overlay
+    document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 
-// 2. ฟังก์ชันบันทึกข้อมูล IT Ticket (ผูก Event ครั้งเดียวจบ)
-if (document.getElementById('form-it-ticket')) {
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
-        const payload = {
-            jobType: document.getElementById('it-job-type').value,
-            problem: document.getElementById('it-problem').value,
-            dept: document.getElementById('it-dept').value,
-            owner: currentUser.USERID 
-        };
-
-        if (!payload.jobType || !payload.problem) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-        // ส่งเข้า handleJobUI ตามโครงสร้างเดิมเพื่อให้ระบบจัดการต่อ
-        const success = await handleJobUI(null, 'saveITTicket', payload);
-        if (success) {
-            document.getElementById('form-it-ticket').reset();
-            closeModal('modal-it-ticket');
-        }
+        showLoading(true);
+        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('it-job-type').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
+        try {
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+            const result = await res.json();
+            if (result.success) {
+                showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ');
+                document.getElementById('form-it-ticket').reset();
+                await loadData();
+            }
+        } catch (e) { alert("Error"); }
+        showLoading(false);
     };
-}
+
+    function renderITTicketList() {
+        const container = document.getElementById('it-ticket-list');
+        if (!store.ITTickets || store.ITTickets.length === 0) {
+            container.innerHTML = '<div class="text-center p-6 text-slate-400 text-[10px]">ไม่พบประวัติ</div>';
+            return;
+        }
+        container.innerHTML = store.ITTickets.map(it => `
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex justify-between items-center">
+                <div>
+                    <p class="text-[8px] text-blue-500 font-bold">${it.JobType}</p>
+                    <p class="text-xs font-bold text-slate-700">${it.Problem}</p>
+                    <p class="text-[8px] text-slate-400 mt-1">${it.Date || '-'} | ${it.Department}</p>
+                </div>
+                <span class="text-[8px] text-green-500 font-bold bg-green-50 px-2 py-1 rounded-full">Saved</span>
+            </div>`).join('');
+    }
+
     function renderSystemLinks() {
         const tab3Container = document.getElementById('tab3');
         if (!tab3Container) return;
@@ -620,30 +620,31 @@ if (document.getElementById('form-it-ticket')) {
                 </div>
             </a>`).join('');
     }
-   function loadITSubType() {
+       function loadITSubType() {
+
     const typeSelect = document.getElementById('it-job-type');
-    const subSelect = document.getElementById('it-job-subtype');
+    const subSelect = document.getElementById('it-job-sub-type');
+
     if (!typeSelect || !subSelect) return;
 
-    const typeData = store.JobTypeMaster || []; 
-    const subTypeData = store.JobSubTypeMaster || []; 
+    const mapping = store.JobTypeMapping || {};
 
-    const updateSubOptions = () => {
-        const selectedTypeName = typeSelect.value;
-        // ค้นหา Code เพื่อเอาไปกรองประเภทย่อย
-        const typeObj = typeData.find(t => t.JobTypeName === selectedTypeName);
-        const selectedCode = typeObj ? typeObj.JobTypeCode : '';
+    typeSelect.onchange = () => {
 
-        // กรองข้อมูลที่ Code ตรงกัน
-        const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
+        const selected = typeSelect.value;
+        const subTypes = mapping[selected]?.SubTypes || [];
 
-        subSelect.innerHTML = filtered.length > 0 
-            ? filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('')
-            : '<option value="">-- ไม่มีประเภทย่อย --</option>';
+        subSelect.innerHTML =
+            '<option value="">-- เลือกประเภทย่อย --</option>' +
+            subTypes.map(s => `
+                <option value="${s.SubTypeName}">
+                    ${s.SubTypeName}
+                </option>
+            `).join('');
     };
 
-    typeSelect.onchange = updateSubOptions; // ผูกเหตุการณ์เมื่อเปลี่ยนค่า
-    updateSubOptions(); // รันครั้งแรกทันที
+    // ✅ บังคับให้โหลดรอบแรก
+    typeSelect.dispatchEvent(new Event('change'));
 }
 
 

@@ -54,58 +54,20 @@
 <script src="./js/api.js"></script>
 
 <script>
-  // --- คัดลอกเนื้อหาจาก main.js มาวางตรงนี้ ---
-  const Loader = {
-    show: () => { const el = document.getElementById('loader'); if(el) el.style.display = 'flex'; },
-    hide: () => { const el = document.getElementById('loader'); if(el) el.style.display = 'none'; }
-  };
-
-  function showModal(title, message, type = 'success') {
-    const popup = document.getElementById('popup');
-    const pTitle = document.getElementById('popup-title');
-    const pMsg = document.getElementById('popup-message');
-    const pBox = document.querySelector('.popup-box');
-    if (popup && pTitle && pMsg && pBox) {
-      pBox.classList.remove('success', 'error', 'warning');
-      pBox.classList.add(type);
-      let icon = type === 'success' ? "✅" : (type === 'error' ? "❌" : "⚠️");
-      pTitle.innerHTML = `<span style="font-size:2.5rem;display:block;margin-bottom:10px;">${icon}</span>${title}`;
-      pMsg.innerText = message;
-      popup.style.display = 'flex';
-    } else { alert(title + ": " + message); }
-  }
-
-  function closePopup() { document.getElementById('popup').style.display = 'none'; }
-
-  const Auth = {
-    setSession: (userData) => localStorage.setItem("it_session", JSON.stringify(userData))
-  };
-
-  // --- คัดลอกเนื้อหาจาก api.js มาวางตรงนี้ ---
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec';
-  const ApiService = {
-    async login(username, password) {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'checkLogin', data: { user: username, pass: password } })
-      });
-      return await response.json();
-    }
-  };
-
-  // --- ฟังก์ชัน handleLogin เดิมของคุณ ---
   async function handleLogin() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
+
     if (!user || !pass) {
       showModal("ข้อมูลไม่ครบ", "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", "warning");
       return;
     }
+
     Loader.show();
+
     try {
       const result = await ApiService.login(user, pass);
+
       if (result.success) {
         showModal("สำเร็จ!", "ยินดีต้อนรับเข้าสู่ระบบ", "success");
         Auth.setSession(result.user);
@@ -114,11 +76,13 @@
         Loader.hide();
         showModal("เข้าสู่ระบบไม่สำเร็จ", result.message || "ข้อมูลไม่ถูกต้อง", "error");
       }
+
     } catch (error) {
       Loader.hide();
       showModal("เกิดข้อผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error");
     }
   }
 </script>
+
 </body>
 </html>

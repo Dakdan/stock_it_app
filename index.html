@@ -34,7 +34,7 @@
             <div class="flex items-center gap-3">
                 <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)v2</h1>
+                    <h1 class="font-bold text-lg leading-tight">รพ.อุดรธานี (ITSM)v3</h1>
                     <p class="text-[10px] opacity-80">ระบบจัดการงานซ่อมและบริการ กลุ่มงาน: เทคโนโลยีสารสนเทศ</p>
                 </div>
             </div>
@@ -583,8 +583,6 @@ document.getElementById('form-it-ticket').onsubmit = async (e) => {
         dept: document.getElementById('it-dept').value,
         owner: currentUser.USERID 
     };
-    if (!payload.jobType || !payload.problem) return alert("กรุณากรอกข้อมูลให้ครบ");
-
     const success = await handleJobUI(null, 'saveITTicket', payload);
     if (success) {
         document.getElementById('form-it-ticket').reset();
@@ -614,33 +612,19 @@ document.getElementById('form-it-ticket').onsubmit = async (e) => {
                 </div>
             </a>`).join('');
     }
-   function loadITSubType() {
-    const typeSelect = document.getElementById('it-job-type');
-    const subSelect = document.getElementById('it-job-subtype');
-    if (!typeSelect || !subSelect) return;
+  function loadITSubType() {
+  const typeVal = document.getElementById('it-job-type').value;
+  const subSelect = document.getElementById('it-job-subtype');
+  
+  // หา Code ของตัวที่เลือก
+  const master = (store.JobTypeMaster || []).find(t => t.JobTypeName === typeVal);
+  const code = master ? master.JobTypeCode : '';
 
-    const typeData = store.JobTypeMaster || []; 
-    const subTypeData = store.JobSubTypeMaster || []; 
+  // กรองเฉพาะตัวที่มี Code ตรงกัน
+  const filtered = (store.JobSubTypeMaster || []).filter(s => String(s.JobTypeCode) === String(code));
 
-    const updateSubOptions = () => {
-        const selectedTypeName = typeSelect.value;
-        // ค้นหา Code เพื่อเอาไปกรองประเภทย่อย
-        const typeObj = typeData.find(t => t.JobTypeName === selectedTypeName);
-        const selectedCode = typeObj ? typeObj.JobTypeCode : '';
-
-        // กรองข้อมูลที่ Code ตรงกัน
-        const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
-
-        subSelect.innerHTML = filtered.length > 0 
-            ? filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('')
-            : '<option value="">-- ไม่มีประเภทย่อย --</option>';
-    };
-
-    typeSelect.onchange = updateSubOptions; // ผูกเหตุการณ์เมื่อเปลี่ยนค่า
-    updateSubOptions(); // รันครั้งแรกทันที
+  subSelect.innerHTML = filtered.map(s => `<option value="${s.SubTypeName}">${s.SubTypeName}</option>`).join('');
 }
-
-
 
     function updateStats(jobs) {
         const getCount = (s) => jobs.filter(j => String(j.Status).trim() === s).length;

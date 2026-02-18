@@ -154,12 +154,13 @@
             <form id="form-it-ticket" class="p-6 space-y-4">
                 <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                     <select id="it-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
-                    <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>                    
-                    <label class="block text-sm text-gray-600 mb-1">ประเภทย่อย</label>
-                    <select id="close-job-subtype"class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">-- 555ลือกประเภทย่อย --</option></select>
-                <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
+                            <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    </div>
+                    <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
+                            <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
+                    </div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
                     <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
                 </div>
@@ -468,7 +469,7 @@
     const subTypeData = store.JobSubTypeMaster || []; 
 
     // 1. เติม "ประเภทงาน"
-    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน88 --</option>';
+    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน--</option>';
     typeData.forEach(item => {
         const opt = document.createElement('option');
         opt.value = item.JobTypeCode; // อ้างอิง JobTypeCode เพื่อใช้เชื่อมโยง
@@ -481,7 +482,7 @@
         const selectedCode = this.value;
         const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
         
-        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย99 --</option>';
+        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกงาน --</option>';
         filtered.forEach(sub => {
             const opt = document.createElement('option');
             opt.value = sub.SubTypeName; // ใช้ SubTypeName ตามหัวตาราง ServiceMA

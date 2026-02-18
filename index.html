@@ -503,37 +503,35 @@ function openCloseJobForm(jobId) {
 
     document.getElementById('modal-close-job').style.display = 'flex';
 
-    document.getElementById('btn-confirm-close').onclick = async () => {
+   document.getElementById('btn-confirm-close').onclick = async () => {
 
-        const note = document.getElementById('close-job-note').value;
-        const typeSelect = document.getElementById('close-job-type');
-        const subTypeSelect = document.getElementById('close-job-subtype');
-        const status = document.getElementById('close-job-status').value;
-        const remark = document.getElementById('close-job-remark').value;
+    const note = document.getElementById('close-job-note').value;
+    const typeSelect = document.getElementById('close-job-type');
+    const subTypeSelect = document.getElementById('close-job-subtype');
+    const status = document.getElementById('close-job-status').value;
+    const remark = document.getElementById('close-job-remark').value;
 
-        if (!typeSelect.value || !subTypeSelect.value || !note) {
-            alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
-            return;
-        }
+    if (!typeSelect.value || !subTypeSelect.value || !note) {
+        alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
+        return;
+    }
 
-        const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
+    const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
 
-        // ✅ ปิด modal ปิดงานก่อน
-        closeModal('modal-close-job');
+    // 🔥 ปิดทุก modal ก่อน
+    closeModal('modal-close-job');
+    closeModal('modal-detail');
 
-        // ✅ ให้ handleJobUI เป็นคนจัดการ success modal ตามระบบเดิม
-        await handleJobUI(jobId, 'done', { 
-            Note: note,
-            JobTypeName: typeNameText,
-            SubTypeName: subTypeSelect.value,
-            CloseStatus: status,
-            Remark: remark,
-            Owner: currentUser.USERID,
-            By: currentUser.UserName
-        });
-
-    };
-}
+    await handleJobUI(jobId, 'done', { 
+        Note: note,
+        JobTypeName: typeNameText,
+        SubTypeName: subTypeSelect.value,
+        CloseStatus: status,
+        Remark: remark,
+        Owner: currentUser.USERID,
+        By: currentUser.UserName
+    });
+};
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
         const role = String(currentUser.UserTypeID || '').toUpperCase();

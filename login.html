@@ -15,11 +15,11 @@
 </div>
 
 <div id="popup" class="popup-overlay" style="display:none;">
-  <div class="popup-box"> 
-    <h3 id="popup-title">แจ้งเตือน</h3>
-    <p id="popup-message"></p>
-    <button onclick="closePopup()" class="btn-login" style="margin-top: 20px; padding: 10px;">ตกลง</button>
-  </div>
+    <div class="popup-box"> 
+        <h3 id="popup-title">แจ้งเตือน</h3>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" class="btn-login" style="margin-top: 20px; padding: 10px;">ตกลง</button>
+    </div>
 </div>
 
 <div class="login-wrapper">
@@ -40,29 +40,21 @@
       <input type="password" id="password" placeholder="กรอกรหัสผ่าน">
     </div>
 
-    <button class="btn-login" id="loginBtn">
+    <button class="btn-login" id="loginBtn" onclick="handleLogin()">
       🛡️ เข้าสู่ระบบ
     </button>
 
     <div class="card-footer" style="text-align:center; margin-top:20px; font-size: 0.9rem; color: #666;">
-      ยังไม่มีบัญชีผู้ใช้งาน? 
-      <a href="register.html" style="font-weight: 600;">ลงทะเบียนที่นี่</a>
+      ยังไม่มีบัญชีผู้ใช้งาน? <a href="register.html" style="font-weight: 600;">ลงทะเบียนที่นี่</a>
     </div>
-
   </main>
 </div>
 
-<!-- โหลด JS ครั้งเดียว -->
 <script src="./js/main.js"></script>
 <script src="./js/api.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  const btn = document.getElementById("loginBtn");
-
-  btn.addEventListener("click", async () => {
-
+  async function handleLogin() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
 
@@ -89,10 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       Loader.hide();
       showModal("เกิดข้อผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error");
     }
-
-  });
-
-});
+  }
 </script>
 
 </body>

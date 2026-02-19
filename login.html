@@ -50,10 +50,19 @@
   </main>
 </div>
 
-<script src="./js/main.js"></script>
-<script src="./js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
 
 <script>
+  // ฟังก์ชันสำรองกรณีดึงค่าจาก main.js ไม่สำเร็จ หรือโหลดไม่ทัน
+  window.showModal = window.showModal || function(title, message, type) {
+    alert(title + ": " + message);
+  };
+  window.closePopup = window.closePopup || function() {
+    const popup = document.getElementById('popup');
+    if (popup) popup.style.display = 'none';
+  };
+
   async function handleLogin() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
@@ -63,22 +72,25 @@
       return;
     }
 
-    Loader.show();
+    // ตรวจสอบ Loader ว่ามีอยู่ใน main.js หรือไม่
+    if (typeof Loader !== 'undefined') Loader.show();
 
     try {
+      // เรียกผ่าน ApiService (ต้องแก้ชื่อใน api.js ให้ตรงกัน)
       const result = await ApiService.login(user, pass);
 
       if (result.success) {
         showModal("สำเร็จ!", "ยินดีต้อนรับเข้าสู่ระบบ", "success");
-        Auth.setSession(result.user);
+        if (typeof Auth !== 'undefined') Auth.setSession(result.user);
         setTimeout(() => { window.location.href = "index.html"; }, 1500);
       } else {
-        Loader.hide();
+        if (typeof Loader !== 'undefined') Loader.hide();
         showModal("เข้าสู่ระบบไม่สำเร็จ", result.message || "ข้อมูลไม่ถูกต้อง", "error");
       }
 
     } catch (error) {
-      Loader.hide();
+      if (typeof Loader !== 'undefined') Loader.hide();
+      console.error("Login Error:", error);
       showModal("เกิดข้อผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error");
     }
   }

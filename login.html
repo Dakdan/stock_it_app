@@ -54,46 +54,75 @@
 <script src="js/api.js"></script>
 
 <script>
-  // ฟังก์ชันสำรองกรณีดึงค่าจาก main.js ไม่สำเร็จ หรือโหลดไม่ทัน
-  window.showModal = window.showModal || function(title, message, type) {
-    alert(title + ": " + message);
-  };
-  window.closePopup = window.closePopup || function() {
-    const popup = document.getElementById('popup');
-    if (popup) popup.style.display = 'none';
-  };
-
-  async function handleLogin() {
-    const user = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value.trim();
-
-    if (!user || !pass) {
-      showModal("ข้อมูลไม่ครบ", "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", "warning");
-      return;
-    }
-
-    // ตรวจสอบ Loader ว่ามีอยู่ใน main.js หรือไม่
-    if (typeof Loader !== 'undefined') Loader.show();
-
+/* --- รวม ApiService ไว้ในหน้านี้เลย --- */
+const ApiService = {
+  async login(username, password) {
+    const url = "https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec";
     try {
-      // เรียกผ่าน ApiService (ต้องแก้ชื่อใน api.js ให้ตรงกัน)
-      const result = await ApiService.login(user, pass);
-
-      if (result.success) {
-        showModal("สำเร็จ!", "ยินดีต้อนรับเข้าสู่ระบบ", "success");
-        if (typeof Auth !== 'undefined') Auth.setSession(result.user);
-        setTimeout(() => { window.location.href = "index.html"; }, 1500);
-      } else {
-        if (typeof Loader !== 'undefined') Loader.hide();
-        showModal("เข้าสู่ระบบไม่สำเร็จ", result.message || "ข้อมูลไม่ถูกต้อง", "error");
-      }
-
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "checkLogin",
+          data: { user: username, pass: password }
+        })
+      });
+      return await response.json();
     } catch (error) {
-      if (typeof Loader !== 'undefined') Loader.hide();
-      console.error("Login Error:", error);
-      showModal("เกิดข้อผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error");
+      console.error("API Error:", error);
+      throw error;
     }
   }
+};
+
+/* --- ฟังก์ชันจัดการ UI พื้นฐาน --- */
+const Loader = {
+  show: () => { document.getElementById('loader').style.display = 'flex'; },
+  hide: () => { document.getElementById('loader').style.display = 'none'; }
+};
+
+const Auth = {
+  setSession: (user) => { localStorage.setItem("it_session", JSON.stringify(user)); }
+};
+
+function showModal(title, message, type = 'success') {
+  const popup = document.getElementById('popup');
+  document.getElementById('popup-title').innerText = (type === 'error' ? "❌ " : "🔔 ") + title;
+  document.getElementById('popup-message').innerText = message;
+  popup.style.display = 'flex';
+}
+
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+
+/* --- ฟังก์ชัน Login หลัก --- */
+async function handleLogin() {
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+
+  if (!user || !pass) {
+    showModal("ข้อมูลไม่ครบ", "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", "warning");
+    return;
+  }
+
+  Loader.show();
+
+  try {
+    const result = await ApiService.login(user, pass);
+
+    if (result.success) {
+      showModal("สำเร็จ!", "ยินดีต้อนรับเข้าสู่ระบบ", "success");
+      Auth.setSession(result.user);
+      setTimeout(() => { window.location.href = "index.html"; }, 1500);
+    } else {
+      Loader.hide();
+      showModal("เข้าสู่ระบบไม่สำเร็จ", result.message || "ข้อมูลไม่ถูกต้อง", "error");
+    }
+  } catch (error) {
+    Loader.hide();
+    showModal("เกิดข้อผิดพลาด", "ไม่สามารถติดต่อ Server ได้ (ตรวจสอบการต่อเน็ต/URL GAS)", "error");
+  }
+}
 </script>
 
 </body>

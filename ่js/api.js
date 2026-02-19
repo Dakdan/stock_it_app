@@ -1,38 +1,30 @@
 // js/api.js
 window.ApiService = {
-    async login(username, password) {
-        const url = "https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec";
+  async login(username, password) {
+    const url = "https://script.google.com/macros/s/AKfycbzala43clqUn9Z9ky9BlAhcTq6Ang40koFQDi59q33spvLNQpcEFqc2_PJ-xT5NHx4/exec";
 
-        // สร้างข้อมูลในรูปแบบที่ Google Apps Script รับได้ง่ายที่สุด
-        const payload = {
-            action: "checkLogin",
-            data: {
-                user: username,
-                pass: password
-            }
-        };
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        // ปรับ Header เพื่อให้ Google Apps Script ยอมรับ
+        mode: "cors", 
+        body: JSON.stringify({
+          action: "checkLogin",
+          data: {
+            user: username,
+            pass: password
+          }
+        })
+      });
 
-        try {
-            // ใช้เทคนิคส่งผ่าน POST แต่ส่งเป็น String ธรรมดาเพื่อเลี่ยงปัญหา CORS
-            const response = await fetch(url, {
-                method: "POST",
-                mode: "no-cors", // ลองใช้โหมดนี้ถ้ายัง Error หรือปรับเปลี่ยนตามการตั้งค่า GAS
-                body: JSON.stringify(payload)
-            });
+      // หากเชื่อมต่อสำเร็จแต่ GAS Redirect (ปกติของ GAS) fetch จะจัดการให้
+      const result = await response.json();
+      return result;
 
-            /* ⚠️ หมายเหตุ: ถ้าใช้ mode "no-cors" เราจะอ่านค่า JSON ตอบกลับไม่ได้ 
-               แนะนำให้ลองแบบปกติก่อนตามด้านล่างนี้:
-            */
-            const normalResponse = await fetch(url, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-
-            return await normalResponse.json();
-
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            throw error;
-        }
+    } catch (error) {
+      console.error("Fetch Error:", error);
+      // ส่งค่ากลับไปเพื่อให้ handleLogin แสดง Modal error
+      return { success: false, message: "ไม่สามารถเชื่อมต่อกับ Google Script ได้ (CORS หรือ URL ผิด)" };
     }
+  }
 };

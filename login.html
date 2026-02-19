@@ -1,59 +1,16 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <title>เข้าสู่ระบบ - IT Maintenance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-</head>
-
-<body class="login-page">
-
-<div id="loader" class="loader-overlay" style="display:none;">
-  <div class="spinner"></div>
-</div>
-<div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
-    <div class="popup-box" style="background:#fff; padding:2rem; border-radius:15px; text-align:center; max-width:350px; width:80%;">
-        <div id="popup-title" style="font-weight:bold; font-size:1.2rem; margin-bottom:10px;"></div>
-        <div id="popup-message" style="margin-bottom:20px; color:#666;"></div>
-        <button onclick="closePopup()" style="width:100%; padding:10px; border:none; border-radius:5px; background:#28a745; color:#fff; cursor:pointer;">ตกลง</button>
-    </div>
-</div>
-
-
-<div class="login-wrapper">
-  <header class="login-header">
-    <img src="./โรงพยาบาลอุดรธานี .png" class="header-logo" alt="Udon Hospital Logo">
-    <h1>โรงพยาบาลอุดรธานี</h1>
-    <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
-  </header>
-
-  <main class="login-card">
-    <div class="form-group">
-      <label for="username">👷 Email / Username</label>
-      <input type="text" id="username" placeholder="กรอกชื่อผู้ใช้งาน หรืออีเมล">
-    </div>
-
-    <div class="form-group">
-      <label for="password">🔒 Password</label>
-      <input type="password" id="password" placeholder="กรอกรหัสผ่าน">
-    </div>
-
-    <button class="btn-login" id="loginBtn" onclick="handleLogin()">
-      🛡️ เข้าสู่ระบบ
-    </button>
-
-    <div class="card-footer" style="text-align:center; margin-top:20px; font-size: 0.9rem; color: #666;">
-      ยังไม่มีบัญชีผู้ใช้งาน? <a href="register.html" style="font-weight: 600;">ลงทะเบียนที่นี่</a>
-    </div>
-  </main>
-</div>
-
-<script src="./js/main.js"></script>
-<script src="./js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
 
 <script>
+  // ฟังก์ชันสำรองกรณีดึงค่าจาก main.js ไม่สำเร็จ หรือโหลดไม่ทัน
+  window.showModal = window.showModal || function(title, message, type) {
+    alert(title + ": " + message);
+  };
+  window.closePopup = window.closePopup || function() {
+    const popup = document.getElementById('popup');
+    if (popup) popup.style.display = 'none';
+  };
+
   async function handleLogin() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
@@ -63,26 +20,26 @@
       return;
     }
 
-    Loader.show();
+    // ตรวจสอบ Loader ว่ามีอยู่ใน main.js หรือไม่
+    if (typeof Loader !== 'undefined') Loader.show();
 
     try {
+      // เรียกผ่าน ApiService (ต้องแก้ชื่อใน api.js ให้ตรงกัน)
       const result = await ApiService.login(user, pass);
 
       if (result.success) {
         showModal("สำเร็จ!", "ยินดีต้อนรับเข้าสู่ระบบ", "success");
-        Auth.setSession(result.user);
+        if (typeof Auth !== 'undefined') Auth.setSession(result.user);
         setTimeout(() => { window.location.href = "index.html"; }, 1500);
       } else {
-        Loader.hide();
+        if (typeof Loader !== 'undefined') Loader.hide();
         showModal("เข้าสู่ระบบไม่สำเร็จ", result.message || "ข้อมูลไม่ถูกต้อง", "error");
       }
 
     } catch (error) {
-      Loader.hide();
+      if (typeof Loader !== 'undefined') Loader.hide();
+      console.error("Login Error:", error);
       showModal("เกิดข้อผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error");
     }
   }
 </script>
-
-</body>
-</html>

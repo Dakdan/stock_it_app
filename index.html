@@ -550,18 +550,7 @@ function openCloseJobForm(jobId) {
 
   function openITTicketForm() {
 
-    document.getElementById('it-job-type').innerHTML =
-        (store.JobTypeMaster || [])
-        .map(t => `<option value="${t.JobTypeName}">${t.JobTypeName}</option>`)
-        .join('');
-
-    document.getElementById('it-dept').innerHTML =
-        (store.DeptList || [])
-        .map(d => `<option value="${d}">${d}</option>`)
-        .join('');
-
-    loadITSubType(); // ✅ ย้ายมาไว้ตรงนี้
-
+    
     document.getElementById('modal-it-ticket').style.display = 'flex';
 }
 

@@ -146,13 +146,12 @@
     </div>
 
     <div id="modal-it-ticket" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
+         <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
             <div id="it-alert" class="inner-alert">
-                <div class="bg-blue-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">📝</span></div>
-                <p class="text-blue-600 font-bold">บันทึกข้อมูลเรียบร้อย</p>
-            </div>
-            <form id="form-it-ticket" class="p-6 space-y-4">
-                <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
+                <form id="form-it-ticket" class="p-6 space-y-4">
+                <div class="p-6">
+                <h3 class="font-bold text-blue-600 text-lg mb-4">📝บันทึกงาน IT Ticket</h3> <div>
+                     <div class="space-y-4">
                      <div>
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
                             <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
@@ -172,8 +171,11 @@
                     <button onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
                     <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">บันทึกข้อมูล</button>
                 </div>
+                </div>
+           
             </form>
         </div>
+               </div>
     </div>
 
     <div id="modal-transfer" class="overlay">

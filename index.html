@@ -551,7 +551,7 @@ function openCloseJobForm(jobId) {
     
     document.getElementById('modal-it-ticket').style.display = 'flex';
 
-    document.getElementById('form-it-ticket').onsubmit = async (e) => {
+    document.getElementById('form-it-ticket').onsubmit = async () => {
      
          loadCloseJobMaster();
         showLoading(true);

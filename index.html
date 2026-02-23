@@ -551,20 +551,12 @@ function openCloseJobForm(jobId) {
     
     document.getElementById('modal-it-ticket').style.display = 'flex';
 
-    document.getElementById('form-it-ticket').onsubmit = async () => {
-     
-       loadCloseJobMaster();
+    document.getElementById('form-it-ticket').onsubmit = async (e) => {
+        e.preventDefault();
+         loadCloseJobMaster();
         showLoading(true);
-        const typeSelect = document.getElementById('close-job-type');
-        const subTypeSelect = document.getElementById('close-job-subtype');
-        const problem = document.getElementById('it-problem').value;
-        const dept = document.getElementById('it-dept').value;
-        // --- ตรวจสอบความถูกต้องก่อนส่ง (Validation) ---
-        if (!typeSelect.value || !subTypeSelect.value || !note) {
-            alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
-            return;
-        }
-       
+        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('close-job-type').value,jobSubType: document.getElementById('close-job-subtype').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
+        try {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
             const result = await res.json();
             if (result.success) {
@@ -574,9 +566,8 @@ function openCloseJobForm(jobId) {
             }
         } catch (e) { alert("Error"); }
         showLoading(false);
-        
-    }
-
+    };
+}
 
     function renderITTicketList() {
         const container = document.getElementById('it-ticket-list');

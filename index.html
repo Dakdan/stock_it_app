@@ -161,9 +161,10 @@
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
                             <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
                      </div>
-                          <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
+                     <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
                             <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
-                    </div>
+                     </div>
                     <div>
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หน่วยงาน</label>
                             <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
@@ -173,7 +174,7 @@
                             <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold ">บันทึกข้อมูล</button>
                     </div>
             </form>
-        </div>
+          </div>
     </div>
 
     <div id="modal-transfer" class="overlay">
@@ -511,16 +512,13 @@ function openCloseJobForm(jobId) {
         const subTypeSelect = document.getElementById('close-job-subtype');
         const status = document.getElementById('close-job-status').value;
         const remark = document.getElementById('close-job-remark').value;
-
         // --- ตรวจสอบความถูกต้องก่อนส่ง (Validation) ---
         if (!typeSelect.value || !subTypeSelect.value || !note) {
             alert("กรุณาเลือกข้อมูลและกรอกรายละเอียดให้ครบ");
             return;
         }
-
         // ดึงชื่อประเภทงานมาเก็บไว้ (ใช้สำหรับ JobTypeName)
         const typeNameText = typeSelect.options[typeSelect.selectedIndex].text;
-
         // --- ส่งข้อมูลไปยัง handleJobUpdate (Apps Script) ---
         await handleJobUI(jobId, 'done', { 
             Note: note,
@@ -555,6 +553,7 @@ function openCloseJobForm(jobId) {
 
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
+         loadCloseJobMaster();
         showLoading(true);
         const data = { action: 'saveITTicket', data: { jobType: document.getElementById('close-job-type').value,jobSubType: document.getElementById('close-job-subtype').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
         try {

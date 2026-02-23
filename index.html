@@ -553,7 +553,7 @@ function openCloseJobForm(jobId) {
 
     document.getElementById('form-it-ticket').onsubmit = async () => {
      
-         loadCloseJobMaster();
+       loadCloseJobMaster();
         showLoading(true);
         const typeSelect = document.getElementById('close-job-type');
         const subTypeSelect = document.getElementById('close-job-subtype');
@@ -575,8 +575,8 @@ function openCloseJobForm(jobId) {
         } catch (e) { alert("Error"); }
         showLoading(false);
         
-    };
-}
+    }
+
 
     function renderITTicketList() {
         const container = document.getElementById('it-ticket-list');

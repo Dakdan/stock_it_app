@@ -610,33 +610,7 @@ function openCloseJobForm(jobId) {
                 </div>
             </a>`).join('');
     }
-    function loadITSubType() {
-
-    const typeSelect = document.getElementById('it-job-type');
-    const subSelect = document.getElementById('it-job-sub-type');
-
-    if (!typeSelect || !subSelect) return;
-
-    const mapping = store.JobTypeMapping || {};
-
-    typeSelect.onchange = () => {
-
-        const selected = typeSelect.value;
-        const subTypes = mapping[selected]?.SubTypes || [];
-
-        subSelect.innerHTML =
-            '<option value="">-- เลือกประเภทย่อย -999-</option>' +
-            subTypes.map(s => `
-                <option value="${s.SubTypeName}">
-                    ${s.SubTypeName}
-                </option>
-            `).join('');
-    };
-
-    // ✅ บังคับให้โหลดรอบแรก
-    typeSelect.dispatchEvent(new Event('change'));
-}
-
+   
 
 
     function updateStats(jobs) {

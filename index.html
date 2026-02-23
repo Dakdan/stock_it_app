@@ -168,9 +168,9 @@
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หน่วยงาน</label>
                             <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
                     </div>
-                    <div class="flex gap-2 pt-4">
+                    <div class="flex gap-2 ">
                             <button onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
-                            <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">บันทึกข้อมูล</button>
+                            <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg">บันทึกข้อมูล</button>
                     </div>
             </form>
         </div>
@@ -549,10 +549,13 @@ function openCloseJobForm(jobId) {
     }
 
   function openITTicketForm() {
-
+     document.getElementById('close-job-note').value = "";
+    document.getElementById('close-job-remark').value = "";
+    
+    // 2. โหลดข้อมูลเข้า Dropdown (ดึงจาก JobTypeMaster/JobSubTypeMaster)
+    loadCloseJobMaster();
     
     document.getElementById('modal-it-ticket').style.display = 'flex';
-}
 
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
@@ -569,6 +572,7 @@ function openCloseJobForm(jobId) {
         } catch (e) { alert("Error"); }
         showLoading(false);
     };
+}
 
     function renderITTicketList() {
         const container = document.getElementById('it-ticket-list');
@@ -610,7 +614,7 @@ function openCloseJobForm(jobId) {
                 </div>
             </a>`).join('');
     }
-       function loadITSubType() {
+    function loadITSubType() {
 
     const typeSelect = document.getElementById('it-job-type');
     const subSelect = document.getElementById('it-job-sub-type');

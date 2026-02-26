@@ -157,3 +157,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // ตรวจสอบความพร้อมของระบบ
     console.log("IT UDON HOSP - Unified Main Core Ready (2026)");
 });
+
+// เพิ่มต่อท้ายไฟล์ main.js เดิมของคุณ
+async function initApp() {
+    const user = Auth.getUser();
+    if (!user) { window.location.replace("login.html"); return; }
+    
+    // แสดงชื่อใน Header
+    document.getElementById('u-fname').innerText = user.UserName + " " + user.UserSname;
+    document.getElementById('u-type-name').innerText = user.UserType;
+
+    Loader.show();
+    const res = await ApiService.call('getInitialData', { USERID: user.USERID });
+    Loader.hide();
+
+    if (res.success) {
+        // บันทึก MasterData ลง Memory เพื่อใช้ใน Modal ต่างๆ
+        window.MasterData = res;
+        renderDashboard(res.AllJobs); // ฟังก์ชันสร้างการ์ดงาน
+    }
+}

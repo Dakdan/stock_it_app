@@ -145,37 +145,50 @@
         </div>
     </div>
 
-     <div id="modal-it-ticket" class="overlay">
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
-            <div id="it-alert" class="inner-alert">
-                <div class="bg-blue-100 p-4 rounded-full mb-3 status-pulse"><span class="text-3xl">📝</span></div>
-                <p class="text-blue-600 font-bold">บันทึกข้อมูลเรียบร้อย</p>
+    <div id="modal-it-ticket" class="modal-overlay" style="display:none;">
+    <div class="modal-card shadow-2xl">
+        <h2 class="text-xl font-bold text-blue-600 mb-6 flex items-center gap-2">
+            บันทึกงาน IT Ticket
+        </h2>
+        
+        <form id="form-it-ticket" class="space-y-4 text-left">
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">ประเภทงาน</label>
+                <select id="it-job-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    <option value="" disabled selected>-- เลือกประเภทงาน --</option>
+                </select>
             </div>
-            <form id="form-it-ticket" class="p-6 space-y-4">
-                <h3 class="font-bold text-blue-600 text-lg mb-4">บันทึกงาน IT Ticket</h3>
-                     <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ประเภทงาน</label>
-                            <select id="close-job-type" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-                     </div>
-                     <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่ย่อย</label>
-                            <select id="close-job-subtype" class="w-full p-3 bg-slate-50 rounded-xl text-sm"></select>
-                     </div>
-                     <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">รายละเอียดงาน</label>
-                            <textarea id="it-problem" class="w-full p-3 bg-slate-50 rounded-xl text-sm h-24" placeholder="ระบุรายละเอียด..." required></textarea>
-                     </div>
-                    <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หน่วยงาน</label>
-                            <select id="it-dept" class="w-full p-3 bg-slate-50 rounded-xl text-sm" required></select>
-                    </div>
-                    <div class="flex gap-2 ">
-                            <button onclick="closeModal('modal-it-ticket')" class="flex-1 py-3 text-slate-400 font-bold text-sm">ยกเลิก</button>
-                            <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold ">บันทึกข้อมูล</button>
-                    </div>
-            </form>
-          </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">หมวดหมู่ย่อย</label>
+                <select id="it-job-sub-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    <option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">รายละเอียดงาน</label>
+                <textarea id="it-problem" rows="4" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="ระบุรายละเอียด..."></textarea>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">หน่วยงาน</label>
+                <select id="it-dept" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
+                </select>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
+                    บันทึกข้อมูล
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
     <div id="modal-transfer" class="overlay">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm mx-4">
@@ -584,25 +597,96 @@ function openCloseJobForm(jobId) {
         };
     }
 
-  function openITTicketForm() {
-  
+ // ฟังก์ชันสำหรับโหลดข้อมูล Dropdown ในหน้า IT Ticket
+function loadITTicketMaster() {
+    const typeSelect = document.getElementById('it-job-type'); // ตรวจสอบ ID ใน HTML ให้ตรงกัน
+    const subSelect = document.getElementById('it-job-sub-type');
+    const deptSelect = document.getElementById('it-dept');
+
+    if (!typeSelect || !subSelect || !deptSelect) return;
+
+    // 1. โหลดรายชื่อ "หน่วยงาน" (DeptList)
+    deptSelect.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>';
+    (store.DeptList || []).forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.Department;
+        opt.textContent = d.Department;
+        deptSelect.appendChild(opt);
+    });
+
+    // 2. โหลด "ประเภทงาน" (JobTypeMaster)
+    const typeData = store.JobTypeMaster || [];
+    typeSelect.innerHTML = '<option value="" disabled selected>-- เลือกประเภทงาน --</option>';
+    typeData.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.JobTypeCode;
+        opt.textContent = item.JobTypeName;
+        typeSelect.appendChild(opt);
+    });
+
+    // 3. เมื่อเลือกประเภทงาน ให้กรอง "หมวดหมู่ย่อย" (JobSubTypeMaster)
+    typeSelect.onchange = function() {
+        const selectedCode = this.value;
+        const subTypeData = store.JobSubTypeMaster || [];
+        const filtered = subTypeData.filter(sub => String(sub.JobTypeCode) === String(selectedCode));
+        
+        subSelect.innerHTML = '<option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>';
+        filtered.forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub.SubTypeName;
+            opt.textContent = sub.SubTypeName;
+            subSelect.appendChild(opt);
+        });
+    };
+}
+
+// ปรับปรุงฟังก์ชันเปิด Modal
+function openITTicketForm() {
+    // ล้างค่าเดิมใน Form
+    const form = document.getElementById('form-it-ticket');
+    if(form) form.reset();
+    
+    // โหลดข้อมูล Dropdown ทั้งหมด
+    loadITTicketMaster();
     
     document.getElementById('modal-it-ticket').style.display = 'flex';
 
+    // จัดการการส่งข้อมูล
     document.getElementById('form-it-ticket').onsubmit = async (e) => {
         e.preventDefault();
-         loadCloseJobMaster();
+        
+        const typeSelect = document.getElementById('it-job-type');
+        const subSelect = document.getElementById('it-job-sub-type');
+        const problemInput = document.getElementById('it-problem');
+        const deptSelect = document.getElementById('it-dept');
+
+        if (!typeSelect.value || !subSelect.value || !problemInput.value || !deptSelect.value) {
+            alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            return;
+        }
+
         showLoading(true);
-        const data = { action: 'saveITTicket', data: { jobType: document.getElementById('close-job-type').value,jobSubType: document.getElementById('close-job-subtype').value, problem: document.getElementById('it-problem').value, dept: document.getElementById('it-dept').value, owner: currentUser.USERID } };
+        const data = { 
+            action: 'saveITTicket', 
+            data: { 
+                jobType: typeSelect.options[typeSelect.selectedIndex].text,
+                jobSubType: subSelect.value, 
+                problem: problemInput.value, 
+                dept: deptSelect.value, 
+                owner: currentUser.USERID 
+            } 
+        };
+
         try {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
             const result = await res.json();
             if (result.success) {
                 showInnerAlert('modal-it-ticket', 'บันทึกสำเร็จ');
-                document.getElementById('form-it-ticket').reset();
                 await loadData();
             }
-        } catch (e) { alert("Error"); }
+        } catch (e) { 
+            alert("เกิดข้อผิดพลาดในการบันทึก"); 
+        }
         showLoading(false);
     };
 }
@@ -647,33 +731,7 @@ function openCloseJobForm(jobId) {
                 </div>
             </a>`).join('');
     }
-    function loadITSubType() {
-
-    const typeSelect = document.getElementById('it-job-type');
-    const subSelect = document.getElementById('it-job-sub-type');
-
-    if (!typeSelect || !subSelect) return;
-
-    const mapping = store.JobTypeMapping || {};
-
-    typeSelect.onchange = () => {
-
-        const selected = typeSelect.value;
-        const subTypes = mapping[selected]?.SubTypes || [];
-
-        subSelect.innerHTML =
-            '<option value="">-- เลือกประเภทย่อย -999-</option>' +
-            subTypes.map(s => `
-                <option value="${s.SubTypeName}">
-                    ${s.SubTypeName}
-                </option>
-            `).join('');
-    };
-
-    // ✅ บังคับให้โหลดรอบแรก
-    typeSelect.dispatchEvent(new Event('change'));
-}
-
+ 
 
 
     function updateStats(jobs) {

@@ -466,30 +466,35 @@
         </div>
     </div>`;
 
-    // --- RENDER ACTIONS (ปุ่มกดด้านล่าง) ---
+  // --- จัดการปุ่ม Action ตามเงื่อนไขที่หายไป ---
     let btns = '';
+
+    // เงื่อนไข 1: งาน "รอรับงาน"
     if (status === 'รอรับงาน') {
         if (role === 'IT') {
             btns = `<button onclick="handleJobUI('${job.JobID}', 'accept')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all mb-2">⚡ รับงาน</button>`;
         } else if (role === 'BOSS') {
             btns = `<button onclick="openTransfer('${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all mb-2">📋 มอบหมายงาน</button>`;
         }
-    } else if (status === 'กำลังดำเนินการ' && isOwner) {
-        // ปุ่มปิดงานและโอนงาน ตามรูป image_e97f9b.png
+    } 
+    // เงื่อนไข 2: งาน "กำลังดำเนินการ" และเราเป็นเจ้าของ (โชว์ปุ่ม ปิดงาน/โอนงาน)
+    else if (status === 'กำลังดำเนินการ' && isOwner) {
         btns = `
         <div class="grid grid-cols-2 gap-3 w-full">
-            <button onclick="openCloseJobForm('${job.JobID}')" class="py-4 bg-[#22C55E] text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
-                <span class="text-lg">✅</span> ปิดงาน
-            </button>
-            <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-[#EFF6FF] text-[#3B82F6] rounded-2xl font-bold active:scale-95 transition-all flex items-center justify-center gap-2 border border-blue-100">
-                <span class="text-lg">🔄</span> โอนงาน
-            </button>
+            <button onclick="openCloseJobForm('${job.JobID}')" class="py-4 bg-[#22C55E] text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">✅ ปิดงาน</button>
+            <button onclick="openTransfer('${job.JobID}')" class="py-4 bg-[#EFF6FF] text-[#3B82F6] rounded-2xl font-bold active:scale-95 transition-all flex items-center justify-center gap-2 border border-blue-100">🔄 โอนงาน</button>
         </div>`;
-    } else if (status !== 'เสร็จสิ้น' && status !== 'ยกเลิก') {
-         btns = `<div class="p-4 text-center text-[11px] text-blue-500 font-bold bg-blue-50 rounded-2xl border border-dashed border-blue-200">งานนี้ดำเนินการโดย ${ownerDisplayName}</div>`;
+    } 
+    // เงื่อนไข 3: สถานะอื่นๆ (รออะไหล่) และเราเป็นเจ้าของ
+    else if (status === 'รออะไหล่' && isOwner) {
+        btns = `<button onclick="openCloseJobForm('${job.JobID}')" class="w-full py-4 bg-green-500 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all mb-2">✅ ปิดงาน (อะไหล่มาแล้ว)</button>`;
+    }
+    // เงื่อนไข 4: งานยังไม่จบ แต่คนอื่นดูแลอยู่
+    else if (status !== 'เสร็จสิ้น' && status !== 'ยกเลิก') {
+        btns = `<div class="p-4 text-center text-[11px] text-blue-500 font-bold bg-blue-50 rounded-2xl border border-dashed border-blue-200">งานนี้ดำเนินการโดย ${ownerDisplayName}</div>`;
     }
 
-    btns += `<button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-xs mt-4 uppercase tracking-widest hover:text-slate-600 transition-colors">CLOSE DETAIL</button>`;
+    btns += `<button onclick="closeModal('modal-detail')" class="w-full py-3 text-slate-400 font-bold text-xs mt-4 uppercase tracking-widest">CLOSE DETAIL</button>`;
     
     actions.innerHTML = btns;
     document.getElementById('modal-detail').style.display = 'flex';

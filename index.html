@@ -145,49 +145,58 @@
         </div>
     </div>
 
-    <div id="modal-it-ticket" class="modal-overlay" >
-        <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden">
-         <div class="p-6">
-                <h3 class="font-bold text-green-600 text-lg mb-4 flex items-center gap-2">
-            บันทึกงาน IT Ticket
-         </h3>
+   <div id="modal-it-ticket" class="modal-overlay">
+    <div class="bg-white rounded-[2rem] w-full max-w-md mx-4 shadow-2xl relative overflow-hidden my-auto">
         
-        <form id="form-it-ticket" class="space-y-4 text-left">
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase">ประเภทงาน</label>
-                <select id="it-job-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                    <option value="" disabled selected>-- เลือกประเภทงาน --</option>
-                </select>
+        <div class="inner-alert absolute inset-0 bg-white/95 hidden flex-col items-center justify-center z-50">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-3">
+                ✓
             </div>
+            <p class="font-bold text-slate-700 text-lg">บันทึกข้อมูลเรียบร้อย</p>
+        </div>
 
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase">หมวดหมู่ย่อย</label>
-                <select id="it-job-sub-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                    <option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>
-                </select>
-            </div>
+        <div class="p-6">
+            <h3 class="font-bold text-green-600 text-lg mb-4 flex items-center gap-2">
+                บันทึกงาน IT Ticket
+            </h3>
+            
+            <form id="form-it-ticket" class="space-y-4 text-left">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">ประเภทงาน</label>
+                    <select id="it-job-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none">
+                        <option value="" disabled selected>-- เลือกประเภทงาน --</option>
+                    </select>
+                </div>
 
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase">รายละเอียดงาน</label>
-                <textarea id="it-problem" rows="4" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="ระบุรายละเอียด..."></textarea>
-            </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">หมวดหมู่ย่อย</label>
+                    <select id="it-job-sub-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none">
+                        <option value="" disabled selected>-- เลือกหมวดหมู่ย่อย --</option>
+                    </select>
+                </div>
 
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase">หน่วยงาน</label>
-                <select id="it-dept" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                    <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
-                </select>
-            </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">รายละเอียดงาน</label>
+                    <textarea id="it-problem" rows="4" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none" placeholder="ระบุรายละเอียด..."></textarea>
+                </div>
 
-            <div class="flex gap-3 pt-4">
-                <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600">
-                    ยกเลิก
-                </button>
-                <button type="submit" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
-                    บันทึกข้อมูล
-                </button>
-            </div>
-        </form>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">หน่วยงาน</label>
+                    <select id="it-dept" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none">
+                        <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modal-it-ticket')" class="flex-1 py-4 font-bold text-slate-400">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">
+                        บันทึกข้อมูล
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

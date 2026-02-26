@@ -3,247 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IT UDON HOSP - Unified 2026</title>
+    <title>IT UDON HOSP - แกนหลักระบบ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         :root {
             --primary-color: #d81b60;
             --primary-gradient: linear-gradient(135deg, #ad1457 0%, #f06292 100%);
             --bg-color: #fce4ec;
             --text-dark: #37474f;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; }
-        .pink-header { background: var(--primary-gradient); color: white; border-radius: 0 0 25px 25px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { background-color: var(--bg-color); color: var(--text-dark); font-family: 'Kanit', sans-serif; }
         
-        /* สไตล์การ์ดงานตามสถานะ (UX เดิม) */
-        .job-card { 
-            background: white; border-radius: 20px; padding: 16px; margin-bottom: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #cbd5e1;
-            transition: transform 0.2s;
+        .header-pink { background: var(--primary-gradient); color: white; border-radius: 0 0 24px 24px; box-shadow: var(--shadow); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* สไตล์การ์ดที่ UX เดิมต้องการ */
+        .job-card-original {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            border-left: 8px solid #ddd;
+            transition: all 0.3s ease;
         }
-        .job-card:active { transform: scale(0.98); }
-        .status-wait { border-left-color: #f06292; }   /* รอรับ - ชมพู */
-        .status-doing { border-left-color: #3b82f6; }  /* กำลังทำ - ฟ้า */
-        .status-spare { border-left-color: #f59e0b; }  /* รออะไหล่ - ส้ม */
-        .status-done { border-left-color: #22c55e; }   /* เสร็จสิ้น - เขียว */
+        .status-wait { border-left-color: #f06292; }   /* ชมพู */
+        .status-doing { border-left-color: #2196f3; }  /* ฟ้า */
+        .status-done { border-left-color: #4caf50; }   /* เขียว */
 
-        .nav-btn.active { color: var(--primary-color); }
-        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 9999; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #fce4ec; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        .btn-action {
+            background: var(--primary-gradient);
+            color: white; border: none; border-radius: 12px;
+            padding: 12px; width: 100%; font-weight: 600; cursor: pointer;
+        }
+        
+        /* Loader & Popup (ใช้ตาม style-login) */
+        .loader-overlay { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.85); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(216, 27, 96, 0.1); border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-24 bg-slate-50">
 
-    <div id="loader" class="loader-overlay">
-        <div class="spinner"></div>
-    </div>
+    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 
-    <header class="pink-header p-6 shadow-lg sticky top-0 z-50">
+    <header class="header-pink p-6 sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-inner">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2906/2906274.png" class="w-8 h-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white rounded-full p-2 shadow-lg">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2906/2906274.png" alt="logo">
                 </div>
                 <div>
-                    <h1 id="u-fname" class="font-bold text-lg leading-tight">Loading...</h1>
-                    <p id="u-type-name" class="text-xs opacity-90 font-light uppercase tracking-wider">...</p>
+                    <h1 id="u-fname" class="text-lg font-bold">กำลังโหลด...</h1>
+                    <p id="u-type-name" class="text-xs opacity-80 uppercase tracking-widest"></p>
                 </div>
             </div>
-            <button onclick="Auth.logout()" class="p-2 bg-white/20 rounded-xl hover:bg-white/30">
+            <button onclick="Auth.logout()" class="p-2 bg-white/20 rounded-xl hover:bg-white/30 transition-all">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4">
-        
-        <div id="tab1" class="tab-content active">
-            <div class="grid grid-cols-4 gap-2 mb-6">
-                <div class="bg-white p-3 rounded-2xl shadow-sm text-center border-b-4 border-pink-500">
-                    <p class="text-[10px] text-slate-400 font-bold">รอรับ</p>
-                    <p id="count-wait" class="text-xl font-black text-pink-600">0</p>
+        <section id="tab1" class="tab-content active">
+            <div class="grid grid-cols-5 gap-2 mb-6">
+                <div class="bg-white p-2 rounded-2xl shadow-sm text-center border">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">รอรับ</p>
+                    <p class="text-lg font-black text-pink-500" id="count-wait">0</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm text-center border-b-4 border-blue-500">
-                    <p class="text-[10px] text-slate-400 font-bold">ทำอยู่</p>
-                    <p id="count-doing" class="text-xl font-black text-blue-600">0</p>
+                <div class="bg-white p-2 rounded-2xl shadow-sm text-center border">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">ทำอยู่</p>
+                    <p class="text-lg font-black text-blue-500" id="count-doing">0</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm text-center border-b-4 border-green-500">
-                    <p class="text-[10px] text-slate-400 font-bold">เสร็จ</p>
-                    <p id="count-done" class="text-xl font-black text-green-600">0</p>
+                <div class="bg-white p-2 rounded-2xl shadow-sm text-center border">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">รออะไหล่</p>
+                    <p class="text-lg font-black text-orange-500" id="count-spare">0</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm text-center border-b-4 border-slate-300">
-                    <p class="text-[10px] text-slate-400 font-bold">รวม</p>
-                    <p id="count-all" class="text-xl font-black text-slate-600">0</p>
+                <div class="bg-white p-2 rounded-2xl shadow-sm text-center border">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">เสร็จ</p>
+                    <p class="text-lg font-black text-green-500" id="count-done">0</p>
+                </div>
+                <div class="bg-white p-2 rounded-2xl shadow-sm text-center border">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">ยกเลิก</p>
+                    <p class="text-lg font-black text-slate-400" id="count-cancel">0</p>
                 </div>
             </div>
 
-            <div id="job-list-container" class="space-y-3">
-                </div>
-        </div>
+            <div id="job-list-dashboard" class="space-y-4">
+                <p class="text-center text-slate-400 py-10">กำลังดึงข้อมูลงานล่าสุด...</p>
+            </div>
+        </section>
 
-        <div id="tab2" class="tab-content">
-            <h3 class="font-bold text-slate-700 mb-4 px-1">🔗 ลิงก์ระบบที่เกี่ยวข้อง</h3>
-            <div id="link-container" class="space-y-3"></div>
-        </div>
-
+        <section id="tab2" class="tab-content">
+            <h2 class="font-bold text-slate-700 mb-4">งานที่ฉันรับผิดชอบ</h2>
+            <div id="job-list-myjob" class="space-y-4"></div>
+        </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex justify-around p-3 z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
-        <button onclick="switchTab(1)" id="nav1" class="nav-btn active flex flex-col items-center gap-1 text-slate-400">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2" stroke-linecap="round"/></svg>
-            <span class="text-[10px] font-bold">งานทั้งหมด</span>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around shadow-lg z-50">
+        <button onclick="switchTab(1)" class="flex flex-col items-center gap-1 text-pink-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2"/></svg>
+            <span class="text-[10px] font-bold">Dashboard</span>
         </button>
-        <button onclick="switchTab(2)" id="nav2" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-width="2"/></svg>
-            <span class="text-[10px] font-bold">ลิงก์ระบบ</span>
+        <button onclick="switchTab(2)" class="flex flex-col items-center gap-1 text-slate-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2"/></svg>
+            <span class="text-[10px] font-bold">งานของฉัน</span>
         </button>
     </nav>
-
-    <div id="job-modal" class="fixed inset-0 bg-black/50 hidden z-[60] flex items-end">
-        <div class="bg-white w-full rounded-t-[30px] p-6 animate-slideUp">
-            <div class="w-12 h-1 bg-slate-200 mx-auto mb-4 rounded-full"></div>
-            <h3 id="modal-job-id" class="text-center font-black text-pink-600 mb-4 text-xl">JOB-XXXX</h3>
-            <div id="modal-content" class="space-y-4">
-                </div>
-            <button onclick="closeModal()" class="w-full mt-4 py-3 text-slate-400 font-bold">ปิดหน้าต่าง</button>
-        </div>
-    </div>
 
     <script src="api.js"></script>
     <script src="main.js"></script>
     
     <script>
-        // --- 1. การทำงานเมื่อโหลดหน้า ---
+        // 1. ตรวจสอบ Session เมื่อโหลด
         document.addEventListener('DOMContentLoaded', async () => {
             const user = Auth.getUser();
-            if (!user) { window.location.href = 'login.html'; return; }
+            if (!user) { window.location.replace("login.html"); return; }
             
-            document.getElementById('u-fname').innerText = user.UserName + " " + user.UserSname;
-            document.getElementById('u-type-name').innerText = user.UserType;
+            // แสดงข้อมูลใน Header ตาม ID ใน main.js
+            document.getElementById('u-fname').innerText = (user.UserName || '') + ' ' + (user.UserSname || '');
+            document.getElementById('u-type-name').innerText = user.UserType || 'Staff';
 
-            await refreshData();
+            await loadData();
         });
 
-        async function refreshData() {
-            Loader.show();
+        // 2. ดึงข้อมูลและ Update UI
+        async function loadData() {
             const user = Auth.getUser();
+            Loader.show();
             const res = await ApiService.call('getInitialData', { USERID: user.USERID });
             Loader.hide();
 
             if (res.success) {
-                window.MasterData = res; // เก็บข้อมูลไว้ใช้ทั่วแอป
-                renderDashboard(res.AllJobs);
-                renderLinks(res.SystemLink);
+                renderJobs(res.AllJobs);
             }
         }
 
-        // --- 2. การสร้างการ์ดงาน (UX แกนหลัก) ---
-        function renderDashboard(jobs) {
-            const container = document.getElementById('job-list-container');
+        // 3. Render การ์ดงาน (UX แกนหลัก)
+        function renderJobs(jobs) {
+            const container = document.getElementById('job-list-dashboard');
             container.innerHTML = '';
             
-            let counts = { wait: 0, doing: 0, done: 0 };
+            let counts = { wait: 0, doing: 0, spare: 0, done: 0, cancel: 0 };
 
-            jobs.sort((a, b) => b.JobID - a.JobID).forEach(job => {
-                const statusClass = getStatusClass(job.Status);
+            jobs.forEach(job => {
+                // อัปเดตตัวเลข Stats
                 if (job.Status === 'รอรับงาน') counts.wait++;
-                if (job.Status === 'กำลังดำเนินการ') counts.doing++;
-                if (job.Status === 'เสร็จสิ้น') counts.done++;
+                else if (job.Status === 'กำลังดำเนินการ') counts.doing++;
+                else if (job.Status === 'เสร็จสิ้น') counts.done++;
 
-                const div = document.createElement('div');
-                div.className = `job-card ${statusClass}`;
-                div.onclick = () => openJobDetails(job);
-                div.innerHTML = `
+                // สร้าง HTML การ์ดงาน
+                const statusClass = job.Status === 'รอรับงาน' ? 'status-wait' : (job.Status === 'กำลังดำเนินการ' ? 'status-doing' : 'status-done');
+                
+                const card = document.createElement('div');
+                card.className = `job-card-original ${statusClass}`;
+                card.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-[10px] font-bold px-2 py-1 bg-slate-100 rounded-md text-slate-500">#${job.JobID}</span>
-                        <span class="text-[10px] font-bold ${statusClass.replace('border-left-', 'text-')}">${job.Status}</span>
+                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded font-bold">#${job.JobID}</span>
+                        <span class="text-[10px] font-bold uppercase ${statusClass.replace('status-', 'text-')}">${job.Status}</span>
                     </div>
-                    <h4 class="font-bold text-slate-700 leading-tight mb-1">${job.Problem || 'ไม่มีรายละเอียด'}</h4>
-                    <p class="text-xs text-slate-400 flex items-center gap-1">
-                        📍 ${job.Department || 'ไม่ระบุ'} | 🕒 ${job.Timestamp ? new Date(job.Timestamp).toLocaleDateString('th-TH') : '-'}
-                    </p>
+                    <h3 class="font-bold text-slate-700 leading-tight mb-1">${job.Problem || 'ไม่ระบุปัญหา'}</h3>
+                    <p class="text-xs text-slate-400">📍 ${job.Department || 'ไม่ทราบหน่วยงาน'}</p>
+                    <div class="mt-4 flex gap-2">
+                        <button class="btn-action text-xs" onclick="alert('จัดการงาน #${job.JobID}')">ดูรายละเอียด / จัดการ</button>
+                    </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(card);
             });
 
+            // ใส่ตัวเลขกลับเข้าไปในหน้า Dashboard
             document.getElementById('count-wait').innerText = counts.wait;
             document.getElementById('count-doing').innerText = counts.doing;
             document.getElementById('count-done').innerText = counts.done;
-            document.getElementById('count-all').innerText = jobs.length;
         }
 
-        function getStatusClass(status) {
-            if (status === 'รอรับงาน') return 'status-wait';
-            if (status === 'กำลังดำเนินการ') return 'status-doing';
-            if (status === 'รออะไหล่') return 'status-spare';
-            if (status === 'เสร็จสิ้น') return 'status-done';
-            return '';
-        }
-
-        // --- 3. การจัดการ Modal & Action (รับงาน/ปิดงาน) ---
-        function openJobDetails(job) {
-            const user = Auth.getUser();
-            document.getElementById('modal-job-id').innerText = `JOB-${job.JobID}`;
-            const content = document.getElementById('modal-content');
-            content.innerHTML = '';
-
-            if (job.Status === 'รอรับงาน') {
-                content.innerHTML = `
-                    <button onclick="handleAction('accept', '${job.JobID}')" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">ยืนยันรับงานนี้</button>
-                `;
-            } else if (job.Status === 'กำลังดำเนินการ' && job.Owner === user.USERID) {
-                content.innerHTML = `
-                    <button onclick="handleAction('done', '${job.JobID}')" class="w-full py-4 bg-green-600 text-white rounded-2xl font-bold shadow-lg">บันทึกปิดงาน</button>
-                `;
-            } else {
-                content.innerHTML = `<p class="text-center text-slate-400 py-4 italic font-light">คุณไม่มีสิทธิ์จัดการงานนี้ในขณะนี้</p>`;
-            }
-
-            document.getElementById('job-modal').style.display = 'flex';
-        }
-
-        async function handleAction(type, jobId) {
-            const user = Auth.getUser();
-            const data = { type, JobID: jobId, Owner: user.USERID };
-            
-            Loader.show();
-            const res = await ApiService.call('updateJobStatus', data);
-            Loader.hide();
-
-            if (res.success) {
-                closeModal();
-                await refreshData();
-            } else {
-                alert(res.message);
-            }
-        }
-
-        function closeModal() { document.getElementById('job-modal').style.display = 'none'; }
-
-        function switchTab(idx) {
+        function switchTab(n) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab' + idx).classList.add('active');
-            document.getElementById('nav' + idx).classList.add('active');
-        }
-
-        function renderLinks(links) {
-            const container = document.getElementById('link-container');
-            container.innerHTML = '';
-            links.forEach(link => {
-                const a = document.createElement('a');
-                a.href = link.Url;
-                a.target = "_blank";
-                a.className = "flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 shadow-sm";
-                a.innerHTML = `<span class="font-bold text-slate-600 text-sm">${link.SystemName}</span><span class="text-pink-500">→</span>`;
-                container.appendChild(a);
-            });
+            document.getElementById('tab' + n).classList.add('active');
         }
     </script>
 </body>

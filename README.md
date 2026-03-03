@@ -1,4 +1,4 @@
-# 🏥 IT Service&Mainternance System - โรงพยาบาลอุดรธานี
+# 🏥 IT Service&Mainternance System
 
 ระบบจัดการงานบริการและซ่อมบำรุงอุปกรณ์คอมพิวเตอร์ IT ที่เชื่อมต่อกับ Google Sheet
 

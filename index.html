@@ -173,7 +173,7 @@
 
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase">หน่วยงาน</label>
-                    <select id="it-dept" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none">
+                    <select id="it-dept-d" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none">
                         <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
                     </select>
                 </div>
@@ -589,7 +589,7 @@ function openCloseJobForm(jobId) {
     if (!deptSelect || !store.DeptList) return;
     
     deptSelect.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>' +
-        store.DeptList.map(d => `<option value="${d.Department}">${d.Department}</option>`).join('');
+        store.DeptList.map(d => `<option value="${d.Department}">${d.Departmentname}</option>`).join('');
 }
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');

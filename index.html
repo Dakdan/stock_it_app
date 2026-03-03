@@ -265,6 +265,7 @@
                 renderMyJobs();
                 renderITTicketList();
                 renderSystemLinks();
+                renderDeptList();
             }
         } catch (e) { console.error("Data error", e); }
         showLoading(false);
@@ -582,7 +583,14 @@ function openCloseJobForm(jobId) {
 
 // 3. ปรับปรุง loadData ให้เรียก renderDeptList ด้วย
 // เพิ่มบรรทัดนี้ลงในฟังก์ชัน loadData() หลังจาก result.success
-// renderDeptList();
+// renderDeptList();.
+    function renderDeptList() {
+    const deptSelect = document.getElementById('it-dept');
+    if (!deptSelect || !store.DeptList) return;
+    
+    deptSelect.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>' +
+        store.DeptList.map(d => `<option value="${d.Department}">${d.Department}</option>`).join('');
+}
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
         const role = String(currentUser.UserTypeID || '').toUpperCase();
@@ -757,13 +765,7 @@ function openITTicketForm() {
         });
         renderSystemLinks(); 
     }
-    function renderDeptList() {
-    const deptSelect = document.getElementById('it-dept');
-    if (!deptSelect || !store.DeptList) return;
     
-    deptSelect.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>' +
-        store.DeptList.map(d => `<option value="${d.Department}">${d.Department}</option>`).join('');
-}
 
     function showInnerAlert(modalId, text) {
         const alertDiv = document.querySelector(`#${modalId} .inner-alert`);

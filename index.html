@@ -589,7 +589,7 @@ function openCloseJobForm(jobId) {
     if (!deptSelect || !store.DeptList) return;
     
     deptSelect.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>' +
-        store.DeptList.map(d => `<option value="${d.Department}">${d.Departmentname}</option>`).join('');
+        store.DeptList.map(d => `<option value="${d.name}">${d.Departmentname}</option>`).join('');
 }
     function openTransfer(jobId) {
         const select = document.getElementById('select-staff');
@@ -618,8 +618,8 @@ function loadITTicketMaster() {
     deptSelect.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>';
     (store.DeptList || []).forEach(d => {
         const opt = document.createElement('option');
-        opt.value = d.Department;
-        opt.textContent = d.Department;
+        opt.value = d.id;
+        opt.textContent = d.name;
         deptSelect.appendChild(opt);
     });
 

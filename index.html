@@ -492,7 +492,7 @@
         }
     } 
     // เงื่อนไข 2: งาน "กำลังดำเนินการ" และเราเป็นเจ้าของ (โชว์ปุ่ม ปิดงาน/โอนงาน)
-    else if (status === 'กำลังดำเนินการ' && isOwner) {
+    else if (currentTab === '2' && isOwner) {
         btns = `
         <div class="grid grid-cols-2 gap-3 w-full">
             <button onclick="openCloseJobForm('${job.JobID}')" class="py-4 bg-[#22C55E] text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">✅ ปิดงาน</button>

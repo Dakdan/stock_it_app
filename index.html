@@ -666,7 +666,7 @@ function openITTicketForm() {
         const deptSelect = document.getElementById('it-dept');
 
         if (!typeSelect.value || !subSelect.value || !problemInput.value || !deptSelect.value) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            showInnerAlert("กรุณากรอกข้อมูลให้ครบถ้วน");
             return;
         }
 

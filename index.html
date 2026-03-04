@@ -666,7 +666,7 @@ function openITTicketForm() {
         const deptSelect = document.getElementById('it-dept');
 
         if (!typeSelect.value || !subSelect.value || !problemInput.value || !deptSelect.value) {
-            showInnerAlert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            showInnerAlert("modal-it-ticket","กรุณากรอกข้อมูลให้ครบถ้วน");
             return;
         }
 

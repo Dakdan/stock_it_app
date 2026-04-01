@@ -89,7 +89,7 @@
         <header class="glass-card p-6 mb-8 flex flex-col md:flex-row items-center justify-between">
             <div class="flex items-center gap-4 mb-4 md:mb-0">
                 <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center border-2 border-pink-200">
-                    <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
+                    <i data-lucide="package" class="w-10 h-10 text-pink-500"></i>
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-pink-600 leading-tight">ระบบบริหารจัดการคลังอะไหล่ IT</h1>
@@ -230,6 +230,7 @@
 
         function updateSummary() {
             google.script.run.withSuccessHandler(summary => {
+                if (!summary) return;
                 document.getElementById('totalItems').innerText = summary.length + " รายการ";
                 const lowStock = summary.filter(i => i.Balance <= i.Min_Stock).length;
                 document.getElementById('lowStockItems').innerText = lowStock + " รายการ";
@@ -246,9 +247,14 @@
                 const resultDiv = document.getElementById('searchResult');
                 resultDiv.classList.remove('hidden');
                
+                if (!summary) {
+                    resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบข้อมูลพัสดุ</p>`;
+                    return;
+                }
+
                 const item = summary.find(i =>
-                    i.Item_Name.toLowerCase().includes(query.toLowerCase()) ||
-                    i.Item_ID.toLowerCase().includes(query.toLowerCase())
+                    (i.Item_Name && i.Item_Name.toLowerCase().includes(query.toLowerCase())) ||
+                    (i.Item_ID && i.Item_ID.toLowerCase().includes(query.toLowerCase()))
                 );
 
                 if (item) {
@@ -304,6 +310,8 @@
                 const tbody = document.getElementById('inventoryTableBody');
                 tbody.innerHTML = '';
                
+                if (!summary) return;
+
                 summary.forEach(item => {
                     const isLow = item.Balance <= item.Min_Stock;
                     const row = `
@@ -333,4 +341,3 @@
     </script>
 </body>
 </html>
-

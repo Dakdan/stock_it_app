@@ -74,6 +74,15 @@
             align-items: center;
             flex-direction: column;
         }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -113,15 +122,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="glass-card p-6 border-l-8 border-pink-400">
                         <h3 class="text-gray-500 text-sm">รายการพัสดุทั้งหมด</h3>
-                        <p id="totalItems" class="text-3xl font-bold text-gray-800">...</p>
+                        <p id="totalItems" class="text-3xl font-bold text-gray-800">0 รายการ</p>
                     </div>
                     <div class="glass-card p-6 border-l-8 border-red-400">
                         <h3 class="text-gray-500 text-sm">สินค้าใกล้หมด (Low Stock)</h3>
-                        <p id="lowStockItems" class="text-3xl font-bold text-gray-800">...</p>
+                        <p id="lowStockItems" class="text-3xl font-bold text-gray-800">0 รายการ</p>
                     </div>
                     <div class="glass-card p-6 border-l-8 border-green-400">
                         <h3 class="text-gray-500 text-sm">มูลค่าพัสดุรวม</h3>
-                        <p class="text-3xl font-bold text-gray-800">ตรวจสอบที่ Sheet</p>
+                        <p class="text-3xl font-bold text-gray-800 text-sm">เช็คได้ที่ Google Sheets</p>
                     </div>
                 </div>
 
@@ -204,15 +213,18 @@
         lucide.createIcons();
 
         function showLoading(show) {
-            document.getElementById('overlay').style.display = show ? 'flex' : 'none';
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.style.display = show ? 'flex' : 'none';
         }
 
         function switchTab(tab) {
             const tabs = ['dashboard', 'inventory'];
             tabs.forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
+                const element = document.getElementById(`tab-${t}`);
+                if (element) element.classList.add('hidden');
             });
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            const target = document.getElementById(`tab-${tab}`);
+            if (target) target.classList.remove('hidden');
            
             if(tab === 'inventory') loadInventory();
             if(tab === 'dashboard') updateSummary();
@@ -229,12 +241,20 @@
         }
 
         function updateSummary() {
-            google.script.run.withSuccessHandler(summary => {
-                if (!summary) return;
-                document.getElementById('totalItems').innerText = summary.length + " รายการ";
-                const lowStock = summary.filter(i => i.Balance <= i.Min_Stock).length;
-                document.getElementById('lowStockItems').innerText = lowStock + " รายการ";
-            }).getStockSummary();
+            showLoading(true);
+            google.script.run
+                .withSuccessHandler(summary => {
+                    showLoading(false);
+                    if (!summary || !Array.isArray(summary)) return;
+                    document.getElementById('totalItems').innerText = summary.length + " รายการ";
+                    const lowStock = summary.filter(i => i.Balance <= i.Min_Stock).length;
+                    document.getElementById('lowStockItems').innerText = lowStock + " รายการ";
+                })
+                .withFailureHandler(err => {
+                    showLoading(false);
+                    showModal("Error", "ไม่สามารถดึงข้อมูลสรุปได้: " + err);
+                })
+                .getStockSummary();
         }
 
         function searchItem() {
@@ -242,102 +262,116 @@
             if (!query) return showModal("คำเตือน", "กรุณาระบุคำค้นหา");
 
             showLoading(true);
-            google.script.run.withSuccessHandler(summary => {
-                showLoading(false);
-                const resultDiv = document.getElementById('searchResult');
-                resultDiv.classList.remove('hidden');
-               
-                if (!summary) {
-                    resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบข้อมูลพัสดุ</p>`;
-                    return;
-                }
+            google.script.run
+                .withSuccessHandler(summary => {
+                    showLoading(false);
+                    const resultDiv = document.getElementById('searchResult');
+                    resultDiv.classList.remove('hidden');
+                   
+                    if (!summary || !Array.isArray(summary)) {
+                        resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบข้อมูลพัสดุ</p>`;
+                        return;
+                    }
 
-                const item = summary.find(i =>
-                    (i.Item_Name && i.Item_Name.toLowerCase().includes(query.toLowerCase())) ||
-                    (i.Item_ID && i.Item_ID.toLowerCase().includes(query.toLowerCase()))
-                );
+                    const item = summary.find(i =>
+                        (i.Item_Name && i.Item_Name.toLowerCase().includes(query.toLowerCase())) ||
+                        (i.Item_ID && i.Item_ID.toLowerCase().includes(query.toLowerCase()))
+                    );
 
-                if (item) {
-                    const isLow = item.Balance <= item.Min_Stock;
-                    resultDiv.innerHTML = `
-                        <div class="flex flex-col md:flex-row justify-between items-start border-b pb-4 mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-gray-800">${item.Item_Name}</h3>
-                                <p class="text-gray-500">รหัสพัสดุ: ${item.Item_ID}</p>
+                    if (item) {
+                        const isLow = item.Balance <= item.Min_Stock;
+                        resultDiv.innerHTML = `
+                            <div class="flex flex-col md:flex-row justify-between items-start border-b pb-4 mb-4">
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-800">${item.Item_Name}</h3>
+                                    <p class="text-gray-500">รหัสพัสดุ: ${item.Item_ID}</p>
+                                </div>
+                                <div class="text-right mt-4 md:mt-0">
+                                    <p class="text-sm text-gray-400">สถานะสต็อก</p>
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${isLow ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+                                        ${isLow ? 'Low Stock' : 'In Stock'}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="text-right mt-4 md:mt-0">
-                                <p class="text-sm text-gray-400">สถานะสต็อก</p>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${isLow ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
-                                    ${isLow ? 'Low Stock' : 'In Stock'}
-                                </span>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                                <div class="p-4 bg-pink-50 rounded-2xl text-center">
+                                    <p class="text-xs text-pink-400">คงเหลือปัจจุบัน</p>
+                                    <p class="text-3xl font-bold text-pink-600">${item.Balance}</p>
+                                    <p class="text-xs text-gray-400">${item.Unit || 'ชิ้น'}</p>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                                    <p class="text-xs text-gray-400">จุดสั่งซื้อ (Min)</p>
+                                    <p class="text-3xl font-bold text-gray-600">${item.Min_Stock}</p>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                                    <p class="text-xs text-gray-400">ยอดรับเข้าทั้งหมด</p>
+                                    <p class="text-3xl font-bold text-gray-600">${item.In}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                            <div class="p-4 bg-pink-50 rounded-2xl text-center">
-                                <p class="text-xs text-pink-400">คงเหลือปัจจุบัน</p>
-                                <p class="text-3xl font-bold text-pink-600">${item.Balance}</p>
-                                <p class="text-xs text-gray-400">${item.Unit || 'ชิ้น'}</p>
+                            <div class="flex gap-2">
+                                <button class="flex-1 btn-gradient py-3 text-white rounded-xl shadow-md">
+                                    <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> เพิ่มสต็อก (Stock In)
+                                </button>
+                                <button class="flex-1 border-2 border-pink-100 text-pink-500 py-3 rounded-xl hover:bg-pink-50">
+                                    <i data-lucide="minus" class="inline w-4 h-4 mr-1"></i> เบิกสต็อก (Stock Out)
+                                </button>
                             </div>
-                            <div class="p-4 bg-gray-50 rounded-2xl text-center">
-                                <p class="text-xs text-gray-400">จุดสั่งซื้อ (Min)</p>
-                                <p class="text-3xl font-bold text-gray-600">${item.Min_Stock}</p>
-                            </div>
-                            <div class="p-4 bg-gray-50 rounded-2xl text-center">
-                                <p class="text-xs text-gray-400">ยอดรับเข้าทั้งหมด</p>
-                                <p class="text-3xl font-bold text-gray-600">${item.In}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="flex-1 btn-gradient py-3 text-white rounded-xl shadow-md">
-                                <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> เพิ่มสต็อก (Stock In)
-                            </button>
-                            <button class="flex-1 border-2 border-pink-100 text-pink-500 py-3 rounded-xl hover:bg-pink-50">
-                                <i data-lucide="minus" class="inline w-4 h-4 mr-1"></i> เบิกสต็อก (Stock Out)
-                            </button>
-                        </div>
-                    `;
-                    lucide.createIcons();
-                } else {
-                    resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบพัสดุที่ตรงกับคำค้นหา "${query}"</p>`;
-                }
-            }).getStockSummary();
+                        `;
+                        lucide.createIcons();
+                    } else {
+                        resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบพัสดุที่ตรงกับคำค้นหา "${query}"</p>`;
+                    }
+                })
+                .withFailureHandler(err => {
+                    showLoading(false);
+                    showModal("Error", "การค้นหาล้มเหลว: " + err);
+                })
+                .getStockSummary();
         }
 
         function loadInventory() {
             showLoading(true);
-            google.script.run.withSuccessHandler(summary => {
-                showLoading(false);
-                const tbody = document.getElementById('inventoryTableBody');
-                tbody.innerHTML = '';
-               
-                if (!summary) return;
+            google.script.run
+                .withSuccessHandler(summary => {
+                    showLoading(false);
+                    const tbody = document.getElementById('inventoryTableBody');
+                    tbody.innerHTML = '';
+                   
+                    if (!summary || !Array.isArray(summary)) return;
 
-                summary.forEach(item => {
-                    const isLow = item.Balance <= item.Min_Stock;
-                    const row = `
-                        <tr class="border-b hover:bg-pink-50/30 transition-colors">
-                            <td class="p-4 text-xs font-mono text-gray-400">${item.Item_ID}</td>
-                            <td class="p-4 font-medium text-gray-800">${item.Item_Name}</td>
-                            <td class="p-4 text-sm">คลัง IT</td>
-                            <td class="p-4">
-                                <span class="text-lg font-bold ${isLow ? 'text-red-500' : 'text-gray-700'}">${item.Balance}</span>
-                            </td>
-                            <td class="p-4 text-sm">${item.Unit || 'ชิ้น'}</td>
-                            <td class="p-4">
-                                <span class="text-[10px] px-2 py-1 rounded-full font-bold uppercase ${isLow ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
-                                    ${isLow ? 'Low' : 'OK'}
-                                </span>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-                lucide.createIcons();
-            }).getStockSummary();
+                    summary.forEach(item => {
+                        const isLow = item.Balance <= item.Min_Stock;
+                        const row = `
+                            <tr class="border-b hover:bg-pink-50/30 transition-colors">
+                                <td class="p-4 text-xs font-mono text-gray-400">${item.Item_ID}</td>
+                                <td class="p-4 font-medium text-gray-800">${item.Item_Name}</td>
+                                <td class="p-4 text-sm">คลัง IT</td>
+                                <td class="p-4">
+                                    <span class="text-lg font-bold ${isLow ? 'text-red-500' : 'text-gray-700'}">${item.Balance}</span>
+                                </td>
+                                <td class="p-4 text-sm">${item.Unit || 'ชิ้น'}</td>
+                                <td class="p-4">
+                                    <span class="text-[10px] px-2 py-1 rounded-full font-bold uppercase ${isLow ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+                                        ${isLow ? 'Low' : 'OK'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                    lucide.createIcons();
+                })
+                .withFailureHandler(err => {
+                    showLoading(false);
+                    showModal("Error", "ไม่สามารถโหลดรายการพัสดุได้: " + err);
+                })
+                .getStockSummary();
         }
 
         // Run summary on load
-        window.onload = updateSummary;
+        window.onload = function() {
+            updateSummary();
+        };
     </script>
 </body>
 </html>

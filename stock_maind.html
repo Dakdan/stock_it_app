@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT UDON HOSP - Asset Management</title>
+    <title>IT UDON HOSP - Inventory System</title>
     <!-- Google Fonts: Kanit -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -52,12 +52,6 @@
             box-shadow: 0 4px 15px rgba(255, 133, 162, 0.4);
         }
 
-        .status-badge {
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-size: 0.85rem;
-        }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -95,10 +89,10 @@
         <header class="glass-card p-6 mb-8 flex flex-col md:flex-row items-center justify-between">
             <div class="flex items-center gap-4 mb-4 md:mb-0">
                 <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center border-2 border-pink-200">
-                     <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
+                    <i data-lucide="package" class="w-10 h-10 text-pink-500"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-pink-600 leading-tight">ระบบตรวจสอบครุภัณฑ์คอมพิวเตอร์</h1>
+                    <h1 class="text-2xl font-bold text-pink-600 leading-tight">ระบบบริหารจัดการคลังอะไหล่ IT</h1>
                     <p class="text-gray-500 text-sm">โรงพยาบาลอุดรธานี | กลุ่มงานเทคโนโลยีสารสนเทศทางการแพทย์</p>
                 </div>
             </div>
@@ -107,44 +101,44 @@
                     <i data-lucide="layout-dashboard" class="inline w-4 h-4 mr-1"></i> Dashboard
                 </button>
                 <button onclick="switchTab('inventory')" class="px-4 py-2 rounded-xl text-pink-600 hover:bg-pink-50 transition-colors">
-                    <i data-lucide="package" class="inline w-4 h-4 mr-1"></i> คลังอะไหล่
+                    <i data-lucide="list" class="inline w-4 h-4 mr-1"></i> รายการพัสดุ
                 </button>
             </div>
         </header>
 
         <!-- Main Content Area -->
         <main id="tab-container">
-            <!-- Dashboard / Asset Search -->
+            <!-- Dashboard / Stock Summary -->
             <section id="tab-dashboard" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="glass-card p-6 border-l-8 border-pink-400">
-                        <h3 class="text-gray-500 text-sm">งานซ่อมวันนี้</h3>
-                        <p class="text-3xl font-bold text-gray-800">12 รายการ</p>
+                        <h3 class="text-gray-500 text-sm">รายการพัสดุทั้งหมด</h3>
+                        <p id="totalItems" class="text-3xl font-bold text-gray-800">...</p>
                     </div>
-                    <div class="glass-card p-6 border-l-8 border-blue-400">
-                        <h3 class="text-gray-500 text-sm">อะไหล่รอเบิก</h3>
-                        <p class="text-3xl font-bold text-gray-800">5 รายการ</p>
+                    <div class="glass-card p-6 border-l-8 border-red-400">
+                        <h3 class="text-gray-500 text-sm">สินค้าใกล้หมด (Low Stock)</h3>
+                        <p id="lowStockItems" class="text-3xl font-bold text-gray-800">...</p>
                     </div>
                     <div class="glass-card p-6 border-l-8 border-green-400">
-                        <h3 class="text-gray-500 text-sm">Asset ทั้งหมด</h3>
-                        <p class="text-3xl font-bold text-gray-800">1,240 เครื่อง</p>
+                        <h3 class="text-gray-500 text-sm">มูลค่าพัสดุรวม</h3>
+                        <p class="text-3xl font-bold text-gray-800">ตรวจสอบที่ Sheet</p>
                     </div>
                 </div>
 
                 <div class="glass-card p-8">
                     <h2 class="text-xl font-semibold text-gray-700 mb-6 flex items-center">
-                        <i data-lucide="search" class="mr-2 text-pink-500"></i> ค้นหาครุภัณฑ์ / เปิด Job ซ่อม
+                        <i data-lucide="search" class="mr-2 text-pink-500"></i> ค้นหาอะไหล่ / เช็คสต็อก
                     </h2>
                     <div class="flex flex-col md:flex-row gap-4">
-                        <input type="text" id="assetSearch" placeholder="สแกน QR หรือ กรอก Asset Tag..."
+                        <input type="text" id="itemSearch" placeholder="กรอกชื่ออะไหล่ หรือรหัสพัสดุ..."
                                class="flex-1 p-4 rounded-xl border-2 border-pink-100 focus:border-pink-300 outline-none transition-all">
-                        <button onclick="searchAsset()" class="btn-gradient px-8 py-4 text-white rounded-xl font-medium flex items-center justify-center">
+                        <button onclick="searchItem()" class="btn-gradient px-8 py-4 text-white rounded-xl font-medium flex items-center justify-center">
                              ค้นหาข้อมูล
                         </button>
                     </div>
                 </div>
 
-                <div id="assetResult" class="hidden glass-card p-8 animate-fadeIn">
+                <div id="searchResult" class="hidden glass-card p-8 animate-fadeIn">
                     <!-- ข้อมูลจะถูกแสดงที่นี่ -->
                 </div>
             </section>
@@ -152,25 +146,30 @@
             <!-- Inventory Table -->
             <section id="tab-inventory" class="hidden glass-card overflow-hidden">
                 <div class="p-6 bg-white border-b flex justify-between items-center">
-                    <h2 class="text-xl font-semibold text-pink-600">รายการคลังอะไหล่ IT</h2>
-                    <button class="bg-pink-50 text-pink-600 px-4 py-2 rounded-lg text-sm border border-pink-200">
-                        <i data-lucide="plus-circle" class="inline w-4 h-4 mr-1"></i> รับเข้าอะไหล่
-                    </button>
+                    <h2 class="text-xl font-semibold text-pink-600">รายการคลังอะไหล่ IT ทั้งหมด</h2>
+                    <div class="flex gap-2">
+                        <button class="bg-green-50 text-green-600 px-4 py-2 rounded-lg text-sm border border-green-200">
+                            <i data-lucide="download" class="inline w-4 h-4 mr-1"></i> นำเข้า (Stock In)
+                        </button>
+                        <button class="bg-pink-50 text-pink-600 px-4 py-2 rounded-lg text-sm border border-pink-200">
+                            <i data-lucide="upload" class="inline w-4 h-4 mr-1"></i> เบิกจ่าย (Stock Out)
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-pink-50 text-pink-700">
                             <tr>
                                 <th class="p-4">Item ID</th>
-                                <th class="p-4">รายการ</th>
+                                <th class="p-4">รายการ/รุ่น</th>
                                 <th class="p-4">หมวดหมู่</th>
                                 <th class="p-4">คงเหลือ</th>
                                 <th class="p-4">หน่วย</th>
-                                <th class="p-4">จัดการ</th>
+                                <th class="p-4">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTableBody" class="text-gray-600">
-                            <!-- Data rows -->
+                            <!-- Data rows will be loaded here -->
                         </tbody>
                     </table>
                 </div>
@@ -180,11 +179,11 @@
         <!-- Footer -->
         <footer class="mt-12 text-center text-gray-400 text-xs no-print">
             <p>&copy; 2024 กลุ่มงานเทคโนโลยีสารสนเทศทางการแพทย์ โรงพยาบาลอุดรธานี</p>
-            <p>Version 1.0 (ITSM & Inventory System)</p>
+            <p>ระบบจัดการสต็อก IT (Inventory Focus)</p>
         </footer>
     </div>
 
-    <!-- Modal Template -->
+    <!-- Modal -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] hidden flex items-center justify-center p-4">
         <div class="glass-card bg-white w-full max-w-md p-6 shadow-2xl">
             <div id="modalHeader" class="flex justify-between items-center mb-4">
@@ -216,6 +215,7 @@
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
            
             if(tab === 'inventory') loadInventory();
+            if(tab === 'dashboard') updateSummary();
         }
 
         function showModal(title, message) {
@@ -228,94 +228,109 @@
             document.getElementById('modal').classList.add('hidden');
         }
 
-        function searchAsset() {
-            const tag = document.getElementById('assetSearch').value;
-            if (!tag) return showModal("คำเตือน", "กรุณาระบุ Asset Tag");
+        function updateSummary() {
+            google.script.run.withSuccessHandler(summary => {
+                document.getElementById('totalItems').innerText = summary.length + " รายการ";
+                const lowStock = summary.filter(i => i.Balance <= i.Min_Stock).length;
+                document.getElementById('lowStockItems').innerText = lowStock + " รายการ";
+            }).getStockSummary();
+        }
+
+        function searchItem() {
+            const query = document.getElementById('itemSearch').value;
+            if (!query) return showModal("คำเตือน", "กรุณาระบุคำค้นหา");
 
             showLoading(true);
-           
-            // จำลองการเรียก GAS API
-            google.script.run.withSuccessHandler(asset => {
+            google.script.run.withSuccessHandler(summary => {
                 showLoading(false);
-                const resultDiv = document.getElementById('assetResult');
+                const resultDiv = document.getElementById('searchResult');
                 resultDiv.classList.remove('hidden');
                
-                if (asset) {
+                const item = summary.find(i =>
+                    i.Item_Name.toLowerCase().includes(query.toLowerCase()) ||
+                    i.Item_ID.toLowerCase().includes(query.toLowerCase())
+                );
+
+                if (item) {
+                    const isLow = item.Balance <= item.Min_Stock;
                     resultDiv.innerHTML = `
                         <div class="flex flex-col md:flex-row justify-between items-start border-b pb-4 mb-4">
                             <div>
-                                <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${asset.Device_Type}</span>
-                                <h3 class="text-2xl font-bold text-gray-800 mt-2">${asset.Asset_Tag}</h3>
-                                <p class="text-gray-500">${asset.Brand} ${asset.Model}</p>
+                                <h3 class="text-2xl font-bold text-gray-800">${item.Item_Name}</h3>
+                                <p class="text-gray-500">รหัสพัสดุ: ${item.Item_ID}</p>
                             </div>
                             <div class="text-right mt-4 md:mt-0">
-                                <p class="text-sm text-gray-400">ผู้ถือครอง</p>
-                                <p class="font-medium text-pink-600">${asset.User}</p>
-                                <p class="text-sm text-gray-400 mt-2">หน่วยงาน</p>
-                                <p class="font-medium text-gray-700">${asset.Department}</p>
+                                <p class="text-sm text-gray-400">สถานะสต็อก</p>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${isLow ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+                                    ${isLow ? 'Low Stock' : 'In Stock'}
+                                </span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                            <div class="p-3 bg-pink-50 rounded-xl">
-                                <p class="text-xs text-pink-400">สถานะ</p>
-                                <p class="text-sm font-semibold text-green-600">${asset.Status}</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                            <div class="p-4 bg-pink-50 rounded-2xl text-center">
+                                <p class="text-xs text-pink-400">คงเหลือปัจจุบัน</p>
+                                <p class="text-3xl font-bold text-pink-600">${item.Balance}</p>
+                                <p class="text-xs text-gray-400">${item.Unit || 'ชิ้น'}</p>
                             </div>
-                            <div class="p-3 bg-gray-50 rounded-xl">
-                                <p class="text-xs text-gray-400">Serial</p>
-                                <p class="text-sm font-semibold">${asset.Serial_Number || '-'}</p>
+                            <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                                <p class="text-xs text-gray-400">จุดสั่งซื้อ (Min)</p>
+                                <p class="text-3xl font-bold text-gray-600">${item.Min_Stock}</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                                <p class="text-xs text-gray-400">ยอดรับเข้าทั้งหมด</p>
+                                <p class="text-3xl font-bold text-gray-600">${item.In}</p>
                             </div>
                         </div>
                         <div class="flex gap-2">
                             <button class="flex-1 btn-gradient py-3 text-white rounded-xl shadow-md">
-                                <i data-lucide="wrench" class="inline w-4 h-4 mr-1"></i> แจ้งซ่อม / เปิด Job
+                                <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> เพิ่มสต็อก (Stock In)
                             </button>
-                            <button class="px-6 py-3 border-2 border-pink-100 text-pink-500 rounded-xl hover:bg-pink-50">
-                                <i data-lucide="history" class="inline w-4 h-4"></i> ประวัติ
+                            <button class="flex-1 border-2 border-pink-100 text-pink-500 py-3 rounded-xl hover:bg-pink-50">
+                                <i data-lucide="minus" class="inline w-4 h-4 mr-1"></i> เบิกสต็อก (Stock Out)
                             </button>
                         </div>
                     `;
                     lucide.createIcons();
                 } else {
-                    resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบข้อมูลครุภัณฑ์หมายเลข ${tag}</p>`;
+                    resultDiv.innerHTML = `<p class="text-center text-red-400 py-8">ไม่พบพัสดุที่ตรงกับคำค้นหา "${query}"</p>`;
                 }
-            }).findAssetByTag(tag);
+            }).getStockSummary();
         }
 
         function loadInventory() {
             showLoading(true);
-            google.script.run.withSuccessHandler(data => {
+            google.script.run.withSuccessHandler(summary => {
                 showLoading(false);
                 const tbody = document.getElementById('inventoryTableBody');
                 tbody.innerHTML = '';
                
-                if (data.error) {
-                    showModal("Error", data.error);
-                    return;
-                }
-
-                data.forEach(item => {
+                summary.forEach(item => {
+                    const isLow = item.Balance <= item.Min_Stock;
                     const row = `
                         <tr class="border-b hover:bg-pink-50/30 transition-colors">
-                            <td class="p-4 text-xs font-mono">${item.Item_ID}</td>
+                            <td class="p-4 text-xs font-mono text-gray-400">${item.Item_ID}</td>
+                            <td class="p-4 font-medium text-gray-800">${item.Item_Name}</td>
+                            <td class="p-4 text-sm">คลัง IT</td>
                             <td class="p-4">
-                                <p class="font-medium text-gray-800">${item.Item_Name}</p>
-                                <p class="text-xs text-gray-400">${item.Brand} ${item.Model}</p>
+                                <span class="text-lg font-bold ${isLow ? 'text-red-500' : 'text-gray-700'}">${item.Balance}</span>
                             </td>
-                            <td class="p-4"><span class="text-sm">${item.Category_ID}</span></td>
+                            <td class="p-4 text-sm">${item.Unit || 'ชิ้น'}</td>
                             <td class="p-4">
-                                <span class="font-bold ${item.Min_Stock >= 10 ? 'text-green-500' : 'text-red-500'}">15</span>
-                            </td>
-                            <td class="p-4 text-sm">${item.Unit}</td>
-                            <td class="p-4">
-                                <button class="text-pink-400 hover:text-pink-600 p-1"><i data-lucide="more-vertical" class="w-5 h-5"></i></button>
+                                <span class="text-[10px] px-2 py-1 rounded-full font-bold uppercase ${isLow ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+                                    ${isLow ? 'Low' : 'OK'}
+                                </span>
                             </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
                 });
                 lucide.createIcons();
-            }).getData('02_Item_Master');
+            }).getStockSummary();
         }
+
+        // Run summary on load
+        window.onload = updateSummary;
     </script>
 </body>
 </html>
+

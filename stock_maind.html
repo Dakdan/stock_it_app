@@ -65,10 +65,10 @@
 
         /* Overlay & Loading */
         #overlay {
-            display: none;
+            display: flex; /* เริ่มต้นด้วยการแสดงผลไว้ก่อนเพื่อรอความพร้อมของ script */
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -90,7 +90,7 @@
     <!-- Loading Overlay -->
     <div id="overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-pink-500"></div>
-        <p class="mt-4 text-pink-600 font-medium">กำลังดำเนินการ...</p>
+        <p class="mt-4 text-pink-600 font-medium">กำลังเตรียมความพร้อมของระบบ...</p>
     </div>
 
     <div class="container mx-auto px-4 py-6 max-w-6xl">
@@ -98,7 +98,7 @@
         <header class="glass-card p-6 mb-8 flex flex-col md:flex-row items-center justify-between">
             <div class="flex items-center gap-4 mb-4 md:mb-0">
                 <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center border-2 border-pink-200">
-                    <img src="./โรงพยาบาลอุดรธานี .png" class="w-12 h-12 bg-white rounded-full p-1" alt="Logo" onerror="this.src='https://via.placeholder.com/50?text=IT'">
+                    <i data-lucide="package" class="w-10 h-10 text-pink-500"></i>
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-pink-600 leading-tight">ระบบบริหารจัดการคลังอะไหล่ IT</h1>
@@ -129,8 +129,10 @@
                         <p id="lowStockItems" class="text-3xl font-bold text-gray-800">0 รายการ</p>
                     </div>
                     <div class="glass-card p-6 border-l-8 border-green-400">
-                        <h3 class="text-gray-500 text-sm">มูลค่าพัสดุรวม</h3>
-                        <p class="text-3xl font-bold text-gray-800 text-sm">เช็คได้ที่ Google Sheets</p>
+                        <h3 class="text-gray-500 text-sm">สถานะการเชื่อมต่อ</h3>
+                        <p id="connStatus" class="text-sm font-bold text-green-600 pt-2 flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> พร้อมใช้งาน
+                        </p>
                     </div>
                 </div>
 
@@ -212,9 +214,13 @@
         // Initialize Icons
         lucide.createIcons();
 
-        function showLoading(show) {
+        function showLoading(show, message) {
             const overlay = document.getElementById('overlay');
-            if (overlay) overlay.style.display = show ? 'flex' : 'none';
+            const text = overlay.querySelector('p');
+            if (overlay) {
+                overlay.style.display = show ? 'flex' : 'none';
+                if (message) text.innerText = message;
+            }
         }
 
         function switchTab(tab) {
@@ -241,7 +247,14 @@
         }
 
         function updateSummary() {
-            showLoading(true);
+            showLoading(true, "กำลังโหลดข้อมูลสรุป...");
+           
+            // ป้องกัน Error หาก google.script ยังไม่พร้อม
+            if (typeof google === 'undefined' || !google.script) {
+                setTimeout(updateSummary, 500);
+                return;
+            }
+
             google.script.run
                 .withSuccessHandler(summary => {
                     showLoading(false);
@@ -252,7 +265,7 @@
                 })
                 .withFailureHandler(err => {
                     showLoading(false);
-                    showModal("Error", "ไม่สามารถดึงข้อมูลสรุปได้: " + err);
+                    showModal("ข้อผิดพลาด", "ไม่สามารถดึงข้อมูลสรุปได้: " + err);
                 })
                 .getStockSummary();
         }
@@ -261,7 +274,7 @@
             const query = document.getElementById('itemSearch').value;
             if (!query) return showModal("คำเตือน", "กรุณาระบุคำค้นหา");
 
-            showLoading(true);
+            showLoading(true, "กำลังค้นหาข้อมูล...");
             google.script.run
                 .withSuccessHandler(summary => {
                     showLoading(false);
@@ -308,14 +321,6 @@
                                     <p class="text-3xl font-bold text-gray-600">${item.In}</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2">
-                                <button class="flex-1 btn-gradient py-3 text-white rounded-xl shadow-md">
-                                    <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> เพิ่มสต็อก (Stock In)
-                                </button>
-                                <button class="flex-1 border-2 border-pink-100 text-pink-500 py-3 rounded-xl hover:bg-pink-50">
-                                    <i data-lucide="minus" class="inline w-4 h-4 mr-1"></i> เบิกสต็อก (Stock Out)
-                                </button>
-                            </div>
                         `;
                         lucide.createIcons();
                     } else {
@@ -330,7 +335,7 @@
         }
 
         function loadInventory() {
-            showLoading(true);
+            showLoading(true, "กำลังโหลดรายการพัสดุ...");
             google.script.run
                 .withSuccessHandler(summary => {
                     showLoading(false);
@@ -368,10 +373,13 @@
                 .getStockSummary();
         }
 
-        // Run summary on load
-        window.onload = function() {
-            updateSummary();
-        };
+        // ฟังก์ชันหลักที่รันตอนโหลด
+        window.addEventListener('load', function() {
+            // หน่วงเวลาเล็กน้อยเพื่อให้ API ของ Google Apps Script พร้อมใช้งานจริง
+            setTimeout(function() {
+                updateSummary();
+            }, 800);
+        });
     </script>
 </body>
 </html>

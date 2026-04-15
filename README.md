@@ -28,7 +28,7 @@
 
 #### 1. Clone Repository
 ```bash
-git clone https://github.com/yourusername/IT-Service-Management.git
+git clone https://dakdan.github.io/stock_it_app/
 cd IT-Service-Management
 
 2. เตรียม Google Sheet

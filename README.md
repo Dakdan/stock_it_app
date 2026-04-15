@@ -1,6 +1,6 @@
-# 🏥 IT Service&Mainternance System
+# 🏥 IT Stock System
 
-ระบบจัดการงานบริการและซ่อมบำรุงอุปกรณ์คอมพิวเตอร์ IT ที่เชื่อมต่อกับ Google Sheet
+ระบบบริหารจัดการคลังอะไหล่คอมพิวเตอร์ IT ที่เชื่อมต่อกับ Google Sheet
 
 [![GitHub](https://img.shields.io/badge/GitHub-IT--Service--Management-blue)](https://github.com/yourusername/IT-Service-Management)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)

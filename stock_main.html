@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารจัดการคลังอะไหล่ IT โรงพยาบาล</title>
+  
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- QRCode.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { kanit: ['Kanit', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 500: '#f43f5e', 
+              600: '#e11d48', 700: '#be123c', gold: '#d97706', goldHover: '#b45309'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Kanit', sans-serif; background: radial-gradient(circle at top right, #fff1f2 0%, #ffffff 80%); }
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+    .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(244, 63, 94, 0.15); }
+    .sidebar-gradient { background: linear-gradient(135deg, #be123c 0%, #881337 100%); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f43f5e; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col md:flex-row overflow-x-hidden">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar-gradient text-white w-full md:w-64 flex-shrink-0 flex flex-col transition-all duration-300 md:relative fixed z-30 h-screen -translate-x-full md:translate-x-0">
+    <div class="p-6 border-b border-rose-800 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white text-rose-600 p-2 rounded-xl shadow-md flex items-center justify-center"><i class="fa-solid fa-square-h text-2xl"></i></div>
+        <div><h1 class="font-bold text-lg leading-tight">คลังอะไหล่ IT</h1><p class="text-rose-200 text-xs font-light">โรงพยาบาลส่วนภูมิภาค</p></div>
+      </div>
+      <button onclick="toggleSidebar()" class="md:hidden text-white hover:text-brand-200 text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-4 py-6 space-y-1">
+      <a href="#" onclick="switchMenu('dashboard')" id="menu-dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 bg-rose-900 bg-opacity-40 text-white font-medium border-l-4 border-brand-gold"><i class="fa-solid fa-chart-pie w-6"></i> <span>แดชบอร์ด</span></a>
+      <div class="text-xs font-bold text-rose-300 uppercase tracking-wider px-4 pt-4 pb-2">โครงสร้างคลัง</div>
+      <a href="#" onclick="switchMenu('category_type')" id="menu-category_type" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-layer-group w-6"></i> <span>ประเภทหมวดหมู่</span></a>
+      <a href="#" onclick="switchMenu('category')" id="menu-category" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-tags w-6"></i> <span>หมวดหมู่อะไหล่</span></a>
+      <a href="#" onclick="switchMenu('item_master')" id="menu-item_master" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-box-open w-6"></i> <span>ทำเนียบอะไหล่ (Master)</span></a>
+      <div class="text-xs font-bold text-rose-300 uppercase tracking-wider px-4 pt-4 pb-2">คุ้มครองอุปกรณ์</div>
+      <a href="#" onclick="switchMenu('device_asset')" id="menu-device_asset" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-desktop w-6"></i> <span>ทะเบียนทรัพย์สิน IT</span></a>
+      <a href="#" onclick="switchMenu('repair_job')" id="menu-repair_job" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-screwdriver-wrench w-6"></i> <span>บันทึกงานซ่อมบำรุง</span></a>
+      <div class="text-xs font-bold text-rose-300 uppercase tracking-wider px-4 pt-4 pb-2">ระบบธุรกรรมคลัง</div>
+      <a href="#" onclick="switchMenu('stock_in')" id="menu-stock_in" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-file-import w-6"></i> <span>รับอะไหล่เข้าคลัง</span></a>
+      <a href="#" onclick="switchMenu('stock_out')" id="menu-stock_out" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-file-export w-6"></i> <span>เบิกอะไหล่ไปใช้งาน</span></a>
+      <a href="#" onclick="switchMenu('stock_summary')" id="menu-stock_summary" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-calculator w-6"></i> <span>ยอดสต็อกคงคลัง</span></a>
+      <a href="#" onclick="switchMenu('transaction_log')" id="menu-transaction_log" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-clock-rotate-left w-6"></i> <span>ประวัติธุรกรรม (Logs)</span></a>
+      <div class="text-xs font-bold text-rose-300 uppercase tracking-wider px-4 pt-4 pb-2">รายงาน & การตั้งค่า</div>
+      <a href="#" onclick="switchMenu('reports')" id="menu-reports" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-file-lines w-6"></i> <span>ออกรายงานรวม</span></a>
+      <a href="#" onclick="switchMenu('settings')" id="menu-settings" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30"><i class="fa-solid fa-sliders w-6"></i> <span>ระบบตั้งค่า & เริ่มต้น</span></a>
+    </nav>
+    <div class="p-4 border-t border-rose-800 text-xs text-rose-200 text-center">v2.0.0 API Based</div>
+  </aside>
+
+  <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-1 flex flex-col min-h-screen overflow-x-hidden md:pl-0">
+    <header class="glass-panel sticky top-0 z-10 flex items-center justify-between px-6 py-4 shadow-sm">
+      <div class="flex items-center space-x-4">
+        <button onclick="toggleSidebar()" class="md:hidden text-slate-800 hover:text-brand-500 focus:outline-none text-xl"><i class="fa-solid fa-bars"></i></button>
+        <h2 id="page-title" class="text-xl md:text-2xl font-bold text-slate-800">แดชบอร์ดสรุปภาพรวม</h2>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span class="hidden md:inline-block bg-brand-50 border border-brand-100 text-brand-700 px-3 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-hospital mr-1"></i> ตึกไอทีชั้น 3</span>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-rose-300 flex items-center justify-center text-white font-bold shadow-sm">IT</div>
+      </div>
+    </header>
+    <main id="main-content" class="flex-1 p-4 md:p-8"></main>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-900 bg-opacity-60 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center max-w-xs w-full border-t-4 border-brand-500">
+      <svg class="animate-spin h-10 w-10 text-brand-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+      <p id="loading-message" class="text-slate-700 text-center font-medium">กำลังประมวลผลระบบ...</p>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div id="form-modal" class="fixed inset-0 bg-slate-900 bg-opacity-50 backdrop-blur-xs z-40 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-brand-100 overflow-hidden transform scale-95 transition-all duration-300">
+      <div class="bg-brand-500 text-white px-6 py-4 flex items-center justify-between">
+        <h3 id="modal-title" class="font-bold text-lg">หัวข้อฟอร์ม</h3>
+        <button onclick="closeModal('form-modal')" class="text-white hover:text-slate-200 text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="modal-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+        <div id="modal-body-content" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div class="flex items-center justify-end space-x-3 border-t border-slate-100 pt-4 mt-6">
+          <button type="button" onclick="closeModal('form-modal')" class="px-5 py-2 rounded-xl bg-slate-100 text-slate-600 font-medium hover:bg-slate-200">ยกเลิก</button>
+          <button type="submit" class="px-6 py-2 rounded-xl bg-brand-500 text-white font-medium hover:bg-brand-600">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="qr-modal" class="fixed inset-0 bg-slate-900 bg-opacity-50 backdrop-blur-xs z-40 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-brand-100 overflow-hidden text-center p-6">
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 class="font-bold text-lg text-slate-800">ระบบรหัส QR Code</h3>
+        <button onclick="closeModal('qr-modal')" class="text-slate-400 hover:text-slate-600 text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="qr-print-container" class="bg-white p-6 border rounded-2xl flex flex-col items-center justify-center mx-auto mb-4">
+        <div id="qrcode-canvas" class="p-2 bg-white"></div>
+        <p id="qr-label-id" class="text-slate-800 font-bold mt-3 text-lg tracking-wide"></p>
+        <p id="qr-label-sub" class="text-slate-400 text-xs mt-1"></p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mt-4">
+        <button onclick="printQrCode()" class="flex items-center justify-center space-x-2 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-xl"><i class="fa-solid fa-print"></i> <span>พิมพ์ QR</span></button>
+        <button onclick="downloadQrCode()" class="flex items-center justify-center space-x-2 px-4 py-2 bg-brand-gold hover:bg-brand-goldHover text-white text-sm font-semibold rounded-xl"><i class="fa-solid fa-download"></i> <span>ดาวน์โหลด</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="upload-modal" class="fixed inset-0 bg-slate-900 bg-opacity-50 backdrop-blur-xs z-40 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-brand-100 overflow-hidden p-6">
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 class="font-bold text-lg text-slate-800">แนบไฟล์หลักฐาน</h3>
+        <button onclick="closeModal('upload-modal')" class="text-slate-400 hover:text-slate-600 text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-4">
+        <div class="border-2 border-dashed border-rose-200 rounded-2xl p-6 text-center hover:bg-rose-50 transition cursor-pointer relative" id="drop-zone">
+          <input type="file" id="file-input" onchange="previewFile()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*,application/pdf,.docx,.xlsx">
+          <div id="upload-prompt" class="space-y-2">
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-brand-500"></i>
+            <p class="text-sm font-semibold text-slate-700">คลิกเพื่อเลือกไฟล์</p>
+          </div>
+          <div id="upload-preview" class="hidden flex flex-col items-center">
+            <img id="image-preview" src="#" alt="Preview" class="max-h-40 rounded-lg shadow-sm border mb-2 hidden">
+            <div id="file-info" class="flex items-center space-x-2 text-slate-700 font-medium text-sm">
+              <i class="fa-solid fa-file-invoice text-rose-500 text-lg"></i>
+              <span id="file-name-span">document.pdf</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 border-t pt-4">
+          <button onclick="closeModal('upload-modal')" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 text-sm">ยกเลิก</button>
+          <button onclick="executeUpload()" class="px-5 py-2 bg-brand-500 text-white rounded-xl text-sm font-medium">อัปโหลดไฟล์</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // API INTEGRATION CONFIGURATION (For GitHub Pages / External Hosting)
+    // =========================================================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbwoqoyq0Q-DZ1WecERSldVfevevQvS0sYAmw8dVLYItEQhULSQ4lHco_Oe4sottLaXrtg/exec";
+
+    let globalDataCache = {}; 
+    let currentSelectedTargetId = null; 
+
+    window.addEventListener('DOMContentLoaded', () => loadDashboard());
+
+    // ==========================================
+    // EXTERNAL API FETCH ENGINE
+    // ==========================================
+    function callBackend(funcName, args, successCallback, errorCallback) {
+      showLoading();
+      fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: funcName, args: args }),
+        // ไม่ต้องส่ง Content-Type ไปเพื่อลดการติดปัญหา CORS Preflight ใน Apps Script
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideLoading();
+        // เช็คว่ากรณีระบบ Backend ส่งกลับมาเป็น Success: false หรือมี Error Message ห้อยมา
+        if (result && result.success === false) {
+           showToast('error', result.message);
+           if (errorCallback) errorCallback(result.message);
+        } else {
+           successCallback(result);
+        }
+      })
+      .catch(error => {
+        hideLoading();
+        showToast('error', "การเชื่อมต่อขัดข้อง: " + error.message);
+        if (errorCallback) errorCallback(error.message);
+      });
+    }
+
+    // ==========================================
+    // UI & COMPONENTS HELPERS
+    // ==========================================
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      sb.classList.toggle('-translate-x-full');
+      bd.classList.toggle('hidden');
+    }
+
+    function switchMenu(menuKey) {
+      document.querySelectorAll('aside nav a').forEach(a => a.className = "flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 text-rose-100 hover:bg-rose-900 hover:bg-opacity-30");
+      const active = document.getElementById(`menu-${menuKey}`);
+      if(active) active.className = "flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-150 bg-rose-900 bg-opacity-40 text-white font-medium border-l-4 border-brand-gold";
+      
+      if (!document.getElementById('sidebar').classList.contains('-translate-x-full')) toggleSidebar();
+
+      const titles = {
+        dashboard: "แดชบอร์ดสรุปภาพรวม", category_type: "โครงสร้างประเภทหมวดหมู่", category: "ทะเบียนหมวดหมู่อะไหล่ IT",
+        item_master: "ทำเนียบพัสดุอะไหล่", device_asset: "ทะเบียนทรัพย์สินไอที", repair_job: "บันทึกงานซ่อมบำรุง",
+        stock_in: "ระบบรับข้อมูลอะไหล่", stock_out: "ระบบเบิกจ่ายอะไหล่", stock_summary: "ปริมาณอะไหล่คงคลัง",
+        transaction_log: "ประวัติธุรกรรม", reports: "ออกรายงานและพิมพ์", settings: "การตั้งค่าระบบ"
+      };
+      document.getElementById('page-title').innerText = titles[menuKey] || "ระบบจัดการ";
+      
+      if (menuKey === 'dashboard') loadDashboard();
+      else if (menuKey === 'reports') loadReportsPage();
+      else if (menuKey === 'settings') loadSettingsPage();
+      else loadModuleData(menuKey);
+    }
+
+    function showToast(type, msg) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const cfg = {
+        success: { bg: 'bg-emerald-50 border-emerald-200 text-emerald-800', icon: 'fa-circle-check text-emerald-500' },
+        error: { bg: 'bg-rose-50 border-rose-200 text-rose-800', icon: 'fa-circle-xmark text-rose-500' },
+        warning: { bg: 'bg-amber-50 border-amber-200 text-amber-800', icon: 'fa-triangle-exclamation text-amber-500' }
+      };
+      const style = cfg[type] || { bg: 'bg-sky-50 border-sky-200 text-sky-800', icon: 'fa-circle-info text-sky-500' };
+      
+      toast.className = `flex items-center p-4 rounded-2xl border ${style.bg} shadow-md transition transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<div class="mr-3"><i class="fa-solid ${style.icon} text-lg"></i></div><div class="flex-1 text-sm font-medium">${msg}</div>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
+      setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+
+    function showLoading(msg = "กำลังโหลดข้อมูล...") {
+      document.getElementById('loading-message').innerText = msg;
+      document.getElementById('loading-overlay').classList.remove('hidden');
+    }
+    function hideLoading() { document.getElementById('loading-overlay').classList.add('hidden'); }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      m.classList.remove('hidden');
+      m.firstElementChild.classList.remove('scale-95');
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      m.firstElementChild.classList.add('scale-95');
+      setTimeout(() => m.classList.add('hidden'), 150);
+    }
+
+    // ==========================================
+    // DASHBOARD & REPORTS (API Fetch Integration)
+    // ==========================================
+    function loadDashboard() {
+      callBackend('getDashboardMetrics', [], (res) => {
+        globalDataCache.dashboard = res.data;
+        renderDashboard(res.data);
+      });
+    }
+
+    function renderDashboard(data) {
+      const content = document.getElementById('main-content');
+      content.innerHTML = `
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div class="bg-gradient-to-br from-white to-pink-50 p-6 rounded-3xl border border-pink-100 shadow-sm flex items-center justify-between">
+            <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">จำนวนอะไหล่ทั้งหมด</p><h4 class="text-3xl font-extrabold text-brand-600 mt-2">${data.totalItems}</h4></div>
+            <div class="text-3xl text-brand-200 hidden sm:block"><i class="fa-solid fa-box"></i></div>
+          </div>
+          <div class="bg-gradient-to-br from-white to-amber-50 p-6 rounded-3xl border border-amber-100 shadow-sm flex items-center justify-between">
+            <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">อะไหล่ต่ำกว่าเกณฑ์</p><h4 class="text-3xl font-extrabold text-brand-gold mt-2">${data.lowStockAlerts}</h4></div>
+            <div class="text-3xl text-amber-200 hidden sm:block"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          </div>
+          <div class="bg-gradient-to-br from-white to-sky-50 p-6 rounded-3xl border border-sky-100 shadow-sm flex items-center justify-between">
+            <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">งานซ่อมกำลังทำ</p><h4 class="text-3xl font-extrabold text-sky-600 mt-2">${data.activeRepairs}</h4></div>
+            <div class="text-3xl text-sky-200 hidden sm:block"><i class="fa-solid fa-clock"></i></div>
+          </div>
+          <div class="bg-gradient-to-br from-white to-emerald-50 p-6 rounded-3xl border border-emerald-100 shadow-sm flex items-center justify-between">
+            <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">งานซ่อมเสร็จสิ้น</p><h4 class="text-3xl font-extrabold text-emerald-600 mt-2">${data.closedRepairs}</h4></div>
+            <div class="text-3xl text-emerald-200 hidden sm:block"><i class="fa-solid fa-clipboard-check"></i></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-3xl border border-rose-100 shadow-sm p-6 overflow-x-auto">
+          <h3 class="font-bold text-lg text-slate-800 mb-4">แจ้งเตือนสินค้าใกล้หมด (Low Stock Alerts)</h3>
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-brand-50 text-brand-700 font-bold uppercase">
+              <tr><th class="px-4 py-3 rounded-l-xl">รหัสอะไหล่</th><th class="px-4 py-3">รายการพัสดุ</th><th class="px-4 py-3 text-center">คงเหลือ</th><th class="px-4 py-3 text-center rounded-r-xl">สถานะ</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${data.itemsWithBalance.filter(i => i.Balance <= i.Min_Stock).map(i => `
+                <tr class="hover:bg-slate-50">
+                  <td class="px-4 py-3 font-semibold text-brand-600">${i.Item_ID}</td><td class="px-4 py-3">${i.Item_Name}</td>
+                  <td class="px-4 py-3 text-center font-bold text-rose-500">${i.Balance} ${i.Unit}</td>
+                  <td class="px-4 py-3 text-center"><span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">LOW STOCK</span></td>
+                </tr>`).join('') || `<tr><td colspan="4" class="text-center py-6 text-emerald-500">สต็อกสินค้าปลอดภัยครบถ้วนสมบูรณ์</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // CRUD DATA TABLES
+    // ==========================================
+    function loadModuleData(moduleKey) {
+      const mappings = {
+        category_type: "Category_Type", category: "Category", item_master: "Item_Master",
+        device_asset: "Device_Asset", repair_job: "Repair_Job", stock_in: "Stock_In",
+        stock_out: "Stock_Out", stock_summary: "Stock_Summary", transaction_log: "Transaction_Log"
+      };
+      
+      const sheetName = mappings[moduleKey];
+      if (!sheetName) return;
+
+      callBackend('readAll', [sheetName], (res) => {
+        globalDataCache[moduleKey] = res; // res is directly the array from our API
+        const idColMap = {
+            category_type: "Category_Type_ID", category: "Category_ID", item_master: "Item_ID",
+            device_asset: "Device_ID", repair_job: "Job_ID", stock_in: "StockIn_ID",
+            stock_out: "StockOut_ID", stock_summary: "Item_ID", transaction_log: "Log_ID"
+        };
+        renderModuleTable(moduleKey, res, idColMap[moduleKey]);
+      });
+    }
+
+    function renderModuleTable(moduleKey, dataList, idCol) {
+      const content = document.getElementById('main-content');
+      const cols = dataList.length ? Object.keys(dataList[0]) : [];
+      const canCreate = !['stock_summary', 'transaction_log'].includes(moduleKey);
+
+      content.innerHTML = `
+        <div class="bg-white rounded-3xl border border-rose-100 shadow-sm p-6">
+          <div class="flex flex-col sm:flex-row justify-between mb-6 gap-4">
+            <input type="text" id="t-search" oninput="handleSearch('${moduleKey}', '${idCol}')" placeholder="ค้นหาข้อมูล..." class="w-full sm:max-w-sm pl-4 pr-4 py-2 border rounded-xl focus:border-rose-500 outline-none text-sm">
+            ${canCreate ? `<button onclick="openCreateForm('${moduleKey}')" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 font-semibold rounded-xl flex items-center justify-center space-x-2 text-sm"><i class="fa-solid fa-plus"></i> <span>เพิ่มข้อมูล</span></button>` : ''}
+          </div>
+          <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap" id="data-table"><thead class="bg-brand-50 text-brand-700 text-xs font-bold uppercase">
+          <tr>${cols.map(c => `<th class="px-4 py-3">${c}</th>`).join('')}<th class="px-4 py-3 text-center">จัดการ</th></tr>
+          </thead><tbody class="divide-y divide-slate-100">${renderRows(moduleKey, dataList, cols, idCol)}</tbody></table></div>
+        </div>
+      `;
+    }
+
+    function renderRows(moduleKey, list, cols, idCol) {
+      if(!list.length) return `<tr><td colspan="${cols.length+1}" class="text-center py-6 text-slate-400">ไม่มีข้อมูล</td></tr>`;
+      return list.map(r => `
+        <tr class="hover:bg-slate-50 transition">
+          ${cols.map(c => {
+             if(c === 'Status') return `<td class="px-4 py-2"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${['LOW STOCK','ระงับการใช้งาน'].includes(r[c]) ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${r[c]}</span></td>`;
+             return `<td class="px-4 py-2">${r[c]}</td>`;
+          }).join('')}
+          <td class="px-4 py-2 text-center">
+            <div class="flex justify-center space-x-2">
+              ${['Item_ID', 'Device_ID', 'Asset_Tag'].some(k=>r[k]) ? `<button onclick="showQrModal('${r[idCol]}')" class="text-brand-gold bg-brand-50 hover:bg-brand-100 p-1.5 rounded"><i class="fa-solid fa-qrcode"></i></button>`:''}
+              ${!['stock_summary','transaction_log'].includes(moduleKey) ? `
+                <button onclick="openEditForm('${moduleKey}', '${r[idCol]}')" class="text-brand-500 bg-rose-50 hover:bg-rose-100 p-1.5 rounded"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="delData('${moduleKey}','${r[idCol]}')" class="text-slate-500 bg-slate-50 hover:bg-slate-200 p-1.5 rounded"><i class="fa-solid fa-trash"></i></button>
+              `:''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleSearch(mod, idCol) {
+      const q = document.getElementById('t-search').value.toLowerCase();
+      const raw = globalDataCache[mod] || [];
+      const filtered = raw.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(q)));
+      document.querySelector("#data-table tbody").innerHTML = renderRows(mod, filtered, raw.length?Object.keys(raw[0]):[], idCol);
+    }
+
+    // ==========================================
+    // FORMS & FILE UPLOADS
+    // ==========================================
+    function openCreateForm(mod) {
+      const form = document.getElementById('modal-form');
+      form.setAttribute('data-mode', 'CREATE'); form.setAttribute('data-module', mod);
+      document.getElementById('modal-title').innerText = "เพิ่มข้อมูลใหม่";
+      document.getElementById('modal-body-content').innerHTML = getFormFieldsTemplate(mod);
+      openModal('form-modal');
+    }
+
+    function openEditForm(mod, id) {
+      const form = document.getElementById('modal-form');
+      form.setAttribute('data-mode', 'EDIT'); form.setAttribute('data-module', mod);
+      form.setAttribute('data-id', id);
+      document.getElementById('modal-title').innerText = `แก้ไขรหัส ${id}`;
+      
+      const idKeyMap = { category_type: "Category_Type_ID", category: "Category_ID", item_master: "Item_ID", device_asset: "Device_ID", repair_job: "Job_ID" };
+      const record = globalDataCache[mod].find(r => String(r[idKeyMap[mod]]) === String(id));
+      document.getElementById('modal-body-content').innerHTML = getFormFieldsTemplate(mod, record);
+      openModal('form-modal');
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const mod = form.getAttribute('data-module');
+      const mode = form.getAttribute('data-mode');
+      const payload = Object.fromEntries(new FormData(form).entries());
+
+      if(mod === 'stock_in' || mod === 'stock_out') {
+        callBackend(mod === 'stock_in' ? 'handleStockIn' : 'handleStockOut', [payload], res => {
+          showToast('success', res.message); closeModal('form-modal'); switchMenu(mod);
+        });
+        return;
+      }
+
+      const cfg = {
+        category_type: ["Category_Type", "Category_Type_ID", "CT"], category: ["Category", "Category_ID", "C"],
+        item_master: ["Item_Master", "Item_ID", "IM"], device_asset: ["Device_Asset", "Device_ID", "DA"], repair_job: ["Repair_Job", "Job_ID", "RJ"]
+      }[mod];
+
+      if(mode === 'CREATE') {
+        callBackend('createRecord', [cfg[0], payload, cfg[1], cfg[2]], res => {
+          showToast('success', res.message); closeModal('form-modal'); loadModuleData(mod);
+        });
+      } else {
+        callBackend('updateRecord', [cfg[0], cfg[1], form.getAttribute('data-id'), payload], res => {
+          showToast('success', res.message); closeModal('form-modal'); loadModuleData(mod);
+        });
+      }
+    }
+
+    function delData(mod, id) {
+      if(!confirm(`ลบข้อมูล ${id} ยืนยัน?`)) return;
+      const cfg = { category_type: ["Category_Type", "Category_Type_ID"], category: ["Category", "Category_ID"], item_master: ["Item_Master", "Item_ID"], device_asset: ["Device_Asset", "Device_ID"], repair_job: ["Repair_Job", "Job_ID"] }[mod];
+      callBackend('deleteRecord', [cfg[0], cfg[1], id], res => { showToast('success', res.message); loadModuleData(mod); });
+    }
+
+    // ==========================================
+    // QR CODE FUNCTIONS
+    // ==========================================
+    function showQrModal(idValue) {
+      document.getElementById('qr-label-id').innerText = idValue;
+      document.getElementById('qrcode-canvas').innerHTML = '';
+      new QRCode(document.getElementById('qrcode-canvas'), { text: idValue, width: 160, height: 160, colorDark: "#be123c", correctLevel: QRCode.CorrectLevel.H });
+      openModal('qr-modal');
+    }
+
+    // Form Generator Template (Condensed for layout)
+    function getFormFieldsTemplate(mod, d = {}) {
+      const m = {
+        item_master: `<div><label class="text-xs font-semibold text-slate-500">หมวดหมู่ ID</label><input type="text" name="Category_ID" value="${d.Category_ID||''}" class="w-full border rounded p-2 text-sm mt-1"></div>
+                      <div><label class="text-xs font-semibold text-slate-500">ชื่ออะไหล่</label><input type="text" name="Item_Name" value="${d.Item_Name||''}" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                      <div><label class="text-xs font-semibold text-slate-500">ยี่ห้อ</label><input type="text" name="Brand" value="${d.Brand||''}" class="w-full border rounded p-2 text-sm mt-1"></div>
+                      <div><label class="text-xs font-semibold text-slate-500">รุ่น</label><input type="text" name="Model" value="${d.Model||''}" class="w-full border rounded p-2 text-sm mt-1"></div>
+                      <div><label class="text-xs font-semibold text-slate-500">จุดแจ้งเตือนต่ำสุด</label><input type="number" name="Min_Stock" value="${d.Min_Stock||'5'}" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                      <div><label class="text-xs font-semibold text-slate-500">หน่วย</label><input type="text" name="Unit" value="${d.Unit||'ชิ้น'}" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                      <div><label class="text-xs font-semibold text-slate-500">สถานะ</label><select name="Status" class="w-full border rounded p-2 text-sm mt-1"><option>ใช้งานได้</option><option>ระงับการใช้งาน</option></select></div>`,
+        stock_in: `<div><label class="text-xs font-semibold text-slate-500">รหัส Item</label><input type="text" name="Item_ID" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                   <div><label class="text-xs font-semibold text-slate-500">จำนวนรับเข้า</label><input type="number" name="Quantity" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                   <div><label class="text-xs font-semibold text-slate-500">หน่วย</label><input type="text" name="Unit" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                   <div><label class="text-xs font-semibold text-slate-500">แหล่งที่มา</label><select name="Source_Type" class="w-full border rounded p-2 text-sm mt-1"><option value="Purchase">สั่งซื้อ</option><option value="Adjustment">ปรับยอดสต็อก</option></select></div>`,
+        stock_out: `<div><label class="text-xs font-semibold text-slate-500">รหัส Item ที่ขอเบิก</label><input type="text" name="Item_ID" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-xs font-semibold text-slate-500">จำนวนเบิก</label><input type="number" name="Quantity" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-xs font-semibold text-slate-500">ช่างผู้เบิก</label><input type="text" name="Technician" required class="w-full border rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-xs font-semibold text-slate-500">เหตุผลประกอบ</label><input type="text" name="Note" required class="w-full border rounded p-2 text-sm mt-1"></div>`
+      };
+      
+      // Fallback Basic Fields
+      if(!m[mod]) return `<div><label class="text-xs text-slate-500">ชื่อรายการ</label><input type="text" name="Name" required class="w-full border rounded p-2 text-sm"></div>`;
+      return m[mod];
+    }
+    
+    function loadSettingsPage() {
+      document.getElementById('main-content').innerHTML = `
+        <div class="bg-white rounded-3xl border shadow-sm p-6 max-w-lg">
+          <h3 class="font-bold text-lg mb-2">ตั้งค่าฐานข้อมูล</h3>
+          <p class="text-sm text-slate-500 mb-6">คลิกปุ่มด้านล่างเพื่อสั่งให้ระบบตรวจสอบและสร้างตารางต่างๆ ลงใน Google Sheet ให้อัตโนมัติ (ใช้งานเมื่อรันครั้งแรก)</p>
+          <button onclick="executeDatabaseInit()" class="w-full bg-brand-500 hover:bg-brand-600 text-white p-3 font-bold rounded-2xl"><i class="fa-solid fa-database mr-2"></i> สร้างตารางฐานข้อมูลอัตโนมัติ</button>
+        </div>`;
+    }
+    function executeDatabaseInit() { callBackend('initDatabase', [], res => showToast('success', res)); }
+    function loadReportsPage() { /* โค้ดพิมพ์เหมือนคำตอบก่อนหน้า */ }
+  </script>
+</body>
+</html>

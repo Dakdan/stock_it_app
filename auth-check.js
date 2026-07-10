@@ -97,8 +97,8 @@ function logout() {
     localStorage.removeItem('currentUser');
     sessionStorage.clear();
     try {
-        window.location.replace("index.html"); // ใช้ replace เพื่อไม่ให้กด Back กลับมาได้
+        window.location.replace("https://dakdan.github.io/it_login/index.html"); // ใช้ replace เพื่อไม่ให้กด Back กลับมาได้
     } catch(e) {
-        window.location.href = "index.html"; // Fallback กรณี Browser ไม่รองรับ replace
+        window.location.href = "https://dakdan.github.io/it_login/index.html"; // Fallback กรณี Browser ไม่รองรับ replace
     }
 }

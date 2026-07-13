@@ -792,12 +792,9 @@
     function viewItemDetail(itemId) {
       const item = state.itemMaster.find(i => i.Item_ID === itemId);
       if (!item) return;
-
       const sumObj = state.stockSummary.find(s => s.Item_ID === itemId);
-      // แก้ไขการดึงค่า Balance ให้ครอบคลุมทุกชื่อคอลัมน์ที่มีโอกาสเกิดขึ้น
-      const balance = sumObj ? (sumObj.Balance || sumObj.Balanec || 0) : 0;
+      const balance = sumObj ? sumObj.Balance : 0;
       const cat = state.categories.find(c => c.Category_ID === item.Category_ID);
-
       const itemLogs = state.transactionLogs.filter(l => l.Item_ID === itemId).slice(-5).reverse();
 
       const title = `รายละเอียดอะไหล่ ID: ${item.Item_ID}`;
@@ -820,10 +817,382 @@
             </div>
           </div>
           <div class="text-center flex flex-col justify-between bg-pink-50/50 p-5 rounded-2xl border border-pink-100">
-            <div>
-              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ยอดสต็อกคงคลังปัจจุบัน</p>
-              <h2 class="text-4xl font-extrabold text-brandPink-600 mt-2">${balance} <span class="text-xs font-medium text-slate-500">${item.Unit}</span></h2>
-              <span class="text-[10px] text-slate-400 block mt-1">จุดเตือนพัสดุต่ำสุด: ${item.Min_Stock} ${item.Unit}</span>
+            <div><p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ยอดสต็อกคงคลังปัจจุบัน</p><h2 class="text-4xl font-extrabold text-brandPink-600 mt-2">${balance} <span class="text-xs font-medium text-slate-500">${item.Unit}</span></h2><span class="text-[10px] text-slate-400 block mt-1">จุดเตือนพัสดุต่ำสุด: ${item.Min_Stock} ${item.Unit}</span></div>
+            <div class="flex flex-col items-center my-4"><div id="modalQRDiv" class="p-2 bg-white rounded-xl border shadow-sm"></div><p class="text-[10px] text-slate-500 font-bold mt-2">${item.Item_ID}</p></div>
+            <div class="flex space-x-2"><button onclick="generateQRCode('${item.Item_ID}')" class="flex-1 py-2 bg-brandPink-500 hover:bg-brandPink-600 text-white font-bold text-xs rounded-xl transition"><i class="fa-solid fa-qrcode mr-1"></i> พิมพ์ QR</button></div>
+          </div>
+        </div>
+      `;
+      const footerHTML = `<button onclick="closeModal('dynamicModal')" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition">ปิดหน้าต่าง</button>`;
+      showModal(title, bodyHTML, footerHTML);
+      setTimeout(() => { new QRCode(document.getElementById('modalQRDiv'), { text: item.Item_ID, width: 100, height: 100, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H }); }, 100);
+    }
+
+    // ========================================== CATEGORY TYPE VIEW ==========================================
+    function renderCategoryType(target) {
+      const items = state.categoryTypes;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-2"><input type="text" id="catTypeSearch" oninput="filterTable('catTypeTable', this.value)" placeholder="ค้นหาหมวดหมู่หลัก..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64"></div>
+            <button onclick="openCategoryTypeForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10"><i class="fa-solid fa-plus mr-1.5"></i> เพิ่มประเภทหมวดหมู่</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="catTypeTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold"><tr><th class="p-4">ID ประเภท</th><th class="p-4">ชื่อประเภท</th><th class="p-4">คำอธิบาย</th><th class="p-4">สถานะ</th><th class="p-4 text-right">ดำเนินการ</th></tr></thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700">${item.Category_Type_ID}</td><td class="p-4 font-semibold text-slate-800">${item.Category_Type_Name}</td><td class="p-4 text-slate-500">${item.Description || '-'}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.Status === 'ใช้งาน' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${item.Status || 'ใช้งาน'}</span></td><td class="p-4 text-right space-x-1"><button onclick="openCategoryTypeForm('${item.Category_Type_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteRow('Category_Type', '${item.Category_Type_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลประเภทหมวดหมู่</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openCategoryTypeForm(id = null) {
+      if (!requireLogin()) return;
+      const isEdit = !!id;
+      const record = isEdit ? state.categoryTypes.find(c => c.Category_Type_ID === id) : null;
+      const title = isEdit ? "แก้ไขประเภทหมวดหมู่" : "เพิ่มประเภทหมวดหมู่หลัก";
+      const bodyHTML = `
+        <form id="catTypeForm" class="space-y-4">
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อประเภทหมวดหมู่หลัก <span class="text-red-500">*</span></label><input type="text" name="Category_Type_Name" value="${record ? record.Category_Type_Name : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">คำอธิบาย</label><textarea name="Description" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Description : ''}</textarea></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">สถานะ <span class="text-red-500">*</span></label><select name="Status" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="ใช้งาน" ${record && record.Status === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option><option value="ระงับการใช้งาน" ${record && record.Status === 'ระงับการใช้งาน' ? 'selected' : ''}>ระงับการใช้งาน</option></select></div>
+        </form>
+      `;
+      const footerHTML = `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button><button onclick="saveCategoryType('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูล</button>`;
+      showModal(title, bodyHTML, footerHTML);
+    }
+
+    function saveCategoryType(id) {
+      if (!requireLogin()) return;
+      const form = document.getElementById('catTypeForm');
+      if (!form.reportValidity()) return;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      showLoading("กำลังประมวลผลระบบ...");
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Category_Type", "Category_Type_ID", id, data]);
+          else res = await apiCall('createRecord', ["Category_Type", data, "Category_Type_ID", "TYP"]);
+          hideLoading();
+          if (res.success) { closeModal('dynamicModal'); showToast(res.message, "success"); fetchSystemData(); } 
+          else { showToast(res.message, "danger"); }
+        } catch (err) { hideLoading(); showToast(err.message, "danger"); }
+      };
+      saveAction();
+    }
+
+    // ========================================== CATEGORY VIEW ==========================================
+    function renderCategory(target) {
+      const items = state.categories;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div><input type="text" id="catSearch" oninput="filterTable('catTable', this.value)" placeholder="ค้นหาหมวดหมู่ย่อย..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64"></div>
+            <button onclick="openCategoryForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10"><i class="fa-solid fa-plus mr-1.5"></i> เพิ่มหมวดหมู่ย่อย</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="catTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold"><tr><th class="p-4">ID หมวดหมู่</th><th class="p-4">ประเภทหลัก</th><th class="p-4">ชื่อหมวดหมู่ย่อย</th><th class="p-4">รายละเอียด</th><th class="p-4">สถานะ</th><th class="p-4 text-right">ดำเนินการ</th></tr></thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const parent = state.categoryTypes.find(pt => pt.Category_Type_ID === item.Category_Type_ID);
+                  return `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700">${item.Category_ID}</td><td class="p-4 font-medium text-slate-500">${parent ? parent.Category_Type_Name : '-'}</td><td class="p-4 font-semibold text-slate-800">${item.Category_Name}</td><td class="p-4 text-slate-500">${item.Description || '-'}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.Status === 'ใช้งาน' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${item.Status || 'ใช้งาน'}</span></td><td class="p-4 text-right space-x-1"><button onclick="openCategoryForm('${item.Category_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteRow('Category', '${item.Category_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                }).join('') || '<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลหมวดหมู่ย่อย</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openCategoryForm(id = null) {
+      if (!requireLogin()) return;
+      const isEdit = !!id;
+      const record = isEdit ? state.categories.find(c => c.Category_ID === id) : null;
+      const title = isEdit ? "แก้ไขหมวดหมู่ย่อย" : "เพิ่มหมวดหมู่ย่อย";
+      const bodyHTML = `
+        <form id="categoryForm" class="space-y-4">
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทหลัก (Category Type) <span class="text-red-500">*</span></label><select name="Category_Type_ID" id="categoryTypeSelect" required onchange="generateDefaultCategoryID()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">เลือกประเภทหมวดหมู่หลัก</option>${state.categoryTypes.map(pt => `<option value="${pt.Category_Type_ID}" ${record && record.Category_Type_ID === pt.Category_Type_ID ? 'selected' : ''}>${pt.Category_Type_Name}</option>`).join('')}</select></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">รหัสหมวดหมู่ (Category_ID) <span class="text-slate-400 font-normal">(คำนวณอัตโนมัติ)</span></label><input type="text" name="Category_ID" id="categoryIDInput" value="${record ? record.Category_ID : ''}" readonly class="w-full text-sm bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-xl text-slate-500 focus:outline-none"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อหมวดหมู่ย่อย <span class="text-red-500">*</span></label><input type="text" name="Category_Name" id="categoryNameInput" value="${record ? record.Category_Name : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น RAM DDR4, SSD SATA"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">คำอธิบาย</label><textarea name="Description" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Description : ''}</textarea></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">สถานะ <span class="text-red-500">*</span></label><select name="Status" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="ใช้งาน" ${record && record.Status === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option><option value="ระงับการใช้งาน" ${record && record.Status === 'ระงับการใช้งาน' ? 'selected' : ''}>ระงับการใช้งาน</option></select></div>
+        </form>
+      `;
+      const footerHTML = `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button><button onclick="saveCategory('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูล</button>`;
+      showModal(title, bodyHTML, footerHTML);
+      if (!isEdit) generateDefaultCategoryID();
+    }
+
+    function generateDefaultCategoryID() {
+      const typeSelect = document.getElementById('categoryTypeSelect');
+      const idInput = document.getElementById('categoryIDInput');
+      if (!typeSelect || !idInput) return;
+      const typeId = typeSelect.value;
+      if (!typeId) { idInput.value = ""; return; }
+      const count = state.categories.filter(c => c.Category_Type_ID === typeId).length;
+      idInput.value = `${typeId} - ${count + 1}`;
+    }
+
+    function saveCategory(id) {
+      if (!requireLogin()) return;
+      const form = document.getElementById('categoryForm');
+      if (!form.reportValidity()) return;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      const isDuplicate = state.categories.some(c => c.Category_ID !== id && c.Category_Type_ID === data.Category_Type_ID && c.Category_Name.trim().toLowerCase() === data.Category_Name.trim().toLowerCase());
+      if (isDuplicate) { showToast("ไม่สามารถเพิ่มได้เนื่องจากมีชื่อหมวดหมู่ย่อยนี้ในประเภทหมวดหมู่หลักนี้แล้ว", "warning"); return; }
+
+      showLoading("กำลังบันทึกข้อมูล...");
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Category", "Category_ID", id, data]);
+          else {
+            res = await apiCall('createRecord', ["Category", data, "Category_ID", "CAT"]);
+            if (res.success && res.id) await apiCall('updateRecord', ["Category", "Category_ID", res.id, { Category_ID: data.Category_ID }]);
+          }
+          hideLoading();
+          if (res.success) { closeModal('dynamicModal'); showToast("บันทึกหมวดหมู่อะไหล่สำเร็จ", "success"); fetchSystemData(); } 
+          else { showToast(res.message, "danger"); }
+        } catch (err) { hideLoading(); showToast(err.message, "danger"); }
+      };
+      saveAction();
+    }
+
+    // ========================================== ITEM MASTER VIEW ==========================================
+    function renderItemMaster(target) {
+      const items = state.itemMaster;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div><input type="text" id="itemSearch" oninput="filterTable('itemTable', this.value)" placeholder="ค้นหาอะไหล่..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64"></div>
+            <button onclick="openItemMasterForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10"><i class="fa-solid fa-plus mr-1.5"></i> เพิ่มรายการอะไหล่ IT ใหม่</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="itemTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold"><tr><th class="p-4">Item ID / QR</th><th class="p-4">หมวดหมู่</th><th class="p-4">ชื่อสินค้า</th><th class="p-4">ยี่ห้อ / รุ่น</th><th class="p-4">สเปคการใช้งาน</th><th class="p-4">การควบคุมคลัง</th><th class="p-4">จุดสั่งชื้อขั้นต่ำ</th><th class="p-4">สถานที่จัดเก็บ</th><th class="p-4 text-right">ดำเนินการ</th></tr></thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const cat = state.categories.find(c => c.Category_ID === item.Category_ID);
+                  const isSerialized = item.Status === "แบบรายชิ้น";
+                  return `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700 flex items-center space-x-2"><span>${item.Item_ID}</span><button onclick="generateQRCode('${item.Item_ID}')" class="text-brandPink-500 hover:text-brandPink-600" title="แสดง QR Code"><i class="fa-solid fa-qrcode"></i></button></td><td class="p-4 font-medium text-slate-500">${cat ? cat.Category_Name : '-'}</td><td class="p-4 font-semibold text-slate-800">${item.Item_Name}</td><td class="p-4 text-slate-700">${item.Brand} / ${item.Model}</td><td class="p-4 text-slate-500 max-w-xs truncate">${item.Specification || '-'}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${isSerialized ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}"><i class="${isSerialized ? 'fa-solid fa-barcode' : 'fa-solid fa-boxes-stacked'} mr-1"></i> ${item.Status || 'แบบกลุ่ม'}</span></td><td class="p-4 font-bold text-slate-800 text-center">${item.Min_Stock} ${item.Unit}</td><td class="p-4 text-slate-600">${item.Location}</td><td class="p-4 text-right space-x-1"><button onclick="openItemMasterForm('${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteRow('Item_Master', '${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                }).join('') || '<tr><td colspan="9" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลอะไหล่ไอทีในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openItemMasterForm(id = null) {
+      if (!requireLogin()) return;
+      const isEdit = !!id;
+      const record = isEdit ? state.itemMaster.find(item => item.Item_ID === id) : null;
+      let recordCategoryTypeID = "";
+      if (record) {
+        const recordCategory = state.categories.find(c => c.Category_ID === record.Category_ID);
+        if (recordCategory) recordCategoryTypeID = recordCategory.Category_Type_ID;
+      }
+      
+      const title = isEdit ? "แก้ไขข้อมูลอะไหล่ IT" : "เพิ่มข้อมูลอะไหล่ IT ใหม่";
+      const bodyHTML = `
+        <form id="itemMasterForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทหมวดหมู่หลัก <span class="text-red-500">*</span></label><select id="itemFormCategoryType" required onchange="filterItemFormCategories()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">เลือกประเภทหลัก</option>${state.categoryTypes.map(ct => `<option value="${ct.Category_Type_ID}" ${recordCategoryTypeID === ct.Category_Type_ID ? 'selected' : ''}>${ct.Category_Type_Name}</option>`).join('')}</select></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">หมวดหมู่อะไหล่ย่อย <span class="text-red-500">*</span></label><select name="Category_ID" id="itemFormCategory" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">กรุณาเลือกประเภทหลักก่อน</option></select></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ชื่ออะไหล่พัสดุ <span class="text-red-500">*</span></label><input type="text" name="Item_Name" value="${record ? record.Item_Name : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น RAM DDR4 16GB"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ยี่ห้อ (Brand) <span class="text-red-500">*</span></label><input type="text" name="Brand" value="${record ? record.Brand : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น Kingston, Samsung"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">รุ่น (Model) <span class="text-red-500">*</span></label><input type="text" name="Model" value="${record ? record.Model : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น HyperX Fury"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">หน่วยนับ <span class="text-red-500">*</span></label><input type="text" name="Unit" value="${record ? record.Unit : 'ชิ้น'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="ชิ้น, ตัว, อัน"></div>
+          <div class="col-span-1 md:col-span-2"><label class="block text-xs font-semibold text-slate-600 mb-1">รายละเอียดทางเทคนิค (Specification)</label><textarea name="Specification" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Specification : ''}</textarea></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">จุดสั่งซื้อขั้นต่ำ (Min Stock) <span class="text-red-500">*</span></label><input type="number" name="Min_Stock" value="${record ? record.Min_Stock : '5'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">สถานที่จัดเก็บ/ตู้เก็บอะไหล่ <span class="text-red-500">*</span></label><input type="text" name="Location" value="${record ? record.Location : 'ตู้เก็บหลัก ชั้น 1'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">การควบคุมสถานะ (Status) <span class="text-red-500">*</span></label><select name="Status" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="แบบกลุ่ม" ${record && record.Status === 'แบบกลุ่ม' ? 'selected' : ''}>แบบกลุ่ม (ควบคุมจำนวน Bulk)</option><option value="แบบรายชิ้น" ${record && record.Status === 'แบบรายชิ้น' ? 'selected' : ''}>แบบรายชิ้น (คุม Serial รายชิ้น)</option></select></div>
+        </form>
+      `;
+      const footerHTML = `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button><button onclick="saveItemMaster('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูลอะไหล่</button>`;
+      showModal(title, bodyHTML, footerHTML);
+      if (recordCategoryTypeID) filterItemFormCategories(record.Category_ID);
+    }
+
+    function filterItemFormCategories(selectedCatID = "") {
+      const typeSelect = document.getElementById('itemFormCategoryType');
+      const catSelect = document.getElementById('itemFormCategory');
+      if (!typeSelect || !catSelect) return;
+      const typeId = typeSelect.value;
+      if (!typeId) { catSelect.innerHTML = `<option value="">กรุณาเลือกประเภทหลักก่อน</option>`; return; }
+      const filtered = state.categories.filter(c => c.Category_Type_ID === typeId);
+      let options = `<option value="">เลือกหมวดหมู่ย่อย</option>`;
+      filtered.forEach(c => { options += `<option value="${c.Category_ID}" ${selectedCatID === c.Category_ID ? 'selected' : ''}>${c.Category_Name}</option>`; });
+      catSelect.innerHTML = options;
+    }
+
+    function saveItemMaster(id) {
+      if (!requireLogin()) return;
+      const form = document.getElementById('itemMasterForm');
+      if (!form.reportValidity()) return;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      const isDuplicate = state.itemMaster.some(item => item.Item_ID !== id && item.Item_Name.trim().toLowerCase() === data.Item_Name.trim().toLowerCase() && item.Brand.trim().toLowerCase() === data.Brand.trim().toLowerCase() && item.Model.trim().toLowerCase() === data.Model.trim().toLowerCase());
+      if (isDuplicate) { showToast("พบข้อมูลอะไหล่ที่มี ชื่อ ยี่ห้อ และรุ่น ตรงกันในคลังแล้ว ป้องกันข้อมูลบันทึกซ้ำ!", "warning"); return; }
+
+      showLoading("กำลังประมวลผลข้อมูล...");
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Item_Master", "Item_ID", id, data]);
+          else res = await apiCall('createRecord', ["Item_Master", data, "Item_ID", "ITM"]);
+          hideLoading();
+          if (res.success) { closeModal('dynamicModal'); showToast("บันทึกข้อมูลอะไหล่พัสดุสำเร็จ", "success"); fetchSystemData(); } 
+          else { showToast(res.message, "danger"); }
+        } catch (err) { hideLoading(); showToast(err.message, "danger"); }
+      };
+      saveAction();
+    }
+
+    // ========================================== DEVICE ASSET VIEW ==========================================
+    function renderDeviceAsset(target) {
+      const items = state.deviceAssets;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-2"><input type="text" id="deviceSearch" oninput="filterTable('deviceTable', this.value)" placeholder="ค้นหาคุรุภัณฑ์คอมพิวเตอร์..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64"></div>
+            <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-circle-info text-brandPink-500 mr-1.5"></i>สิทธิ์การเพิ่มและแก้ไขครุภัณฑ์สงวนไว้เฉพาะส่วนงานพัสดุกลาง</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="deviceTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold"><tr><th class="p-4">Device ID / QR</th><th class="p-4">เลขทรัพย์สิน (Asset Tag)</th><th class="p-4">ยี่ห้อ / รุ่น</th><th class="p-4">ประเภทอุปกรณ์</th><th class="p-4">Serial Number</th><th class="p-4">กลุ่มงาน / แผนก</th><th class="p-4">ผู้รับผิดชอบ</th><th class="p-4">สถานะ</th></tr></thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700 flex items-center space-x-2"><span>${item.Device_ID}</span><button onclick="generateQRCode('${item.Device_ID}')" class="text-brandPink-500 hover:text-brandPink-600" title="แสดง QR Code"><i class="fa-solid fa-qrcode"></i></button></td><td class="p-4 font-semibold text-slate-800">${item.Asset_Tag || '-'}</td><td class="p-4 text-slate-700 font-semibold">${item.Brand} / ${item.Model}</td><td class="p-4 text-slate-500">${item.Device_Type}</td><td class="p-4 text-slate-600 font-mono text-xs">${item.Serial_Number || '-'}</td><td class="p-4 text-slate-600">${item.Department}</td><td class="p-4 text-slate-700 font-medium">${item.User}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.Status === 'พร้อมใช้งาน' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">${item.Status || 'พร้อมใช้งาน'}</span></td></tr>`).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลคุรุภัณฑ์คอมพิวเตอร์ในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================== REPAIR JOB VIEW ==========================================
+    function renderRepairJob(target) {
+      const items = state.repairJobs;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div><input type="text" id="repairSearch" oninput="filterTable('repairTable', this.value)" placeholder="ค้นหาใบส่งซ่อม..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64"></div>
+            <button onclick="openRepairJobForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10"><i class="fa-solid fa-plus mr-1.5"></i> เปิดบันทึกรับซ่อมงานใหม่</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="repairTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold"><tr><th class="p-4">เลขใบซ่อม (Job ID)</th><th class="p-4">วันที่เปิดงาน</th><th class="p-4">วันที่ปิดงาน</th><th class="p-4">Device ID (เครื่อง)</th><th class="p-4">ปัญหาชำรุดที่พบ</th><th class="p-4">ช่างคอมผู้รับผิดชอบ</th><th class="p-4">สถานะการทำงาน</th><th class="p-4">หมายเหตุ / ลิงก์เอกสาร</th><th class="p-4 text-right">ดำเนินการ</th></tr></thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const dev = state.deviceAssets.find(d => d.Device_ID === item.Device_ID);
+                  let badge = "bg-slate-100 text-slate-700";
+                  if (item.Status === 'เปิดงาน') badge = "bg-sky-50 text-sky-700 font-bold";
+                  if (item.Status === 'กำลังดำเนินงาน') badge = "bg-amber-50 text-amber-700 font-bold";
+                  if (item.Status === 'ซ่อมสำเร็จ') badge = "bg-emerald-50 text-emerald-700 font-bold";
+                  if (item.Status === 'ยกเลิกการซ่อม') badge = "bg-rose-50 text-rose-700";
+                  const noteContent = (item.Remark && item.Remark.startsWith('http')) ? `<a href="${item.Remark}" target="_blank" class="text-brandPink-600 hover:underline font-bold"><i class="fa-solid fa-paperclip"></i> ลิงก์เอกสารแนบ</a>` : (item.Remark || '-');
+                  return `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700">${item.Job_ID}</td><td class="p-4 text-slate-600">${item.Open_Date}</td><td class="p-4 text-slate-600">${item.Close_Date || '-'}</td><td class="p-4 font-medium text-slate-700">${item.Device_ID} ${dev ? `(${dev.User})` : ''}</td><td class="p-4 text-slate-500 max-w-xs truncate">${item.Problem}</td><td class="p-4 text-slate-700 font-medium">${item.Technician}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs ${badge}">${item.Status}</span></td><td class="p-4 text-xs text-slate-500">${noteContent}</td><td class="p-4 text-right space-x-1"><button onclick="openUploadModal('${item.Job_ID}')" class="p-1.5 text-slate-500 hover:text-brandPink-600 hover:bg-brandPink-50 rounded-lg transition" title="แนบเอกสาร"><i class="fa-solid fa-paperclip"></i></button><button onclick="openRepairJobForm('${item.Job_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="อัปเดตสถานะ"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteRow('Repair_Job', '${item.Job_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                }).join('') || '<tr><td colspan="9" class="p-8 text-center text-slate-400">ยังไม่มีบันทึกใบแจ้งส่งซ่อมในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openRepairJobForm(id = null) {
+      if (!requireLogin()) return;
+      const isEdit = !!id;
+      const record = isEdit ? state.repairJobs.find(job => job.Job_ID === id) : null;
+      const title = isEdit ? "อัปเดตข้อมูล / ตรวจสอบงานซ่อมบำรุง" : "เปิดใบส่งงานแจ้งซ่อมใหม่";
+      const bodyHTML = `
+        <form id="repairJobForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ระบุคุรุภัณฑ์คอมพิวเตอร์ <span class="text-red-500">*</span></label><select name="Device_ID" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">เลือกเครื่องผู้ส่งซ่อม</option>${state.deviceAssets.map(d => `<option value="${d.Device_ID}" ${record && record.Device_ID === d.Device_ID ? 'selected' : ''}>${d.Device_ID} - ${d.Brand} ${d.Model} (ผู้ใช้: ${d.User})</option>`).join('')}</select></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">วันที่เปิดรับงานซ่อม <span class="text-red-500">*</span></label><input type="date" name="Open_Date" value="${record ? record.Open_Date : new Date().toISOString().split('T')[0]}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">วันที่ดำเนินงานแล้วเสร็จ (ถ้ามี)</label><input type="date" name="Close_Date" value="${record && record.Close_Date ? record.Close_Date : ''}" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อช่างประจำเครื่อง/ผู้รับงาน <span class="text-red-500">*</span></label><input type="text" name="Technician" value="${record ? record.Technician : getDisplayName()}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
+          <div class="col-span-1 md:col-span-2"><label class="block text-xs font-semibold text-slate-600 mb-1">อาการชำรุด / รายละเอียดปัญหาของครุภัณฑ์ <span class="text-red-500">*</span></label><textarea name="Problem" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Problem : ''}</textarea></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">สถานะปัจจุบัน <span class="text-red-500">*</span></label><select name="Status" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="เปิดงาน" ${record && record.Status === 'เปิดงาน' ? 'selected' : ''}>เปิดงาน (รอดำเนินการ)</option><option value="กำลังดำเนินงาน" ${record && record.Status === 'กำลังดำเนินงาน' ? 'selected' : ''}>กำลังดำเนินงาน</option><option value="ซ่อมสำเร็จ" ${record && record.Status === 'ซ่อมสำเร็จ' ? 'selected' : ''}>ซ่อมสำเร็จ</option><option value="ยกเลิกการซ่อม" ${record && record.Status === 'ยกเลิกการซ่อม' ? 'selected' : ''}>ยกเลิกการซ่อม</option></select></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุ หรือ ลิงก์แนบงานซ่อมภายนอก</label><input type="text" name="Remark" id="fieldRemarkLink" value="${record ? record.Remark : ''}" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="คำอธิบายเพิ่มเติม"></div>
+        </form>
+      `;
+      const footerHTML = `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button><button onclick="saveRepairJob('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกประวัติการส่งซ่อม</button>`;
+      showModal(title, bodyHTML, footerHTML);
+    }
+
+    function saveRepairJob(id) {
+      if (!requireLogin()) return;
+      const form = document.getElementById('repairJobForm');
+      if (!form.reportValidity()) return;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      showLoading("กำลังประมวลผลเซิร์ฟเวอร์...");
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Repair_Job", "Job_ID", id, data]);
+          else res = await apiCall('createRecord', ["Repair_Job", data, "Job_ID", "JOB"]);
+          hideLoading();
+          if (res.success) { closeModal('dynamicModal'); showToast(res.message, "success"); fetchSystemData(); } 
+          else { showToast(res.message, "danger"); }
+        } catch (err) { hideLoading(); showToast(err.message, "danger"); }
+      };
+      saveAction();
+    }
+
+    // ========================================== STOCK IN VIEW (MULTI-SERIAL CAPABLE) ==========================================
+    function renderStockIn(target) {
+      const items = state.stockIn;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div><input type="text" id="stockInSearch" oninput="filterTable('stockInTable', this.value)" placeholder="ค้นหาบันทึกนำเข้าสต็อก..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64"></div>
+            <button onclick="openStockInForm()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-emerald-500/10"><i class="fa-solid fa-plus mr-1.5"></i> ทำรายการนำเข้าคลัง (Stock In)</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="stockInTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr><th class="p-4">รายการบันทึก (ID)</th><th class="p-4">วันที่นำเข้า</th><th class="p-4">รหัสอะไหล่</th><th class="p-4">ชื่ออะไหล่</th><th class="p-4">รหัสสินค้า (Item Code)</th><th class="p-4">จำนวนนำเข้า</th><th class="p-4">ประเภทที่มา</th><th class="p-4">เลขที่ใบสั่งซื้อ (PO_ID)</th><th class="p-4">เลขเอกสารอ้างอิง / Serial No.</th><th class="p-4">หมายเหตุเพิ่มเติม</th><th class="p-4">ผู้บันทึก</th></tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const master = state.itemMaster.find(m => m.Item_ID === item.Item_ID);
+                  return `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700">${item.StockIn_ID}</td><td class="p-4 text-slate-600">${item.Date}</td><td class="p-4 font-mono text-xs font-semibold text-slate-500">${item.Item_ID}</td><td class="p-4 font-semibold text-slate-800">${master ? master.Item_Name : 'ไม่พบข้อมูล'}</td><td class="p-4 font-semibold text-slate-700 text-xs font-mono">${item.Item_Code || '-'}</td><td class="p-4 font-bold text-emerald-600">+${item.Quantity} ${item.Unit}</td><td class="p-4 text-slate-600 font-medium">${item.Source_Type}</td><td class="p-4 text-brandPink-600 font-semibold text-xs">${item.PO_ID || '-'}</td><td class="p-4 text-slate-500 font-mono text-xs">${item.Reference_No || '-'}</td><td class="p-4 text-xs text-slate-500">${item.Note || '-'}</td><td class="p-4 text-slate-700 font-medium">${item.User}</td></tr>`;
+                }).join('') || '<tr><td colspan="11" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการนำเข้าในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openStockInForm() {
+      if (!requireLogin()) return; 
+      pendingSerialNumbers = [];
+      const title = "ทำใบนำเข้าคลังอะไหล่ (Stock In)";
+      const bodyHTML = `
+        <form id="stockInForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกอะไหล่ไอทีที่ต้องการเติมสต็อก <span class="text-red-500">*</span></label>
+            <select name="Item_ID" id="stockInItemSelect" required onchange="onStockInItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">เลือกประเภทอะไหล่</option>
+              ${state.itemMaster.map(item => `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}">${item.Item_ID} - ${item.Item_Name} [การคุม: ${item.Status || 'แบบกลุ่ม'}]</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">จำนวนที่ต้องการเติมสต็อก <span class="text-red-500">*</span></label>
+            <div class="relative flex items-center">
+              <input type="number" name="Quantity" id="stockInQtyField" min="1" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <input type="text" name="Unit" id="stockInUnitField" readonly class="absolute right-3 w-16 text-center text-xs bg-slate-100 border-none font-bold text-slate-600" value="ชิ้น">
             </div>
             <p id="stockInWarningText" class="text-[10px] text-amber-600 font-bold mt-1 hidden"><i class="fa-solid fa-triangle-exclamation"></i> อะไหล่ประเภท "แบบรายชิ้น" ยอดจะนับจากจำนวน Serial Number ที่สแกนอัตโนมัติ</p>
           </div>

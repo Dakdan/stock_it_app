@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบคลังอะไหล่และอุปกรณ์ไอที โรงพยาบาล</title>
   
-  <!-- Add Favicon from GitHub -->
+  <!-- Add Favicon from GitHub / Deploy root -->
   <link rel="icon" type="image/png" href="favicon.png">
   
   <!-- Tailwind CSS CDN -->
@@ -24,91 +24,85 @@
 
   <!-- HTML5 QR Code Scanner Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" integrity="sha512-r6rDA7W6ZeQhvl8OH7mwwjAtS62fTVFi5pxgNg3gRyipkgZKLvPPkOf1bvm99JOPnoH81JEg9JgmqD6z7D4G6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="auth-check.js"></script>
-  <!-- ================= AUTH CHECK SCRIPT ================= -->
- <!-- <script>
-    (function () {
-        try {
-            const userData = localStorage.getItem('currentUser');
-            if (!userData) {
-                window.user = null;
-                return;
-            }
-            const user = JSON.parse(userData);
-            if (!user || !user.UserPN) {
-                localStorage.removeItem('currentUser');
-                window.user = null;
-                return;
-            }
-            window.user = user;
-        } catch (err) {
-            console.error("Auth-Check error: ", err);
-            localStorage.removeItem('currentUser');
-            window.user = null;
-        }
-    })();
-
-    function getCurrentUser() { return window.user || null; }
-    function hasRole(role) {
-        if (!window.user) return false;
-        return String(window.user.UserTypeID).toUpperCase() === String(role).toUpperCase();
-    }
-    function getDisplayName() {
-        if (!window.user) return "ผู้ใช้งานทั่วไป";
-        return (window.user.UserName || "") + " " + (window.user.UserSname || "");
-    }
-    function logout() {
-        localStorage.removeItem('currentUser');
-        sessionStorage.clear();
-        try { window.location.replace("index.html"); } 
-        catch(e) { window.location.href = "index.html"; }
-    }
-  </script> -->
 
   <!-- Tailwind Configuration for Theme Customization -->
+  
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            brandPink: { 50: '#fdf2f8', 100: '#fce7f3', 500: '#ec4899', 600: '#db2777', 700: '#be185d' },
-            brandGold: { 500: '#d97706', 600: '#b45309' }
+            brandPink: {
+              50: '#fdf2f8',
+              100: '#fce7f3',
+              500: '#ec4899',
+              600: '#db2777',
+              700: '#be185d',
+            },
+            brandGold: {
+              500: '#d97706',
+              600: '#b45309',
+            }
           },
-          fontFamily: { sans: ['Kanit', 'sans-serif'] }
+          fontFamily: {
+            sans: ['Kanit', 'sans-serif'],
+          }
         }
       }
     }
   </script>
-  
-  <style>
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #ec4899; }
 
-     /* ป้องกัน Pull-to-refresh และอาการหน้าจอเด้ง (Bounce) บน Mobile */
-    /* 
-     html, body {
-       overscroll-behavior-y: none; 
-       overscroll-behavior-x: none;
-     }
-    */
-    .glassmorphism {
-      background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.25);
+  <style>
+    /* Custom Scrollbar for modern look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #fbcfe8;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ec4899;
     }
     
+    /* Soft Glassmorphism */
+    .glassmorphism {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    
+    /* Animation pulse for low stock */
     @keyframes low-stock-pulse {
       0%, 100% { background-color: rgba(239, 68, 68, 1); }
       50% { background-color: rgba(239, 68, 68, 0.6); }
     }
-    .badge-pulse { animation: low-stock-pulse 2s infinite ease-in-out; }
+    .badge-pulse {
+      animation: low-stock-pulse 2s infinite ease-in-out;
+    }
 
+    /* Print Friendly Landscape Setup */
     @media print {
-      body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
-      .no-print { display: none !important; }
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -128,13 +122,14 @@
     
     <!-- SIDEBAR -->
     <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-100 flex-shrink-0 flex flex-col shadow-2xl transition-all duration-300 z-50">
+      <!-- Hospital IT Banner -->
       <div class="p-5 border-b border-slate-800 bg-slate-950 flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brandPink-500 to-pink-400 flex items-center justify-center shadow-lg shadow-pink-500/30 overflow-hidden">
           <img src="favicon.png" alt="Logo" class="w-8 h-8 object-contain drop-shadow-sm" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
           <i class="fa-solid fa-hospital-user text-white text-lg hidden"></i>
         </div>
         <div>
-          <h1 class="font-bold text-base leading-none text-brandPink-100">IT HOSP Asset</h1>
+          <h1 class="font-bold text-base leading-none text-brandPink-100">IT Inventory & Stock</h1>
           <p class="text-xs text-brandPink-500 mt-1 font-semibold tracking-wide">UDONTHANI HOSPITAL</p>
         </div>
       </div>
@@ -205,15 +200,12 @@
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-100 uppercase" id="userInitial">IT</div>
           <div>
-            <div class="text-xs font-semibold text-slate-200" id="usernameDisplay">กำลังตรวจสอบ...</div>
-            <div class="text-[10px] text-emerald-400 font-semibold flex items-center" id="userStatusIndicator">
+            <div class="text-xs font-semibold text-slate-200" id="usernameDisplay">ช่าง IT โรงพยาบาล</div>
+            <div class="text-[10px] text-emerald-400 font-semibold flex items-center">
               <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1 inline-block animate-ping"></span> Online
             </div>
           </div>
         </div>
-        <button onclick="logout()" id="logoutBtn" class="text-slate-500 hover:text-rose-400 transition p-2 rounded-lg hover:bg-slate-800" title="ออกจากระบบ">
-          <i class="fa-solid fa-right-from-bracket"></i>
-        </button>
       </div>
     </aside>
 
@@ -248,7 +240,7 @@
   </div>
 
   <!-- ========================================== MODALS SECTION ========================================== -->
-  <!-- GENERIC DYNAMIC MODAL -->
+  <!-- GENERIC DYNAMIC MODAL (For forms & action views) -->
   <div id="dynamicModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300">
       <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-brandPink-500 to-pink-600 rounded-t-2xl">
@@ -257,8 +249,12 @@
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-      <div class="p-6 overflow-y-auto" id="modalBody"></div>
-      <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3 rounded-b-2xl" id="modalFooter"></div>
+      <div class="p-6 overflow-y-auto" id="modalBody">
+        <!-- Forms injection dynamically -->
+      </div>
+      <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3 rounded-b-2xl" id="modalFooter">
+        <!-- Action Buttons -->
+      </div>
     </div>
   </div>
 
@@ -274,7 +270,7 @@
       </div>
       <div class="space-y-2">
         <p class="text-sm font-semibold text-slate-700" id="qrTextValue"></p>
-        <p class="text-xs text-slate-400">สแกนรหัสเพื่อติดตามงานซ่อม หรือตรวจเช็คสต็อก</p>
+        <p class="text-xs text-slate-400">สแกนรหัสเพื่อติดตามงานซ่อม บันทึกข้อมูล หรือตรวจเช็คสต็อก</p>
       </div>
       <div class="mt-6 flex space-x-2">
         <button onclick="downloadQR()" class="flex-1 bg-slate-800 hover:bg-slate-950 text-white py-2 px-3 rounded-lg text-sm transition font-medium">
@@ -302,6 +298,7 @@
             <p class="text-sm font-medium text-slate-600">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อค้นหา</p>
             <p class="text-xs text-slate-400 mt-1">รองรับ JPG, PNG, WEBP, PDF, XLSX (สูงสุด 5MB)</p>
           </div>
+          <!-- Image preview element -->
           <div id="uploadPreviewContainer" class="hidden flex flex-col items-center">
             <img id="uploadPreviewImg" src="" class="max-h-40 rounded-lg shadow-sm border mb-2">
             <span id="uploadFileName" class="text-xs text-slate-600 font-semibold truncate max-w-xs"></span>
@@ -327,7 +324,7 @@
       <div class="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
         <div id="qr-reader" class="w-full"></div>
       </div>
-      <p class="text-[11px] text-slate-500 mt-3 text-center">จัดตำแหน่งบาร์โค้ดหรือคิวอาร์โค้ดให้อยู่ในกรอบ</p>
+      <p class="text-[11px] text-slate-500 mt-3 text-center">จัดตำแหน่งบาร์โค้ดหรือคิวอาร์โค้ดของพัสดุคอมพิวเตอร์ให้อยู่ในกรอบ เพื่อทำรายการอย่างรวดเร็ว</p>
       <div class="mt-4">
         <button onclick="closeScanner()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl transition text-xs">
           ปิดหน้ากล้องสแกน
@@ -336,85 +333,130 @@
     </div>
   </div>
 
-  <!-- PRINT REPORT WRAPPER -->
+  <!-- PRINT REPORT WRAPPER (HIDDEN FROM NORMAL SCREEN) -->
   <div id="printArea" class="hidden"></div>
 
   <!-- ========================================== JAVASCRIPT LOGIC ========================================== -->
   <script>
+    // --- ระบบ AUTHENTICATION ตรวจสอบสิทธิ์ ---
+    (function () {
+        try {
+            // ดึงข้อมูลจาก LocalStorage ด้วย Key: 'currentUser'
+            const userData = localStorage.getItem('currentUser');
+            
+            // เงื่อนไข 1: หากไม่มีข้อมูลในระบบ
+            if (!userData) {
+                window.user = null; // ปรับไม่ให้เด้งหนี เพื่อส่งค่าไปเปลี่ยนสลับปุ่มล็อกอินที่หน้าหลักแทน
+                return;
+            }
+
+            const user = JSON.parse(userData);
+            
+            // เงื่อนไข 2: หากมีข้อมูลแต่โครงสร้างไม่ถูกต้อง (ไม่มี UserPN)
+            if (!user || !user.UserPN) {
+                localStorage.removeItem('currentUser'); // ล้างข้อมูลขยะทิ้ง
+                window.user = null;
+                return;
+            }
+
+            // เงื่อนไข 3: ข้อมูลถูกต้อง
+            // ผูก Object ผู้ใช้งานเข้ากับ Global Window สำหรับการดึงใช้งานในหน้าเพจได้อย่างอิสระ
+            window.user = user;
+        } catch (err) {
+            console.error("Auth-Check error: ", err);
+            localStorage.removeItem('currentUser');
+            window.user = null;
+        }
+    })();
+
+    function getCurrentUser() {
+        return window.user || null;
+    }
+
+    function hasRole(role) {
+        if (!window.user) return false;
+        return String(window.user.UserTypeID).toUpperCase() === String(role).toUpperCase();
+    }
+
+    function getDisplayName() {
+        if (!window.user) return "ไม่ได้ login"; // ปรับตามเงื่อนไข: หากไม่มีแสดง ไม่ได้ login
+        return (window.user.UserName || "") + " " + (window.user.UserSname || "");
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        sessionStorage.clear();
+        try {
+            window.location.replace("https://dakdan.github.io/it_login/index.html");
+        } catch(e) {
+            window.location.href = "https://dakdan.github.io/it_login/index.html";
+        }
+    }
+
+    // ฟังก์ชันกลางสำหรับตรวจสอบก่อนทำรายการเพิ่มข้อมูล (Guard Clause)
+    function requireLogin() {
+        if (!getCurrentUser()) {
+            showToast("ปฏิเสธการเข้าถึง: กรุณาทำการ Login ก่อนเพิ่มหรือแก้ไขข้อมูล", "danger");
+            // หน่วงเวลา 2 วิให้เห็นข้อความ แล้วเด้งกลับหน้า Login
+            setTimeout(() => {
+                window.location.href = "https://dakdan.github.io/it_login/index.html";
+            }, 2000);
+            return false;
+        }
+        return true;
+    }
+    // ------------------------------------------
+
+    // State management - ดึงจาก API เท่านั้น (ไม่มี Mock Data)
     let state = {
-      categoryTypes: [], categories: [], itemMaster: [], deviceAssets: [],
-      repairJobs: [], stockIn: [], stockOut: [], stockSummary: [], transactionLogs: [],
-      currentUser: ""
+      categoryTypes: [],
+      categories: [],
+      itemMaster: [],
+      deviceAssets: [],
+      repairJobs: [],
+      stockIn: [],
+      stockOut: [],
+      stockSummary: [],
+      transactionLogs: [],
+      currentUser: "" // จะถูกกำหนดค่าใน window.onload
     };
 
     let activeMenu = "dashboard";
     let pendingUploadData = { base64: null, fileName: null, mimeType: null };
     let activeUploadTargetFieldId = null;
-    let catalogViewMode = 'grid'; 
-    let html5QrCode = null; 
-    const API_URL = "https://script.google.com/macros/s/AKfycbwoqoyq0Q-DZ1WecERSldVfevevQvS0sYAmw8dVLYItEQhULSQ4lHco_Oe4sottLaXrtg/exec";
+    let catalogViewMode = 'grid'; // ค่าเริ่มต้นของโหมดแสดงผลหน้า Catalog (grid หรือ table)
+    let html5QrCode = null; // Scanner instance
 
+    // Run initially when window loads
     window.onload = function() {
-      // 1. ตรวจสอบสถานะการล็อกอิน (Auth Check)
-      if (!getCurrentUser()) {
-         renderRequireLogin();
-         return; 
-      }
+      // 1. ตรวจสอบสถานะการเข้าสู่ระบบ
+      const user = getCurrentUser();
+      const displayEl = document.getElementById('usernameDisplay');
+      const initialEl = document.getElementById('userInitial');
+      const statusContainer = displayEl.nextElementSibling; // ดึง div ที่บรรจุสถานะ Online
 
-      // 2. ตั้งค่าข้อมูลผู้ใช้งาน
+      // 2. จัดการข้อมูลผู้ใช้และ UI แถบซ้ายล่าง โดยใช้ ID เดิมทั้งหมด
       state.currentUser = getDisplayName();
-      document.getElementById('usernameDisplay').innerText = state.currentUser;
+      displayEl.innerText = state.currentUser;
+
+      if (user) {
+        // กรณีมีผู้ล็อกอิน
+        displayEl.classList.remove('text-rose-400');
+        initialEl.innerText = state.currentUser.substring(0, 2).toUpperCase();
+        initialEl.classList.replace('bg-rose-900', 'bg-slate-700');
+        statusContainer.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-1 inline-block animate-ping"></span> Online <span class="mx-1 text-slate-600">|</span> <a href="#" onclick="logout()" class="text-rose-400 hover:text-rose-300 hover:underline cursor-pointer">ออกระบบ</a>`;
+      } else {
+        // กรณีไม่ได้ล็อกอิน
+        displayEl.classList.add('text-rose-400');
+        initialEl.innerText = "?";
+        initialEl.classList.replace('bg-slate-700', 'bg-rose-900');
+        statusContainer.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500 mr-1 inline-block"></span> Offline <span class="mx-1 text-slate-600">|</span> <a href="https://dakdan.github.io/it_login/index.html" class="text-brandPink-400 hover:text-brandPink-300 hover:underline cursor-pointer">ล็อกอิน</a>`;
+      }
       
-      const fName = window.user.UserName ? window.user.UserName.charAt(0) : "I";
-      const lName = window.user.UserSname ? window.user.UserSname.charAt(0) : "T";
-      document.getElementById('userInitial').innerText = fName + lName;
-      
-      // 3. เริ่มซิงค์ข้อมูล
       fetchSystemData();
     };
 
-    function renderRequireLogin() {
-      document.getElementById('usernameDisplay').innerText = "ผู้ใช้งานทั่วไป";
-      document.getElementById('userInitial').innerText = "?";
-      document.getElementById('userStatusIndicator').innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500 mr-1 inline-block"></span> Offline`;
-      document.getElementById('logoutBtn').classList.add('hidden');
-      document.getElementById('pageTitle').innerText = "โปรดยืนยันตัวตน (Authentication)";
-      
-      document.getElementById('mainStage').innerHTML = `
-        <div class="flex flex-col items-center justify-center h-full text-center bg-white rounded-2xl shadow-sm border border-slate-100 p-10 max-w-lg mx-auto mt-10">
-          <div class="w-24 h-24 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-6">
-            <i class="fa-solid fa-lock text-5xl"></i>
-          </div>
-          <h2 class="text-2xl font-bold text-slate-800 mb-2">กรุณาเข้าสู่ระบบ</h2>
-          <p class="text-slate-500 mb-8 text-sm">คุณจำเป็นต้องยืนยันตัวตนด้วยรหัสพนักงานโรงพยาบาล เพื่อเข้าถึงระบบคลังพัสดุคอมพิวเตอร์</p>
-          
-          <button onclick="window.location.href='https://dakdan.github.io/it_login/index.html'" class="w-full py-3 bg-brandPink-500 hover:bg-brandPink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/30 transition flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-arrow-right-to-bracket"></i> <span>ไปที่หน้าเข้าสู่ระบบ (Login)</span>
-          </button>
-
-          <div class="mt-8 pt-6 border-t border-slate-100 w-full text-left">
-             <p class="text-[10px] text-slate-400 font-bold uppercase mb-2">เครื่องมือจำลอง (Developer Tools)</p>
-             <button onclick="mockLogin()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg text-xs transition flex items-center justify-center shadow-md">
-               <i class="fa-solid fa-user-check mr-2"></i> จำลองล็อกอิน (Mock Login) เพื่อทดสอบ
-             </button>
-          </div>
-        </div>
-      `;
-
-      document.querySelectorAll('aside nav a').forEach(el => {
-        el.removeAttribute('onclick');
-        el.classList.add('opacity-50', 'cursor-not-allowed');
-      });
-    }
-
-    function mockLogin() {
-       const mockUser = {
-          UserPN: "EMP-IT01", UserName: "ช่าง IT", UserSname: "รพ.อุดรธานี",
-          UserTypeID: "ADMIN", DeptName: "ศูนย์เทคโนโลยีสารสนเทศ"
-       };
-       localStorage.setItem('currentUser', JSON.stringify(mockUser));
-       window.location.reload();
-    }
+    const API_URL = "https://script.google.com/macros/s/AKfycbwoqoyq0Q-DZ1WecERSldVfevevQvS0sYAmw8dVLYItEQhULSQ4lHco_Oe4sottLaXrtg/exec";
 
     async function apiCall(action, args = []) {
       try {
@@ -425,14 +467,48 @@
         });
         return await response.json();
       } catch (e) {
-        throw new Error("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย API");
+        throw new Error("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย API ของโรงพยาบาล");
       }
     }
 
+    /**
+     * Helper สำหรับอ่านข้อมูลสต็อกจากชีต Stock_Summary ที่ผูกสูตรเบ็ดเสร็จไว้แล้ว
+     * ตัดปัญหาต้องมานั่งบวกลบเลขเองในฝั่ง Frontend
+     */
+    function getStockData(itemId, itemMasterRef = null) {
+      const sumObj = state.stockSummary.find(s => s.Item_ID === itemId);
+      
+      // รองรับการพิมพ์ผิดใน Sheet (Balanec -> Balance) เพื่อให้ดึงข้อมูลได้เสมอ
+      const bal = sumObj ? Number(sumObj.Balance ?? sumObj.Balanec ?? 0) : 0;
+      const stockIn = sumObj ? Number(sumObj.Stock_In || 0) : 0;
+      const stockOut = sumObj ? Number(sumObj.Stock_Out || 0) : 0;
+      
+      let isLow = false;
+      if (sumObj && sumObj.Status_Stock) {
+        // อิงจากสูตรใน Sheet เป็นหลัก (Source of Truth)
+        isLow = String(sumObj.Status_Stock).trim().toLowerCase() === 'low';
+      } else {
+        // Fallback เผื่อ Sheet ไม่มีคอลัมน์ Status_Stock
+        const minStock = itemMasterRef ? Number(itemMasterRef.Min_Stock || 0) : 0;
+        isLow = bal <= minStock;
+      }
+      
+      return { balance: bal, stockIn: stockIn, stockOut: stockOut, isLow: isLow, raw: sumObj };
+    }
+
+    /**
+     * ดึงข้อมูลระบบทั้งหมดจาก Backend REST API
+     */
     async function fetchSystemData(isRefresh = false) {
-      showLoading("กำลังซิงค์ข้อมูลคลังพัสดุ...");
+      showLoading("กำลังซิงค์และเชื่อมโยงฐานข้อมูลโรงพยาบาล...");
+      
       try {
-        const sheets = ["Category_Type", "Category", "Item_Master", "Device_Asset", "Repair_Job", "Stock_In", "Stock_Out", "Stock_Summary", "Transaction_Log"];
+        const sheets = [
+          "Category_Type", "Category", "Item_Master", "Device_Asset", 
+          "Repair_Job", "Stock_In", "Stock_Out", "Stock_Summary", "Transaction_Log"
+        ];
+        
+        // Fetch all sheets in parallel via API
         const promises = sheets.map(sheet => apiCall('readAll', [sheet]));
         const results = await Promise.all(promises);
 
@@ -447,78 +523,123 @@
         state.transactionLogs = results[8] || [];
 
         hideLoading();
-        if (isRefresh) showToast("อัปเดตข้อมูลระบบเรียบร้อย", "success");
+        if (isRefresh) {
+          showToast("อัปเดตข้อมูลระบบปัจจุบันเรียบร้อยแล้ว", "success");
+        }
         renderCurrentView();
       } catch (err) {
         hideLoading();
-        showToast("ไม่สามารถเข้าถึงฐานข้อมูล: " + err.message, "danger");
+        showToast("ไม่สามารถเข้าถึงฐานข้อมูลได้: " + err.message, "danger");
       }
     }
 
+    /**
+     * การสลับเมนูหลักของโปรแกรม
+     */
     function switchMenu(menuName) {
       activeMenu = menuName;
+      // ลบคลาส active เมนูอื่น
       document.querySelectorAll('aside nav a').forEach(el => {
-        if(!el.classList.contains('cursor-not-allowed')){
-          el.classList.remove('bg-slate-800', 'text-brandPink-100', 'border-l-4', 'border-brandPink-500');
-          el.classList.add('text-slate-300');
-        }
+        el.classList.remove('bg-slate-800', 'text-brandPink-100', 'border-l-4', 'border-brandPink-500');
+        el.classList.add('text-slate-300');
       });
       
+      // เพิ่มคลาสเมนูที่ถูกเลือก
       const activeEl = document.getElementById('menu-' + menuName);
-      if (activeEl && !activeEl.classList.contains('cursor-not-allowed')) {
+      if (activeEl) {
         activeEl.classList.add('bg-slate-800', 'text-brandPink-100', 'border-l-4', 'border-brandPink-500');
         activeEl.classList.remove('text-slate-300');
       }
 
+      // เปลี่ยนชื่อหัวเพจ
       const titles = {
-        dashboard: "Dashboard ภาพรวมความเคลื่อนไหว", catalog: "แคตตาล็อกอะไหล่แบบจัดกลุ่ม (Catalog Grouping)",
-        categoryType: "ประเภทหมวดหมู่ (Category Type)", category: "หมวดหมู่อะไหล่ (Category)",
-        itemMaster: "คลังฐานข้อมูลอะไหล่ไอที (Item Master)", deviceAsset: "ทะเบียนคุรุภัณฑ์คอมพิวเตอร์",
-        repairJob: "รายการตรวจสอบและซ่อมบำรุง", stockIn: "บันทึกนำเข้าอะไหล่ (Stock In)",
-        stockOut: "บันทึกเบิกใช้อะไหล่และอุปกรณ์ (Stock Out)", stockAudit: "ระบบเช็คสต็อก (Stock Audit)",
-        stockSummary: "ข้อมูลสรุปปริมาณคงเหลือ", transactionLogs: "บันทึกธุรกรรม (Log)"
+        dashboard: "Dashboard ภาพรวมความเคลื่อนไหว",
+        catalog: "แคตตาล็อกอะไหล่แบบจัดกลุ่ม (Catalog Grouping)",
+        categoryType: "ประเภทหมวดหมู่ (Category Type)",
+        category: "หมวดหมู่อะไหล่ (Category)",
+        itemMaster: "คลังฐานข้อมูลอะไหล่ไอที (Item Master)",
+        deviceAsset: "ทะเบียนคุรุภัณฑ์คอมพิวเตอร์และอุปกรณ์เครือข่าย",
+        repairJob: "รายการตรวจสอบและซ่อมบำรุง (Repair)",
+        stockIn: "บันทึกนำเข้าอะไหล่ (Stock In)",
+        stockOut: "บันทึกเบิกใช้อะไหล่และอุปกรณ์ (Stock Out)",
+        stockAudit: "ระบบตรวจเช็คสต็อกและปรับปรุงยอดคงเหลือ (Stock Audit)",
+        stockSummary: "ข้อมูลสรุปปริมาณคงเหลือและเตือน Low Stock",
+        transactionLogs: "บันทึกธุรกรรมทั้งหมดของช่าง (Log)"
       };
       
       document.getElementById('pageTitle').innerText = titles[menuName] || "ระบบไอทีโรงพยาบาล";
       renderCurrentView();
-      if (window.innerWidth < 768) toggleSidebar();
-    }
-
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-    }
-
-    function renderCurrentView() {
-      const stage = document.getElementById('mainStage');
-      switch (activeMenu) {
-        case "dashboard": renderDashboard(stage); break;
-        case "catalog": renderCatalog(stage); break;
-        case "categoryType": renderCategoryType(stage); break;
-        case "category": renderCategory(stage); break;
-        case "itemMaster": renderItemMaster(stage); break;
-        case "deviceAsset": renderDeviceAsset(stage); break;
-        case "repairJob": renderRepairJob(stage); break;
-        case "stockIn": renderStockIn(stage); break;
-        case "stockOut": renderStockOut(stage); break;
-        case "stockAudit": renderStockAudit(stage); break;
-        case "stockSummary": renderStockSummary(stage); break;
-        case "transactionLog": renderTransactionLog(stage); break;
+      
+      if (window.innerWidth < 768) {
+        toggleSidebar();
       }
     }
 
+    /**
+     * สลับการแสดงผล Sidebar บนมือถือ
+     */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    /**
+     * ประมวลผลและ Render View ปัจจุบัน
+     */
+    function renderCurrentView() {
+      const stage = document.getElementById('mainStage');
+      
+      switch (activeMenu) {
+        case "dashboard":
+          renderDashboard(stage);
+          break;
+        case "catalog":
+          renderCatalog(stage);
+          break;
+        case "categoryType":
+          renderCategoryType(stage);
+          break;
+        case "category":
+          renderCategory(stage);
+          break;
+        case "itemMaster":
+          renderItemMaster(stage);
+          break;
+        case "deviceAsset":
+          renderDeviceAsset(stage);
+          break;
+        case "repairJob":
+          renderRepairJob(stage);
+          break;
+        case "stockIn":
+          renderStockIn(stage);
+          break;
+        case "stockOut":
+          renderStockOut(stage);
+          break;
+        case "stockAudit":
+          renderStockAudit(stage);
+          break;
+        case "stockSummary":
+          renderStockSummary(stage);
+          break;
+        case "transactionLog":
+          renderTransactionLog(stage);
+          break;
+      }
+    }
+
+    // ========================================== RENDER VIEWS (DASHBOARD) ==========================================
     function renderDashboard(target) {
       const totalItems = state.itemMaster.length;
       
-      // คำนวณ low stock โดยดึงจากชีตโดยตรง (ใช้ Status_Stock หรือคำนวณซ้ำ)
       const lowStockItems = state.itemMaster.filter(item => {
-        const sumObj = state.stockSummary.find(s => s.Item_ID === item.Item_ID);
-        const bal = sumObj ? Number(sumObj.Balance) : 0;
-        return bal <= (Number(item.Min_Stock) || 0);
+        return getStockData(item.Item_ID, item).isLow;
       }).length;
 
       const openJobs = state.repairJobs.filter(job => {
         const s = String(job.Status).toUpperCase();
-        return s === "OPEN" || s === "เปิดงาน" || s === "กำลังดำเนินงาน" || s === "รอดำเนินการ";
+        return s === "OPEN" || s === "เปิดงาน" || s === "กำลังดำเนินงาน" || s === "กำลังดำเนินการ" || s === "รอดำเนินการ";
       }).length;
       
       const closedJobs = state.repairJobs.filter(job => {
@@ -527,106 +648,170 @@
       }).length;
 
       const totalDevices = state.deviceAssets.length;
+
       const today = new Date().toISOString().split('T')[0];
       const stockInToday = state.stockIn.filter(s => s.Date && s.Date.substring(0, 10) === today).reduce((acc, curr) => acc + Number(curr.Quantity), 0);
       const stockOutToday = state.stockOut.filter(s => s.Date && s.Date.substring(0, 10) === today).reduce((acc, curr) => acc + Number(curr.Quantity), 0);
 
       target.innerHTML = `
+        <!-- STATS CARD GRID -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-gradient-to-tr from-brandPink-500 to-pink-600 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden group">
-            <div class="absolute right-2 bottom-0 text-white/10 text-8xl transition-all duration-300 group-hover:scale-110"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-            <p class="text-xs font-semibold text-pink-100 uppercase">อะไหล่ทั้งหมดในคลัง</p>
-            <h3 class="text-3xl font-extrabold mt-2">${totalItems} <span class="text-sm">รายการ</span></h3>
+          
+          <div class="bg-gradient-to-tr from-brandPink-500 to-pink-600 text-white rounded-2xl p-5 shadow-lg shadow-pink-500/20 relative overflow-hidden group">
+            <div class="absolute right-2 bottom-0 text-white/10 text-8xl font-bold transition-all duration-300 group-hover:scale-110">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <p class="text-xs font-semibold text-pink-100 uppercase tracking-wider">อะไหล่ทั้งหมดในคลัง</p>
+            <h3 class="text-3xl font-extrabold mt-2">${totalItems} <span class="text-sm font-medium">รายการ</span></h3>
+            <div class="mt-4 text-xs text-pink-100 flex items-center space-x-1">
+              <span class="bg-white/20 px-2 py-0.5 rounded-full font-semibold">Active</span>
+              <span>พร้อมสำหรับการเบิกใช้</span>
+            </div>
           </div>
-          <div class="bg-white rounded-2xl p-5 shadow-md border relative overflow-hidden group">
-            <div class="absolute right-2 bottom-0 text-red-100 text-8xl transition-all duration-300 group-hover:scale-110"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <p class="text-xs font-semibold text-slate-500 uppercase">ต่ำกว่าจุดสั่งซื้อ</p>
-            <h3 class="text-3xl font-extrabold mt-2 text-rose-600">${lowStockItems} <span class="text-sm text-slate-400">รายการ</span></h3>
+
+          <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-100 relative overflow-hidden group">
+            <div class="absolute right-2 bottom-0 text-red-100 text-8xl font-bold transition-all duration-300 group-hover:scale-110">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ต่ำกว่าจุดสั่งซื้อ (Min Stock)</p>
+            <h3 class="text-3xl font-extrabold mt-2 text-rose-600">${lowStockItems} <span class="text-sm font-medium text-slate-400">รายการ</span></h3>
+            <div class="mt-4 text-xs text-rose-500 flex items-center font-semibold">
+              <span class="bg-rose-100 px-2.5 py-0.5 rounded-full badge-pulse text-white mr-1.5"><i class="fa-solid fa-bell"></i> เตือนสต็อกต่ำ</span>
+            </div>
           </div>
-          <div class="bg-white rounded-2xl p-5 shadow-md border relative overflow-hidden group">
-            <div class="absolute right-2 bottom-0 text-blue-100 text-8xl transition-all duration-300 group-hover:scale-110"><i class="fa-solid fa-toolbox"></i></div>
-            <p class="text-xs font-semibold text-slate-500 uppercase">งานซ่อมรอดำเนินการ</p>
-            <h3 class="text-3xl font-extrabold mt-2 text-sky-600">${openJobs} <span class="text-sm text-slate-400">งานเปิดอยู่</span></h3>
+
+          <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-100 relative overflow-hidden group">
+            <div class="absolute right-2 bottom-0 text-blue-100 text-8xl font-bold transition-all duration-300 group-hover:scale-110">
+              <i class="fa-solid fa-toolbox"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">งานซ่อมรอดำเนินการ</p>
+            <h3 class="text-3xl font-extrabold mt-2 text-sky-600">${openJobs} <span class="text-sm font-medium text-slate-400">งานเปิดอยู่</span></h3>
+            <div class="mt-4 text-xs text-sky-600 flex items-center space-x-1 font-semibold">
+              <span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">${closedJobs} ซ่อมเสร็จแล้ว</span>
+            </div>
           </div>
-          <div class="bg-white rounded-2xl p-5 shadow-md border relative overflow-hidden group">
-            <div class="absolute right-2 bottom-0 text-amber-100 text-8xl transition-all duration-300 group-hover:scale-110"><i class="fa-solid fa-desktop"></i></div>
-            <p class="text-xs font-semibold text-slate-500 uppercase">คุรุภัณฑ์คอมพิวเตอร์</p>
-            <h3 class="text-3xl font-extrabold mt-2 text-amber-600">${totalDevices} <span class="text-sm text-slate-400">เครื่อง</span></h3>
+
+          <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-100 relative overflow-hidden group">
+            <div class="absolute right-2 bottom-0 text-amber-100 text-8xl font-bold transition-all duration-300 group-hover:scale-110">
+              <i class="fa-solid fa-desktop"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">คุรุภัณฑ์คอมพิวเตอร์</p>
+            <h3 class="text-3xl font-extrabold mt-2 text-amber-600">${totalDevices} <span class="text-sm font-medium text-slate-400">เครื่อง</span></h3>
+            <div class="mt-4 text-xs text-slate-500 flex items-center">
+              <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-semibold">Udon Thani Network</span>
+            </div>
           </div>
+
         </div>
 
+        <!-- RECENT ACTIVITY LOGS & IN-OUT SUMMARY -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="bg-white rounded-2xl p-6 shadow-md border flex flex-col justify-between">
+          
+          <!-- TODAY'S TRANSACTION SUMMARY -->
+          <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col justify-between">
             <div>
-              <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center"><i class="fa-solid fa-calendar-day text-brandPink-500 mr-2"></i> ความเคลื่อนไหววันนี้</h4>
+              <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center">
+                <i class="fa-solid fa-calendar-day text-brandPink-500 mr-2"></i> ความเคลื่อนไหววันนี้ (${today})
+              </h4>
               <div class="space-y-4">
                 <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                   <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i class="fa-solid fa-box-open"></i></div>
                     <div>
-                      <h5 class="text-xs font-bold text-slate-700">Stock In</h5>
-                      <p class="text-[10px] text-emerald-600">รายการเข้ารวมวันนี้</p>
+                      <h5 class="text-xs font-bold text-slate-700">Stock In (นำเข้าคลัง)</h5>
+                      <p class="text-[10px] text-emerald-600">รายการอะไหล่เข้ารวมวันนี้</p>
                     </div>
                   </div>
-                  <span class="text-xl font-bold text-emerald-600">+${stockInToday}</span>
+                  <div class="text-right">
+                    <span class="text-xl font-bold text-emerald-600">+${stockInToday}</span>
+                  </div>
                 </div>
+
                 <div class="flex items-center justify-between p-3 bg-rose-50 rounded-xl border border-rose-100">
                   <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center"><i class="fa-solid fa-truck-ramp-box"></i></div>
                     <div>
-                      <h5 class="text-xs font-bold text-slate-700">Stock Out</h5>
-                      <p class="text-[10px] text-rose-600">รายการเบิกรวมวันนี้</p>
+                      <h5 class="text-xs font-bold text-slate-700">Stock Out (เบิกใช้งาน)</h5>
+                      <p class="text-[10px] text-rose-600">รายการอะไหล่เบิกรวมวันนี้</p>
                     </div>
                   </div>
-                  <span class="text-xl font-bold text-rose-600">-${stockOutToday}</span>
+                  <div class="text-right">
+                    <span class="text-xl font-bold text-rose-600">-${stockOutToday}</span>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <div class="pt-6 border-t mt-6">
+              <button onclick="switchMenu('stockSummary')" class="w-full py-2 bg-slate-100 hover:bg-brandPink-100 hover:text-brandPink-600 text-slate-600 font-semibold rounded-xl text-xs transition duration-150">
+                <i class="fa-solid fa-magnifying-glass mr-1"></i> ตรวจสอบยอดสต็อกคงเหลือทั้งหมด
+              </button>
+            </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 shadow-md border lg:col-span-2">
-            <h4 class="font-bold text-slate-800 text-base mb-4">ความเคลื่อนไหวล่าสุด</h4>
+          <!-- LATEST TRANSACTION LOG -->
+          <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 lg:col-span-2">
+            <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center justify-between">
+              <span><i class="fa-solid fa-clock-rotate-left text-brandPink-500 mr-2"></i> ความเคลื่อนไหวล่าสุุดของระบบ</span>
+              <button onclick="switchMenu('transactionLog')" class="text-xs text-brandPink-600 hover:underline font-semibold">ดูบันทึกทั้งหมด</button>
+            </h4>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
-                <thead><tr class="text-slate-400 font-semibold border-b"><th class="py-2">เวลา</th><th class="py-2">ประเภท</th><th class="py-2">รหัสสินค้า</th><th class="py-2">จำนวน</th><th class="py-2">ผู้ทำรายการ</th></tr></thead>
+                <thead>
+                  <tr class="text-slate-400 font-semibold border-b border-slate-100">
+                    <th class="py-2">วันเวลา</th>
+                    <th class="py-2">ประเภทรายการ</th>
+                    <th class="py-2">รหัสสินค้า</th>
+                    <th class="py-2">จำนวน</th>
+                    <th class="py-2">ผู้ดำเนินงาน</th>
+                  </tr>
+                </thead>
                 <tbody class="divide-y divide-slate-50">
-                  ${state.transactionLogs.slice(-5).reverse().map(log => `
-                    <tr>
-                      <td class="py-3 text-slate-500">${log.Date}</td>
-                      <td class="py-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] bg-slate-100">${log.Type}</span></td>
-                      <td class="py-3 text-slate-700 font-semibold">${log.Item_ID}</td>
-                      <td class="py-3 font-bold">${log.Qty}</td>
-                      <td class="py-3 text-slate-500">${log.User}</td>
-                    </tr>
-                  `).join('') || '<tr><td colspan="5" class="py-4 text-center">ไม่มีข้อมูล</td></tr>'}
+                  ${state.transactionLogs.slice(-5).reverse().map(log => {
+                    let badgeClass = "bg-slate-100 text-slate-600";
+                    if (log.Type.includes("CREATE")) badgeClass = "bg-blue-100 text-blue-700";
+                    if (log.Type.includes("UPDATE")) badgeClass = "bg-amber-100 text-amber-700";
+                    if (log.Type.includes("DELETE")) badgeClass = "bg-red-100 text-red-700";
+                    if (log.Type === "STOCK_IN") badgeClass = "bg-emerald-100 text-emerald-700";
+                    if (log.Type === "STOCK_OUT") badgeClass = "bg-rose-100 text-rose-700";
+
+                    return `
+                      <tr>
+                        <td class="py-3 font-medium text-slate-500">${log.Date}</td>
+                        <td class="py-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badgeClass}">${log.Type}</span></td>
+                        <td class="py-3 text-slate-700 font-semibold">${log.Item_ID}</td>
+                        <td class="py-3 text-slate-800 font-bold">${log.Qty}</td>
+                        <td class="py-3 text-slate-500">${log.User}</td>
+                      </tr>
+                    `;
+                  }).join('') || '<tr><td colspan="5" class="py-4 text-center text-slate-400">ยังไม่มีธุรกรรมในวันนี้</td></tr>'}
                 </tbody>
               </table>
             </div>
           </div>
+
         </div>
       `;
     }
 
+    // ========================================== REQUIREMENT 1: CATALOG GROUPED VIEW ==========================================
     function renderCatalog(target) {
       let catalogHtml = "";
       
       if (state.categoryTypes.length === 0) {
-        target.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-slate-400">ไม่พบประเภทหมวดหมู่หลัก</div>`;
+        target.innerHTML = `<div class="bg-white p-8 rounded-2xl shadow-sm text-center text-slate-400"><i class="fa-solid fa-boxes-stacked text-5xl mb-3 block text-slate-300"></i> ไม่พบประเภทหมวดหมู่หลักในฐานข้อมูล กรุณาเพิ่มข้อมูลประเภทหมวดหมู่ก่อน</div>`;
         return;
       }
 
       state.categoryTypes.forEach(ct => {
         const ctCategories = state.categories.filter(c => c.Category_Type_ID === ct.Category_Type_ID);
+        // คัดกรองเอาเฉพาะหมวดหมู่ย่อยที่มีรายการพัสดุอยู่ข้างในจริงๆ เท่านั้น
+        const activeCategories = ctCategories.filter(c => state.itemMaster.some(i => i.Category_ID === c.Category_ID));
         
-        // Filter out empty sub-categories
-        const activeCategories = ctCategories.map(c => {
-          const items = state.itemMaster.filter(i => i.Category_ID === c.Category_ID);
-          return { ...c, items };
-        }).filter(c => c.items.length > 0);
+        // ถ้าประเภทหมวดหมู่นี้ ไม่มีหมวดหมู่ย่อยที่มีของเลย ให้ข้ามการแสดงผลไปเลย
+        if (activeCategories.length === 0) return;
 
-        if (activeCategories.length === 0) return; // Skip if no active sub-categories
-
-        let typeIconClass = "fa-solid fa-layer-group";
+        let typeIconClass = "fa-solid fa-layer-group"; // Default icon
         const typeId = ct.Category_Type_ID;
         const typeName = ct.Category_Type_Name || "";
         
@@ -643,15 +828,17 @@
 
         catalogHtml += `
           <div class="mb-8">
-            <div onclick="toggleCategoryType('${ct.Category_Type_ID}')" class="cursor-pointer bg-gradient-to-r from-brandPink-50 to-pink-50 border p-3 rounded-xl mb-4 flex justify-between shadow-sm hover:shadow-md transition group">
+            <div onclick="toggleCategoryType('${ct.Category_Type_ID}')" class="cursor-pointer bg-gradient-to-r from-brandPink-50 to-pink-50 border border-pink-200 p-3 rounded-xl mb-4 flex items-center justify-between shadow-sm hover:shadow-md transition group">
               <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-brandPink-500 text-white rounded-lg flex items-center justify-center"><i class="${typeIconClass}"></i></div>
+                <div class="w-8 h-8 bg-brandPink-500 text-white rounded-lg flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                  <i class="${typeIconClass}"></i>
+                </div>
                 <div>
-                  <h3 class="text-base font-bold text-brandPink-800">${ct.Category_Type_Name}</h3>
-                  <p class="text-[10px] text-brandPink-600">${activeCategories.length} หมวดหมู่ย่อย</p>
+                  <h3 class="text-base font-bold text-brandPink-800 leading-tight">${ct.Category_Type_Name}</h3>
+                  <p class="text-[10px] text-brandPink-600 font-semibold">${activeCategories.length} หมวดหมู่ย่อย</p>
                 </div>
               </div>
-              <div class="bg-white text-brandPink-500 w-7 h-7 rounded-full flex items-center justify-center">
+              <div class="bg-white text-brandPink-500 w-7 h-7 rounded-full flex items-center justify-center shadow-sm">
                 <i id="catTypeIcon_${ct.Category_Type_ID}" class="fa-solid fa-chevron-up rotate-180 transition-transform duration-300"></i>
               </div>
             </div>
@@ -660,83 +847,155 @@
         `;
 
         if (catalogViewMode === 'grid') {
+          // --- มุมมองแบบ CARD/GRID ---
           catalogHtml += `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">`;
           activeCategories.forEach(c => {
+            const catItems = state.itemMaster.filter(i => i.Category_ID === c.Category_ID);
+            
             catalogHtml += `
-              <div class="bg-white rounded-2xl p-5 border flex flex-col justify-between">
+              <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between">
                 <div>
                   <div class="flex items-center justify-between mb-3">
-                    <h4 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-folder-open text-brandPink-500 mr-2"></i> ${c.Category_Name}</h4>
-                    <span class="text-xs bg-slate-100 px-2 py-1 rounded-lg">${c.items.length} รายการ</span>
+                    <h4 class="font-bold text-sm text-slate-800 flex items-center">
+                      <i class="fa-solid fa-folder-open text-brandPink-500 mr-2 text-base"></i> ${c.Category_Name}
+                    </h4>
+                    <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">${catItems.length} รายการพัสดุ</span>
                   </div>
+                  <p class="text-xs text-slate-400 mb-4">${c.Description || 'ไม่มีคำอธิบายเพิ่มเติม'}</p>
+                  
                   <div class="divide-y divide-slate-100">
             `;
-            c.items.forEach(i => {
-              const sumObj = state.stockSummary.find(s => s.Item_ID === i.Item_ID);
-              const balance = sumObj ? Number(sumObj.Balance) : 0;
-              const isLow = balance <= (Number(i.Min_Stock) || 0);
+
+            catItems.forEach(i => {
+              const stockInfo = getStockData(i.Item_ID, i);
+              const balance = stockInfo.balance;
+              const isLow = stockInfo.isLow;
+              
+              let iconClass = "fa-solid fa-cube";
+              const nameLower = i.Item_Name.toLowerCase();
+              if (nameLower.includes("ram") || nameLower.includes("หน่วยความจำ")) iconClass = "fa-solid fa-memory";
+              else if (nameLower.includes("disk") || nameLower.includes("ssd") || nameLower.includes("harddisk")) iconClass = "fa-solid fa-hard-drive";
+              else if (nameLower.includes("cpu") || nameLower.includes("processor")) iconClass = "fa-solid fa-microchip";
+              else if (nameLower.includes("monitor") || nameLower.includes("จอ")) iconClass = "fa-solid fa-display";
+              else if (nameLower.includes("printer") || nameLower.includes("พิมพ์")) iconClass = "fa-solid fa-print";
+              else if (nameLower.includes("switch") || nameLower.includes("hub") || nameLower.includes("router")) iconClass = "fa-solid fa-network-wired";
+              else if (nameLower.includes("ups") || nameLower.includes("สำรองไฟ")) iconClass = "fa-solid fa-battery-three-quarters";
 
               catalogHtml += `
-                <div class="py-3 flex justify-between items-center px-2 hover:bg-slate-50">
-                  <div class="flex space-x-3 items-center">
-                    <div class="w-9 h-9 rounded-xl bg-pink-50 text-brandPink-500 flex items-center justify-center"><i class="fa-solid fa-cube"></i></div>
+                <div class="py-3 flex items-center justify-between hover:bg-slate-50/50 px-2 rounded-lg transition duration-150">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-pink-50 text-brandPink-500 flex items-center justify-center">
+                      <i class="${iconClass}"></i>
+                    </div>
                     <div>
                       <h5 class="text-xs font-semibold text-slate-800">${i.Item_Name}</h5>
-                      <p class="text-[10px] text-slate-400">${i.Brand} | ${i.Model}</p>
+                      <p class="text-[10px] text-slate-400">ยี่ห้อ: ${i.Brand} | รุ่น: ${i.Model} [${i.Item_ID}]</p>
                     </div>
                   </div>
-                  <div class="flex items-center space-x-3">
+                  <div class="flex items-center space-x-4">
                     <div class="text-right">
                       <span class="text-sm font-extrabold ${isLow ? 'text-rose-600' : 'text-slate-800'}">${balance}</span>
-                      <span class="text-[10px] text-slate-500">${i.Unit}</span>
-                      ${isLow ? `<span class="block text-[8px] badge-pulse rounded text-white text-center">Low</span>` : ''}
+                      <span class="text-[10px] text-slate-500 ml-0.5">${i.Unit}</span>
+                      ${isLow ? `<span class="block text-[8px] font-extrabold text-rose-500 badge-pulse rounded px-1 text-white text-center">Low</span>` : ''}
                     </div>
-                    <button onclick="viewItemDetail('${i.Item_ID}')" class="text-xs text-brandPink-500 hover:bg-brandPink-100 p-2 rounded-lg"><i class="fa-solid fa-circle-info"></i> Detail</button>
+                    <button onclick="viewItemDetail('${i.Item_ID}')" class="text-xs text-brandPink-500 hover:text-brandPink-700 bg-brandPink-50 hover:bg-brandPink-100 p-2 rounded-xl transition duration-150" title="ดูรายละเอียดแบบเจาะลึก">
+                      <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
                   </div>
                 </div>
               `;
             });
-            catalogHtml += `</div></div></div>`;
+
+            catalogHtml += `
+                  </div>
+                </div>
+              </div>
+            `;
           });
           catalogHtml += `</div>`;
-        } else {
-          // Table mode
+          
+        } else if (catalogViewMode === 'table') {
+          // --- มุมมองแบบ TABLE ---
           catalogHtml += `
-            <div class="bg-white rounded-2xl border overflow-x-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
               <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50 border-b text-slate-500 font-semibold"><tr><th class="p-3">หมวดหมู่ย่อย</th><th class="p-3">ชื่ออะไหล่</th><th class="p-3">ยี่ห้อ/รุ่น</th><th class="p-3 text-center">ยอดคงคลัง</th><th class="p-3 text-right">ดำเนินการ</th></tr></thead>
+                <thead class="bg-slate-50 border-b text-slate-500 font-semibold">
+                  <tr>
+                    <th class="p-3">หมวดหมู่ย่อย</th>
+                    <th class="p-3">ชื่ออะไหล่พัสดุ (Item Name)</th>
+                    <th class="p-3">ยี่ห้อ / รุ่น</th>
+                    <th class="p-3 text-center">ยอดคงคลัง</th>
+                    <th class="p-3 text-right">ดำเนินการ</th>
+                  </tr>
+                </thead>
                 <tbody class="divide-y divide-slate-100">
           `;
-          activeCategories.forEach(c => {
-            c.items.forEach((i, idx) => {
-              const sumObj = state.stockSummary.find(s => s.Item_ID === i.Item_ID);
-              const balance = sumObj ? Number(sumObj.Balance) : 0;
-              const isLow = balance <= (Number(i.Min_Stock) || 0);
 
-              catalogHtml += `<tr class="hover:bg-slate-50">`;
+          activeCategories.forEach(c => {
+            const catItems = state.itemMaster.filter(i => i.Category_ID === c.Category_ID);
+            catItems.forEach((i, idx) => {
+              const stockInfo = getStockData(i.Item_ID, i);
+              const balance = stockInfo.balance;
+              const isLow = stockInfo.isLow;
+
+              catalogHtml += `<tr class="hover:bg-slate-50/50">`;
+              // แสดง Category Column แค่บรรทัดแรก และรวม Rowspan
               if (idx === 0) {
-                catalogHtml += `<td class="p-3 font-semibold text-slate-700 border-r align-top" rowspan="${c.items.length}">${c.Category_Name}</td>`;
+                catalogHtml += `<td class="p-3 font-semibold text-slate-700 border-r border-slate-50 align-top" rowspan="${catItems.length}">
+                  <div class="flex flex-col space-y-1">
+                    <span class="flex items-center"><i class="fa-solid fa-folder-open text-brandPink-500 mr-1.5"></i> ${c.Category_Name}</span>
+                    <span class="text-[10px] font-normal text-slate-400">${c.Category_ID}</span>
+                  </div>
+                </td>`;
               }
               catalogHtml += `
-                <td class="p-3 font-semibold text-slate-800">${i.Item_Name}</td>
-                <td class="p-3 text-slate-600 text-xs">${i.Brand} / ${i.Model}</td>
-                <td class="p-3 text-center"><span class="font-extrabold ${isLow ? 'text-rose-600' : 'text-slate-800'}">${balance}</span></td>
-                <td class="p-3 text-right"><button onclick="viewItemDetail('${i.Item_ID}')" class="text-xs text-brandPink-600">Detail</button></td>
-              </tr>`;
+                  <td class="p-3">
+                      <div class="font-semibold text-slate-800">${i.Item_Name}</div>
+                      <div class="text-[10px] text-slate-500 font-mono">${i.Item_ID}</div>
+                    </td>
+                    <td class="p-3 text-slate-600 text-xs">${i.Brand} / ${i.Model}</td>
+                    <td class="p-3 text-center">
+                      <span class="font-extrabold text-base ${isLow ? 'text-rose-600' : 'text-slate-800'}">${balance}</span> 
+                      <span class="text-[10px] text-slate-500">${i.Unit}</span>
+                      ${isLow ? `<div class="mt-0.5"><span class="bg-rose-500 text-white px-1.5 py-0.5 rounded text-[8px] badge-pulse font-bold">Low Stock</span></div>` : ''}
+                    </td>
+                    <td class="p-3 text-right">
+                      <button onclick="viewItemDetail('${i.Item_ID}')" class="text-xs font-semibold text-brandPink-600 hover:text-brandPink-800 bg-brandPink-50 hover:bg-brandPink-100 px-3 py-1.5 rounded-lg transition" title="รายละเอียด">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                      </button>
+                    </td>
+                  </tr>
+                `;
             });
           });
-          catalogHtml += `</tbody></table></div>`;
+
+          catalogHtml += `
+                </tbody>
+              </table>
+            </div>
+          `;
         }
-        catalogHtml += `</div></div>`;
+
+        catalogHtml += `
+            </div>
+          </div>
+        `;
       });
 
       target.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white rounded-2xl p-4 border flex justify-between">
-            <span class="text-xs text-slate-500 font-semibold">ข้อมูลคลังพัสดุและอะไหล่ไอที</span>
-            <div class="flex space-x-2">
-              <button onclick="setCatalogViewMode('grid')" class="px-3 py-1 text-xs rounded ${catalogViewMode === 'grid' ? 'bg-brandPink-500 text-white' : 'bg-slate-100'}">Grid</button>
-              <button onclick="setCatalogViewMode('table')" class="px-3 py-1 text-xs rounded ${catalogViewMode === 'table' ? 'bg-brandPink-500 text-white' : 'bg-slate-100'}">Table</button>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
+            <span class="text-xs text-slate-500 font-semibold flex items-center">
+              <i class="fa-solid fa-circle-info text-brandPink-500 mr-2 text-sm"></i>
+              ข้อมูลคลังพัสดุและอะไหล่ไอทีแบบจัดกลุ่ม พร้อมผลรวมยอดคงเหลือ
+            </span>
+            <div class="flex items-center space-x-2 bg-slate-50 p-1 rounded-xl border border-slate-100">
+              <button onclick="setCatalogViewMode('grid')" class="px-4 py-1.5 rounded-lg text-xs font-semibold transition ${catalogViewMode === 'grid' ? 'bg-brandPink-500 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-200'}">
+                <i class="fa-solid fa-grip mr-1"></i> แบบการ์ด (Grid)
+              </button>
+              <button onclick="setCatalogViewMode('table')" class="px-4 py-1.5 rounded-lg text-xs font-semibold transition ${catalogViewMode === 'table' ? 'bg-brandPink-500 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-200'}">
+                <i class="fa-solid fa-list mr-1"></i> แบบตาราง (Table)
+              </button>
             </div>
           </div>
           ${catalogHtml}
@@ -744,6 +1003,7 @@
       `;
     }
 
+    // ฟังก์ชันย่อยสำหรับพับเก็บ-ขยาย กล่องหมวดหมู่
     function toggleCategoryType(typeId) {
       const content = document.getElementById('catTypeContent_' + typeId);
       const icon = document.getElementById('catTypeIcon_' + typeId);
@@ -752,45 +1012,860 @@
         icon.classList.toggle('rotate-180');
       }
     }
-    function setCatalogViewMode(mode) { catalogViewMode = mode; renderCurrentView(); }
 
+    // ฟังก์ชันจัดการมุมมอง Grid / Table
+    function setCatalogViewMode(mode) {
+      catalogViewMode = mode;
+      renderCurrentView();
+    }
+
+    // หน้าข้อมูล Detail ของอะไหล่ที่ระบุ
     function viewItemDetail(itemId) {
       const item = state.itemMaster.find(i => i.Item_ID === itemId);
       if (!item) return;
-      const sumObj = state.stockSummary.find(s => s.Item_ID === itemId);
-      const balance = sumObj ? sumObj.Balance : 0;
-      showModal(`รายละเอียดอะไหล่ ${item.Item_ID}`, `<div><h3>${item.Item_Name}</h3><p>คงเหลือ: ${balance} ${item.Unit}</p></div>`, `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 bg-slate-800 text-white rounded-xl">ปิด</button>`);
+
+      const stockInfo = getStockData(itemId, item);
+      const balance = stockInfo.balance;
+      const cat = state.categories.find(c => c.Category_ID === item.Category_ID);
+
+      const itemLogs = state.transactionLogs.filter(l => l.Item_ID === itemId).slice(-5).reverse();
+
+      const title = `รายละเอียดอะไหล่ ID: ${item.Item_ID}`;
+      const bodyHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 space-y-4">
+            <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">ชื่อพัสดุอะไหล่</p>
+                <p class="text-sm font-bold text-slate-800">${item.Item_Name}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">หมวดหมู่ย่อย</p>
+                <p class="text-sm font-semibold text-slate-700">${cat ? cat.Category_Name : '-'}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">ยี่ห้อ (Brand)</p>
+                <p class="text-sm font-semibold text-slate-700">${item.Brand}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">รุ่น (Model)</p>
+                <p class="text-sm font-semibold text-slate-700">${item.Model}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">ประเภทการควบคุมสต็อก</p>
+                <p class="text-xs font-bold text-brandPink-600">${item.Status || 'แบบกลุ่ม'}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">สถานที่เก็บหลัก</p>
+                <p class="text-sm font-semibold text-slate-700">${item.Location}</p>
+              </div>
+            </div>
+
+            <div class="bg-white border rounded-2xl p-4 shadow-sm">
+              <h4 class="text-xs font-bold text-slate-700 border-b pb-2 mb-3 flex items-center justify-between">
+                <span><i class="fa-solid fa-clock-rotate-left text-brandPink-500 mr-1.5"></i> ประวัติธุรกรรมล่าสุด 5 รายการ</span>
+              </h4>
+              <div class="divide-y divide-slate-100">
+                ${itemLogs.map(l => `
+                  <div class="py-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <span class="px-2 py-0.5 rounded text-[9px] font-bold ${l.Type === 'STOCK_IN' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${l.Type}</span>
+                      <span class="text-slate-500 ml-2">${l.Date}</span>
+                    </div>
+                    <span class="font-extrabold ${l.Type === 'STOCK_IN' ? 'text-emerald-600' : 'text-rose-600'}">${l.Type === 'STOCK_IN' ? '+' : '-'}${l.Qty}</span>
+                  </div>
+                `).join('') || '<p class="text-xs text-slate-400 text-center py-4">ไม่พบประวัติธุรกรรมสำหรับพัสดุชิ้นนี้</p>'}
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center flex flex-col justify-between bg-pink-50/50 p-5 rounded-2xl border border-pink-100">
+            <div>
+              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ยอดสต็อกคงคลังปัจจุบัน</p>
+              <h2 class="text-4xl font-extrabold text-brandPink-600 mt-2">${balance} <span class="text-xs font-medium text-slate-500">${item.Unit}</span></h2>
+              <div class="flex justify-center space-x-4 mt-3 text-xs font-bold">
+                 <span class="text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">ยอดเข้า (In): ${stockInfo.stockIn}</span>
+                 <span class="text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg">ยอดออก (Out): ${stockInfo.stockOut}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 block mt-3">จุดเตือนพัสดุต่ำสุด: ${item.Min_Stock} ${item.Unit}</span>
+            </div>
+            
+            <div class="flex flex-col items-center my-4">
+              <div id="modalQRDiv" class="p-2 bg-white rounded-xl border shadow-sm"></div>
+              <p class="text-[10px] text-slate-500 font-bold mt-2">${item.Item_ID}</p>
+            </div>
+
+            <div class="flex space-x-2">
+              <button onclick="generateQRCode('${item.Item_ID}')" class="flex-1 py-2 bg-brandPink-500 hover:bg-brandPink-600 text-white font-bold text-xs rounded-xl transition">
+                <i class="fa-solid fa-qrcode mr-1"></i> พิมพ์ QR
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition">ปิดหน้าต่าง</button>
+      `;
+
+      showModal(title, bodyHTML, footerHTML);
+
+      setTimeout(() => {
+        new QRCode(document.getElementById('modalQRDiv'), {
+          text: item.Item_ID,
+          width: 100,
+          height: 100,
+          colorDark: "#0f172a",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }, 100);
     }
 
-    function renderCategoryType(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">จัดการประเภท (Category Type) - UI Placeholder</div>`; }
-    function renderCategory(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">จัดการหมวดหมู่ (Category) - UI Placeholder</div>`; }
-    function renderItemMaster(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">จัดการพัสดุอะไหล่ (Item Master) - UI Placeholder</div>`; }
-    function renderDeviceAsset(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">ทะเบียนครุภัณฑ์ - Directory View Only</div>`; }
-    function renderRepairJob(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">ระบบงานซ่อมบำรุง - UI Placeholder</div>`; }
-    
+    // ========================================== RENDER CATEGORY TYPE VIEW ==========================================
+    function renderCategoryType(target) {
+      const items = state.categoryTypes;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+              <input type="text" id="catTypeSearch" oninput="filterTable('catTypeTable', this.value)" placeholder="ค้นหาหมวดหมู่หลัก..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <button onclick="openCategoryTypeForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10">
+              <i class="fa-solid fa-plus mr-1.5"></i> เพิ่มประเภทหมวดหมู่
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="catTypeTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">ID ประเภท</th>
+                  <th class="p-4">ชื่อประเภท</th>
+                  <th class="p-4">คำอธิบาย</th>
+                  <th class="p-4">สถานะ</th>
+                  <th class="p-4 text-right">ดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => `
+                  <tr class="hover:bg-slate-50/50">
+                    <td class="p-4 font-bold text-slate-700">${item.Category_Type_ID}</td>
+                    <td class="p-4 font-semibold text-slate-800">${item.Category_Type_Name}</td>
+                    <td class="p-4 text-slate-500">${item.Description || '-'}</td>
+                    <td class="p-4">
+                      <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.Status === 'ใช้งาน' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${item.Status || 'ใช้งาน'}</span>
+                    </td>
+                    <td class="p-4 text-right space-x-1">
+                      <button onclick="openCategoryTypeForm('${item.Category_Type_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button>
+                      <button onclick="deleteRow('Category_Type', '${item.Category_Type_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                  </tr>
+                `).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลประเภทหมวดหมู่</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openCategoryTypeForm(id = null) {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดฟอร์ม
+      const isEdit = !!id;
+      const record = isEdit ? state.categoryTypes.find(c => c.Category_Type_ID === id) : null;
+      
+      const title = isEdit ? "แก้ไขประเภทหมวดหมู่" : "เพิ่มประเภทหมวดหมู่หลัก";
+      const bodyHTML = `
+        <form id="catTypeForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อประเภทหมวดหมู่หลัก <span class="text-red-500">*</span></label>
+            <input type="text" name="Category_Type_Name" value="${record ? record.Category_Type_Name : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">คำอธิบาย</label>
+            <textarea name="Description" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Description : ''}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">สถานะ <span class="text-red-500">*</span></label>
+            <select name="Status" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="ใช้งาน" ${record && record.Status === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option>
+              <option value="ระงับการใช้งาน" ${record && record.Status === 'ระงับการใช้งาน' ? 'selected' : ''}>ระงับการใช้งาน</option>
+            </select>
+          </div>
+        </form>
+      `;
+      
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button>
+        <button onclick="saveCategoryType('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูล</button>
+      `;
+      
+      showModal(title, bodyHTML, footerHTML);
+    }
+
+    function saveCategoryType(id) {
+      const form = document.getElementById('catTypeForm');
+      if (!form.reportValidity()) return;
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      showLoading("กำลังประมวลผลระบบ...");
+      
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') {
+            res = await apiCall('updateRecord', ["Category_Type", "Category_Type_ID", id, data]);
+          } else {
+            res = await apiCall('createRecord', ["Category_Type", data, "Category_Type_ID", "TYP"]);
+          }
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('dynamicModal');
+            showToast(res.message, "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      };
+      
+      saveAction();
+    }
+
+    // ========================================== REQUIREMENT 2: CATEGORY FORM ==========================================
+    function renderCategory(target) {
+      const items = state.categories;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <input type="text" id="catSearch" oninput="filterTable('catTable', this.value)" placeholder="ค้นหาหมวดหมู่ย่อย..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <button onclick="openCategoryForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10">
+              <i class="fa-solid fa-plus mr-1.5"></i> เพิ่มหมวดหมู่ย่อย
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="catTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">ID หมวดหมู่</th>
+                  <th class="p-4">ประเภทหลัก</th>
+                  <th class="p-4">ชื่อหมวดหมู่ย่อย</th>
+                  <th class="p-4">รายละเอียด</th>
+                  <th class="p-4">สถานะ</th>
+                  <th class="p-4 text-right">ดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const parent = state.categoryTypes.find(pt => pt.Category_Type_ID === item.Category_Type_ID);
+                  return `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-4 font-bold text-slate-700">${item.Category_ID}</td>
+                      <td class="p-4 font-medium text-slate-500">${parent ? parent.Category_Type_Name : '-'}</td>
+                      <td class="p-4 font-semibold text-slate-800">${item.Category_Name}</td>
+                      <td class="p-4 text-slate-500">${item.Description || '-'}</td>
+                      <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.Status === 'ใช้งาน' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${item.Status || 'ใช้งาน'}</span>
+                      </td>
+                      <td class="p-4 text-right space-x-1">
+                        <button onclick="openCategoryForm('${item.Category_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteRow('Category', '${item.Category_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลหมวดหมู่ย่อย</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openCategoryForm(id = null) {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดฟอร์ม
+      const isEdit = !!id;
+      const record = isEdit ? state.categories.find(c => c.Category_ID === id) : null;
+      
+      const title = isEdit ? "แก้ไขหมวดหมู่ย่อย" : "เพิ่มหมวดหมู่ย่อย";
+      const bodyHTML = `
+        <form id="categoryForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทหลัก (Category Type) <span class="text-red-500">*</span></label>
+            <select name="Category_Type_ID" id="categoryTypeSelect" required onchange="generateDefaultCategoryID()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">เลือกประเภทหมวดหมู่หลัก</option>
+              ${state.categoryTypes.map(pt => `<option value="${pt.Category_Type_ID}" ${record && record.Category_Type_ID === pt.Category_Type_ID ? 'selected' : ''}>${pt.Category_Type_Name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสหมวดหมู่ (Category_ID) <span class="text-slate-400 font-normal">(คำนวณอัตโนมัติ)</span></label>
+            <input type="text" name="Category_ID" id="categoryIDInput" value="${record ? record.Category_ID : ''}" readonly class="w-full text-sm bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-xl text-slate-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อหมวดหมู่ย่อย <span class="text-red-500">*</span></label>
+            <input type="text" name="Category_Name" id="categoryNameInput" value="${record ? record.Category_Name : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น RAM DDR4, SSD SATA">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">คำอธิบาย</label>
+            <textarea name="Description" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Description : ''}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">สถานะ <span class="text-red-500">*</span></label>
+            <select name="Status" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="ใช้งาน" ${record && record.Status === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option>
+              <option value="ระงับการใช้งาน" ${record && record.Status === 'ระงับการใช้งาน' ? 'selected' : ''}>ระงับการใช้งาน</option>
+            </select>
+          </div>
+        </form>
+      `;
+      
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button>
+        <button onclick="saveCategory('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูล</button>
+      `;
+      
+      showModal(title, bodyHTML, footerHTML);
+      
+      if (!isEdit) {
+        generateDefaultCategoryID();
+      }
+    }
+
+    function generateDefaultCategoryID() {
+      const typeSelect = document.getElementById('categoryTypeSelect');
+      const idInput = document.getElementById('categoryIDInput');
+      if (!typeSelect || !idInput) return;
+
+      const typeId = typeSelect.value;
+      if (!typeId) {
+        idInput.value = "";
+        return;
+      }
+
+      const count = state.categories.filter(c => c.Category_Type_ID === typeId).length;
+      idInput.value = `${typeId} - ${count + 1}`;
+    }
+
+    function saveCategory(id) {
+      const form = document.getElementById('categoryForm');
+      if (!form.reportValidity()) return;
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      const isDuplicate = state.categories.some(c => 
+        c.Category_ID !== id && 
+        c.Category_Type_ID === data.Category_Type_ID && 
+        c.Category_Name.trim().toLowerCase() === data.Category_Name.trim().toLowerCase()
+      );
+
+      if (isDuplicate) {
+        showToast("ไม่สามารถเพิ่มได้เนื่องจากมีชื่อหมวดหมู่ย่อยนี้ในประเภทหมวดหมู่หลักนี้แล้ว", "warning");
+        return;
+      }
+
+      showLoading("กำลังบันทึกข้อมูล...");
+      
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') {
+            res = await apiCall('updateRecord', ["Category", "Category_ID", id, data]);
+          } else {
+            res = await apiCall('createRecord', ["Category", data, "Category_ID", "CAT"]);
+            
+            if (res.success && res.id) {
+              await apiCall('updateRecord', ["Category", "Category_ID", res.id, { Category_ID: data.Category_ID }]);
+            }
+          }
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('dynamicModal');
+            showToast("บันทึกหมวดหมู่อะไหล่สำเร็จ", "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      };
+      
+      saveAction();
+    }
+
+    // ========================================== REQUIREMENT 3: ITEM MASTER FORM ==========================================
+    function renderItemMaster(target) {
+      const items = state.itemMaster;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <input type="text" id="itemSearch" oninput="filterTable('itemTable', this.value)" placeholder="ค้นหาอะไหล่..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <button onclick="openItemMasterForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10">
+              <i class="fa-solid fa-plus mr-1.5"></i> เพิ่มรายการอะไหล่ IT ใหม่
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="itemTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">Item ID / QR</th>
+                  <th class="p-4">หมวดหมู่</th>
+                  <th class="p-4">ชื่อสินค้า</th>
+                  <th class="p-4">ยี่ห้อ / รุ่น</th>
+                  <th class="p-4">สเปคการใช้งาน</th>
+                  <th class="p-4">การควบคุมคลัง (Status)</th>
+                  <th class="p-4">จุดสั่งชื้อขั้นต่ำ (Min)</th>
+                  <th class="p-4">สถานที่จัดเก็บ</th>
+                  <th class="p-4 text-right">ดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const cat = state.categories.find(c => c.Category_ID === item.Category_ID);
+                  const isSerialized = item.Status === "แบบรายชิ้น";
+                  return `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-4 font-bold text-slate-700 flex items-center space-x-2">
+                        <span>${item.Item_ID}</span>
+                        <button onclick="generateQRCode('${item.Item_ID}')" class="text-brandPink-500 hover:text-brandPink-600" title="แสดง QR Code"><i class="fa-solid fa-qrcode"></i></button>
+                      </td>
+                      <td class="p-4 font-medium text-slate-500">${cat ? cat.Category_Name : '-'}</td>
+                      <td class="p-4 font-semibold text-slate-800">${item.Item_Name}</td>
+                      <td class="p-4 text-slate-700">${item.Brand} / ${item.Model}</td>
+                      <td class="p-4 text-slate-500 max-w-xs truncate">${item.Specification || '-'}</td>
+                      <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isSerialized ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}">
+                          <i class="${isSerialized ? 'fa-solid fa-barcode' : 'fa-solid fa-boxes-stacked'} mr-1"></i> ${item.Status || 'แบบกลุ่ม'}
+                        </span>
+                      </td>
+                      <td class="p-4 font-bold text-slate-800 text-center">${item.Min_Stock} ${item.Unit}</td>
+                      <td class="p-4 text-slate-600">${item.Location}</td>
+                      <td class="p-4 text-right space-x-1">
+                        <button onclick="openItemMasterForm('${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteRow('Item_Master', '${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="9" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลอะไหล่ไอทีในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openItemMasterForm(id = null) {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดฟอร์ม
+      const isEdit = !!id;
+      const record = isEdit ? state.itemMaster.find(item => item.Item_ID === id) : null;
+      let recordCategory = null;
+      let recordCategoryTypeID = "";
+
+      if (record) {
+        recordCategory = state.categories.find(c => c.Category_ID === record.Category_ID);
+        if (recordCategory) {
+          recordCategoryTypeID = recordCategory.Category_Type_ID;
+        }
+      }
+      
+      const title = isEdit ? "แก้ไขข้อมูลอะไหล่ IT" : "เพิ่มข้อมูลอะไหล่ IT ใหม่";
+      const bodyHTML = `
+        <form id="itemMasterForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทหมวดหมู่หลัก <span class="text-red-500">*</span></label>
+            <select id="itemFormCategoryType" required onchange="filterItemFormCategories()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">เลือกประเภทหลัก</option>
+              ${state.categoryTypes.map(ct => `<option value="${ct.Category_Type_ID}" ${recordCategoryTypeID === ct.Category_Type_ID ? 'selected' : ''}>${ct.Category_Type_Name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">หมวดหมู่อะไหล่ย่อย <span class="text-red-500">*</span></label>
+            <select name="Category_ID" id="itemFormCategory" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">กรุณาเลือกประเภทหลักก่อน</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่ออะไหล่พัสดุ <span class="text-red-500">*</span></label>
+            <input type="text" name="Item_Name" value="${record ? record.Item_Name : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น RAM DDR4 16GB">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ยี่ห้อ (Brand) <span class="text-red-500">*</span></label>
+            <input type="text" name="Brand" value="${record ? record.Brand : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น Kingston, Samsung">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">รุ่น (Model) <span class="text-red-500">*</span></label>
+            <input type="text" name="Model" value="${record ? record.Model : ''}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น HyperX Fury">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">หน่วยนับ <span class="text-red-500">*</span></label>
+            <input type="text" name="Unit" value="${record ? record.Unit : 'ชิ้น'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="ชิ้น, ตัว, อัน">
+          </div>
+          <div class="col-span-1 md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">รายละเอียดทางเทคนิค (Specification)</label>
+            <textarea name="Specification" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Specification : ''}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">จุดสั่งซื้อขั้นต่ำ (Min Stock) <span class="text-red-500">*</span></label>
+            <input type="number" name="Min_Stock" value="${record ? record.Min_Stock : '5'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">สถานที่จัดเก็บ/ตู้เก็บอะไหล่ <span class="text-red-500">*</span></label>
+            <input type="text" name="Location" value="${record ? record.Location : 'ตู้เก็บหลัก ชั้น 1'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">การควบคุมสถานะ (Status) <span class="text-red-500">*</span></label>
+            <select name="Status" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="แบบกลุ่ม" ${record && record.Status === 'แบบกลุ่ม' ? 'selected' : ''}>แบบกลุ่ม (ควบคุมจำนวน Bulk)</option>
+              <option value="แบบรายชิ้น" ${record && record.Status === 'แบบรายชิ้น' ? 'selected' : ''}>แบบรายชิ้น (คุม Serial รายชิ้น)</option>
+            </select>
+          </div>
+        </form>
+      `;
+      
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button>
+        <button onclick="saveItemMaster('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูลอะไหล่</button>
+      `;
+      
+      showModal(title, bodyHTML, footerHTML);
+      
+      if (recordCategoryTypeID) {
+        filterItemFormCategories(record.Category_ID);
+      }
+    }
+
+    function filterItemFormCategories(selectedCatID = "") {
+      const typeSelect = document.getElementById('itemFormCategoryType');
+      const catSelect = document.getElementById('itemFormCategory');
+      if (!typeSelect || !catSelect) return;
+
+      const typeId = typeSelect.value;
+      if (!typeId) {
+        catSelect.innerHTML = `<option value="">กรุณาเลือกประเภทหลักก่อน</option>`;
+        return;
+      }
+
+      const filtered = state.categories.filter(c => c.Category_Type_ID === typeId);
+      let options = `<option value="">เลือกหมวดหมู่ย่อย</option>`;
+      filtered.forEach(c => {
+        options += `<option value="${c.Category_ID}" ${selectedCatID === c.Category_ID ? 'selected' : ''}>${c.Category_Name}</option>`;
+      });
+      catSelect.innerHTML = options;
+    }
+
+    function saveItemMaster(id) {
+      const form = document.getElementById('itemMasterForm');
+      if (!form.reportValidity()) return;
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      const isDuplicate = state.itemMaster.some(item => 
+        item.Item_ID !== id && 
+        item.Item_Name.trim().toLowerCase() === data.Item_Name.trim().toLowerCase() && 
+        item.Brand.trim().toLowerCase() === data.Brand.trim().toLowerCase() && 
+        item.Model.trim().toLowerCase() === data.Model.trim().toLowerCase()
+      );
+
+      if (isDuplicate) {
+        showToast("พบข้อมูลอะไหล่ที่มี ชื่อ ยี่ห้อ และรุ่น ตรงกันในคลังแล้ว ป้องกันข้อมูลบันทึกซ้ำ!", "warning");
+        return;
+      }
+
+      showLoading("กำลังประมวลผลข้อมูล...");
+      
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') {
+            res = await apiCall('updateRecord', ["Item_Master", "Item_ID", id, data]);
+          } else {
+            res = await apiCall('createRecord', ["Item_Master", data, "Item_ID", "ITM"]);
+          }
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('dynamicModal');
+            showToast("บันทึกข้อมูลอะไหล่พัสดุสำเร็จ", "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      };
+      
+      saveAction();
+    }
+
+    // ========================================== RENDER DEVICE ASSET VIEW (READ-ONLY DIRECTORY) ==========================================
+    function renderDeviceAsset(target) {
+      const items = state.deviceAssets;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+              <input type="text" id="deviceSearch" oninput="filterTable('deviceTable', this.value)" placeholder="ค้นหาคุรุภัณฑ์คอมพิวเตอร์..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-circle-info text-brandPink-500 mr-1.5"></i>สิทธิ์การเพิ่มและแก้ไขครุภัณฑ์สงวนไว้เฉพาะส่วนงานพัสดุกลาง</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="deviceTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">Device ID / QR</th>
+                  <th class="p-4">เลขทรัพย์สิน (Asset Tag)</th>
+                  <th class="p-4">ยี่ห้อ / รุ่น</th>
+                  <th class="p-4">ประเภทอุปกรณ์</th>
+                  <th class="p-4">Serial Number</th>
+                  <th class="p-4">กลุ่มงาน / แผนก</th>
+                  <th class="p-4">ผู้รับผิดชอบ</th>
+                  <th class="p-4">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => `
+                  <tr class="hover:bg-slate-50/50">
+                    <td class="p-4 font-bold text-slate-700 flex items-center space-x-2">
+                      <span>${item.Device_ID}</span>
+                      <button onclick="generateQRCode('${item.Device_ID}')" class="text-brandPink-500 hover:text-brandPink-600" title="แสดง QR Code"><i class="fa-solid fa-qrcode"></i></button>
+                    </td>
+                    <td class="p-4 font-semibold text-slate-800">${item.Asset_Tag || '-'}</td>
+                    <td class="p-4 text-slate-700 font-semibold">${item.Brand} / ${item.Model}</td>
+                    <td class="p-4 text-slate-500">${item.Device_Type}</td>
+                    <td class="p-4 text-slate-600 font-mono text-xs">${item.Serial_Number || '-'}</td>
+                    <td class="p-4 text-slate-600">${item.Department}</td>
+                    <td class="p-4 text-slate-700 font-medium">${item.User}</td>
+                    <td class="p-4">
+                      <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.Status === 'พร้อมใช้งาน' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">${item.Status || 'พร้อมใช้งาน'}</span>
+                    </td>
+                  </tr>
+                `).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลคุรุภัณฑ์คอมพิวเตอร์ในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================== RENDER REPAIR JOB VIEW ==========================================
+    function renderRepairJob(target) {
+      const items = state.repairJobs;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <input type="text" id="repairSearch" oninput="filterTable('repairTable', this.value)" placeholder="ค้นหาใบส่งซ่อม..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <button onclick="openRepairJobForm()" class="bg-gradient-to-tr from-brandPink-500 to-pink-600 hover:from-brandPink-600 hover:to-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10">
+              <i class="fa-solid fa-plus mr-1.5"></i> เปิดบันทึกรับซ่อมงานใหม่
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="repairTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">เลขใบซ่อม (Job ID)</th>
+                  <th class="p-4">วันที่เปิดงาน</th>
+                  <th class="p-4">วันที่ปิดงาน</th>
+                  <th class="p-4">Device ID (เครื่อง)</th>
+                  <th class="p-4">ปัญหาชำรุดที่พบ</th>
+                  <th class="p-4">ช่างคอมผู้รับผิดชอบ</th>
+                  <th class="p-4">สถานะการทำงาน</th>
+                  <th class="p-4">หมายเหตุ / ลิงก์เอกสาร</th>
+                  <th class="p-4 text-right">ดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const dev = state.deviceAssets.find(d => d.Device_ID === item.Device_ID);
+                  let badge = "bg-slate-100 text-slate-700";
+                  if (item.Status === 'เปิดงาน') badge = "bg-sky-50 text-sky-700 font-bold";
+                  if (item.Status === 'กำลังดำเนินงาน') badge = "bg-amber-50 text-amber-700 font-bold";
+                  if (item.Status === 'ซ่อมสำเร็จ') badge = "bg-emerald-50 text-emerald-700 font-bold";
+                  if (item.Status === 'ยกเลิกการซ่อม') badge = "bg-rose-50 text-rose-700";
+
+                  const noteContent = (item.Remark && item.Remark.startsWith('http')) 
+                    ? `<a href="${item.Remark}" target="_blank" class="text-brandPink-600 hover:underline font-bold"><i class="fa-solid fa-paperclip"></i> ลิงก์เอกสารแนบ</a>` 
+                    : (item.Remark || '-');
+
+                  return `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-4 font-bold text-slate-700">${item.Job_ID}</td>
+                      <td class="p-4 text-slate-600">${item.Open_Date}</td>
+                      <td class="p-4 text-slate-600">${item.Close_Date || '-'}</td>
+                      <td class="p-4 font-medium text-slate-700">${item.Device_ID} ${dev ? `(${dev.User})` : ''}</td>
+                      <td class="p-4 text-slate-500 max-w-xs truncate">${item.Problem}</td>
+                      <td class="p-4 text-slate-700 font-medium">${item.Technician}</td>
+                      <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs ${badge}">${item.Status}</span></td>
+                      <td class="p-4 text-xs text-slate-500">${noteContent}</td>
+                      <td class="p-4 text-right space-x-1">
+                        <button onclick="openUploadModal('${item.Job_ID}')" class="p-1.5 text-slate-500 hover:text-brandPink-600 hover:bg-brandPink-50 rounded-lg transition" title="แนบเอกสารใบตรวจรับ"><i class="fa-solid fa-paperclip"></i></button>
+                        <button onclick="openRepairJobForm('${item.Job_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="อัปเดตสถานะการซ่อม"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteRow('Repair_Job', '${item.Job_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="9" class="p-8 text-center text-slate-400">ยังไม่มีบันทึกใบแจ้งส่งซ่อมในระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openRepairJobForm(id = null) {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดฟอร์ม
+      const isEdit = !!id;
+      const record = isEdit ? state.repairJobs.find(job => job.Job_ID === id) : null;
+      
+      const title = isEdit ? "อัปเดตข้อมูล / ตรวจสอบงานซ่อมบำรุง" : "เปิดใบส่งงานแจ้งซ่อมใหม่";
+      const bodyHTML = `
+        <form id="repairJobForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ระบุคุรุภัณฑ์คอมพิวเตอร์ <span class="text-red-500">*</span></label>
+            <select name="Device_ID" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">เลือกเครื่องผู้ส่งซ่อม</option>
+              ${state.deviceAssets.map(d => `<option value="${d.Device_ID}" ${record && record.Device_ID === d.Device_ID ? 'selected' : ''}>${d.Device_ID} - ${d.Brand} ${d.Model} (ผู้ใช้: ${d.User})</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">วันที่เปิดรับงานซ่อม <span class="text-red-500">*</span></label>
+            <input type="date" name="Open_Date" value="${record ? record.Open_Date : new Date().toISOString().split('T')[0]}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">วันที่ดำเนินงานแล้วเสร็จ (ถ้ามี)</label>
+            <input type="date" name="Close_Date" value="${record && record.Close_Date ? record.Close_Date : ''}" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อช่างประจำเครื่อง/ผู้รับงาน <span class="text-red-500">*</span></label>
+            <input type="text" name="Technician" value="${record ? record.Technician : state.currentUser}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div class="col-span-1 md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">อาการชำรุด / รายละเอียดปัญหาของครุภัณฑ์ <span class="text-red-500">*</span></label>
+            <textarea name="Problem" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Problem : ''}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">สถานะปัจจุบัน <span class="text-red-500">*</span></label>
+            <select name="Status" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="เปิดงาน" ${record && record.Status === 'เปิดงาน' ? 'selected' : ''}>เปิดงาน (รอดำเนินการ)</option>
+              <option value="กำลังดำเนินงาน" ${record && record.Status === 'กำลังดำเนินงาน' ? 'selected' : ''}>กำลังดำเนินงาน</option>
+              <option value="ซ่อมสำเร็จ" ${record && record.Status === 'ซ่อมสำเร็จ' ? 'selected' : ''}>ซ่อมสำเร็จ</option>
+              <option value="ยกเลิกการซ่อม" ${record && record.Status === 'ยกเลิกการซ่อม' ? 'selected' : ''}>ยกเลิกการซ่อม</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุ หรือ ลิงก์แนบงานซ่อมภายนอก</label>
+            <input type="text" name="Remark" id="fieldRemarkLink" value="${record ? record.Remark : ''}" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="คำอธิบายเพิ่มเติม">
+          </div>
+        </form>
+      `;
+      
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button>
+        <button onclick="saveRepairJob('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกประวัติการส่งซ่อม</button>
+      `;
+      
+      showModal(title, bodyHTML, footerHTML);
+    }
+
+    function saveRepairJob(id) {
+      const form = document.getElementById('repairJobForm');
+      if (!form.reportValidity()) return;
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      showLoading("กำลังประมวลผลเซิร์ฟเวอร์...");
+      
+      const saveAction = async () => {
+        try {
+          let res;
+          if (id !== 'null' && id !== '') {
+            res = await apiCall('updateRecord', ["Repair_Job", "Job_ID", id, data]);
+          } else {
+            res = await apiCall('createRecord', ["Repair_Job", data, "Job_ID", "JOB"]);
+          }
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('dynamicModal');
+            showToast(res.message, "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      };
+      
+      saveAction();
+    }
+
+    // ========================================== STOCK IN VIEW ==========================================
     function renderStockIn(target) {
       const items = state.stockIn;
       target.innerHTML = `
-        <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div class="p-5 border-b flex justify-between">
-            <input type="text" placeholder="ค้นหา..." class="text-sm border px-3 py-2 rounded-xl">
-            <button onclick="openStockInForm()" class="bg-emerald-500 text-white px-4 py-2 rounded-xl"><i class="fa-solid fa-plus mr-1"></i> นำเข้า</button>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <input type="text" id="stockInSearch" oninput="filterTable('stockInTable', this.value)" placeholder="ค้นหาบันทึกนำเข้าสต็อก..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <button onclick="openStockInForm()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-emerald-500/10">
+              <i class="fa-solid fa-plus mr-1.5"></i> ทำรายการนำเข้าคลัง (Stock In)
+            </button>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-slate-50 border-b">
-                <tr><th class="p-4">ID</th><th class="p-4">วันที่</th><th class="p-4">อะไหล่</th><th class="p-4">Item Code</th><th class="p-4">จำนวน</th><th class="p-4">PO_ID</th><th class="p-4">อ้างอิง/SN</th><th class="p-4">ผู้บันทึก</th></tr>
+            <table class="w-full text-left text-sm" id="stockInTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">รายการบันทึก (ID)</th>
+                  <th class="p-4">วันที่นำเข้า</th>
+                  <th class="p-4">รหัสอะไหล่</th>
+                  <th class="p-4">ชื่ออะไหล่</th>
+                  <th class="p-4">รหัสสินค้า (Item Code)</th>
+                  <th class="p-4">จำนวนนำเข้า</th>
+                  <th class="p-4">ประเภทที่มา</th>
+                  <th class="p-4">เลขที่ใบสั่งซื้อ (PO_ID)</th>
+                  <th class="p-4">เลขเอกสารอ้างอิง / Serial No.</th>
+                  <th class="p-4">หมายเหตุเพิ่มเติม</th>
+                  <th class="p-4">ผู้บันทึก</th>
+                </tr>
               </thead>
-              <tbody class="divide-y">
-                ${items.map(item => `
-                  <tr>
-                    <td class="p-4 font-bold text-slate-700">${item.StockIn_ID}</td><td class="p-4">${item.Date}</td>
-                    <td class="p-4">${item.Item_ID}</td><td class="p-4">${item.Item_Code || '-'}</td>
-                    <td class="p-4 font-bold text-emerald-600">+${item.Quantity} ${item.Unit}</td>
-                    <td class="p-4 font-semibold text-brandPink-600">${item.PO_ID || '-'}</td>
-                    <td class="p-4">${item.Reference_No || '-'}</td><td class="p-4">${item.User}</td>
-                  </tr>
-                `).join('') || '<tr><td colspan="8" class="p-4 text-center">ไม่มีข้อมูล</td></tr>'}
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const master = state.itemMaster.find(m => m.Item_ID === item.Item_ID);
+                  return `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-4 font-bold text-slate-700">${item.StockIn_ID}</td>
+                      <td class="p-4 text-slate-600">${item.Date}</td>
+                      <td class="p-4 font-mono text-xs font-semibold text-slate-500">${item.Item_ID}</td>
+                      <td class="p-4 font-semibold text-slate-800">${master ? master.Item_Name : 'ไม่พบข้อมูล'}</td>
+                      <td class="p-4 font-semibold text-slate-700 text-xs font-mono">${item.Item_Code || '-'}</td>
+                      <td class="p-4 font-bold text-emerald-600">+${item.Quantity} ${item.Unit}</td>
+                      <td class="p-4 text-slate-600 font-medium">${item.Source_Type}</td>
+                      <td class="p-4 text-brandPink-600 font-semibold text-xs">${item.PO_ID || '-'}</td>
+                      <td class="p-4 text-slate-500 font-mono text-xs">${item.Reference_No || '-'}</td>
+                      <td class="p-4 text-xs text-slate-500">${item.Note || '-'}</td>
+                      <td class="p-4 text-slate-700 font-medium">${item.User}</td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="11" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการนำเข้าในระบบ</td></tr>'}
               </tbody>
             </table>
           </div>
@@ -799,122 +1874,974 @@
     }
 
     function openStockInForm() {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดฟอร์ม
+      const title = "ทำใบนำเข้าคลังอะไหล่ (Stock In)";
       const bodyHTML = `
         <form id="stockInForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold mb-1">เลือกอะไหล่ <span class="text-red-500">*</span></label>
-            <select name="Item_ID" id="stockInItemSelect" onchange="onStockInItemChanged()" class="w-full border px-3 py-2 rounded-xl" required>
-              <option value="">เลือกอะไหล่</option>
-              ${state.itemMaster.map(i => `<option value="${i.Item_ID}" data-unit="${i.Unit}" data-status="${i.Status}">${i.Item_ID} - ${i.Item_Name}</option>`).join('')}
+            <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกอะไหล่ไอทีที่ต้องการเติมสต็อก <span class="text-red-500">*</span></label>
+            <select name="Item_ID" id="stockInItemSelect" required onchange="onStockInItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">เลือกประเภทอะไหล่</option>
+              ${state.itemMaster.map(item => `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}">${item.Item_ID} - ${item.Item_Name} [การคุม: ${item.Status || 'แบบกลุ่ม'}]</option>`).join('')}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">จำนวน <span class="text-red-500">*</span></label>
-            <input type="number" name="Quantity" id="stockInQtyField" class="w-full border px-3 py-2 rounded-xl" required>
-            <p id="stockInWarningText" class="text-[10px] text-amber-600 font-bold hidden">บังคับรับเข้าทีละ 1 ชิ้น</p>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">จำนวนที่ต้องการเติมสต็อก <span class="text-red-500">*</span></label>
+            <div class="relative flex items-center">
+              <input type="number" name="Quantity" id="stockInQtyField" min="1" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <input type="text" name="Unit" id="stockInUnitField" readonly class="absolute right-3 w-16 text-center text-xs bg-slate-100 border-none font-bold text-slate-600" value="ชิ้น">
+            </div>
+            <p id="stockInWarningText" class="text-[10px] text-amber-600 font-bold mt-1 hidden"><i class="fa-solid fa-triangle-exclamation"></i> อะไหล่ประเภท "แบบรายชิ้น" ถูกบังคับบันทึกนำเข้าทีละ 1 ชิ้น</p>
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">Item Code (สแกนกล่อง)</label>
-            <div class="flex relative">
-              <input type="text" name="Item_Code" id="stockInItemCodeField" class="w-full border px-3 py-2 rounded-xl">
-              <button type="button" onclick="openScanner('stockInItemCodeField')" class="absolute right-2 top-2 text-brandPink-500"><i class="fa-solid fa-camera"></i></button>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสสินค้าภายนอก / Item Code (บาร์โค้ดสติกเกอร์ที่กล่อง)</label>
+            <div class="relative flex items-center">
+              <input type="text" name="Item_Code" id="stockInItemCodeField" class="w-full text-sm border border-slate-200 px-3 pr-10 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="สแกนหรือระบุรหัสสินค้าภายนอก">
+              <button type="button" onclick="openScanner('stockInItemCodeField')" class="absolute right-3 text-brandPink-500 hover:text-brandPink-600 p-1 bg-white rounded-lg border shadow-sm flex items-center justify-center w-7 h-7" title="ยิงสแกนกล้อง">
+                <i class="fa-solid fa-camera"></i>
+              </button>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">ที่มา <span class="text-red-500">*</span></label>
-            <select name="Source_Type" id="stockInSourceTypeSelect" onchange="onStockInSourceTypeChanged()" class="w-full border px-3 py-2 rounded-xl" required>
-              <option value="Purchase">Purchase (จัดซื้อ)</option>
-              <option value="Transfer">Transfer (โอนย้าย)</option>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ที่มาของสินค้า/อะไหล่ <span class="text-red-500">*</span></label>
+            <select name="Source_Type" id="stockInSourceTypeSelect" required onchange="onStockInSourceTypeChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="Purchase">Purchase (การจัดซื้อพัสดุคอมฯ)</option>
+              <option value="Return_From_Device">Return From Device (การคืนเครื่องจากการรื้อถอน)</option>
+              <option value="Transfer">Transfer (การโอนย้ายจากคลังย่อยอื่น)</option>
+              <option value="Adjustment">Adjustment (การปรับปรุงยอดตรวจนับ)</option>
             </select>
           </div>
-          <div id="poIdContainer">
-            <label class="block text-xs font-semibold mb-1">PO_ID (เลขใบสั่งซื้อ) <span class="text-red-500">*</span></label>
-            <input type="text" name="PO_ID" id="stockInPoIdField" class="w-full border px-3 py-2 rounded-xl" required>
+          <div id="poIdContainer" class="">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">เลขที่ใบสั่งซื้อ (PO_ID) <span class="text-red-500">*</span></label>
+            <input type="text" name="PO_ID" id="stockInPoIdField" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เช่น PO-67001">
           </div>
           <div class="col-span-1 md:col-span-2">
-            <label class="block text-xs font-semibold mb-1">Reference_No / Serial Number</label>
-            <div class="flex relative">
-              <input type="text" name="Reference_No" id="stockInRefField" class="w-full border px-3 py-2 rounded-xl">
-              <button type="button" onclick="openScanner('stockInRefField')" class="absolute right-2 top-2 text-brandPink-500"><i class="fa-solid fa-camera"></i></button>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">หมายเลขเอกสารอ้างอิง (หรือ Serial Number ของชิ้นงานถ้าคุมรายชิ้น)</label>
+            <div class="relative flex items-center">
+              <input type="text" name="Reference_No" id="stockInRefField" class="w-full text-sm border border-slate-200 px-3 pr-12 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" placeholder="เลขที่ใบพัสดุ หรือ S/N อุปกรณ์">
+              <button type="button" onclick="openScanner('stockInRefField')" class="absolute right-3 text-brandPink-500 hover:text-brandPink-600 p-1 bg-white rounded-lg border shadow-sm flex items-center justify-center w-7 h-7" title="ยิงสแกนกล้อง">
+                <i class="fa-solid fa-camera"></i>
+              </button>
             </div>
+          </div>
+          <div class="col-span-1 md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">บันทึกช่วยจำ/หมายเหตุเพิ่มเติม</label>
+            <textarea name="Note" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3"></textarea>
           </div>
         </form>
       `;
-      showModal("บันทึกนำเข้า", bodyHTML, `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 bg-slate-200 rounded">ยกเลิก</button><button onclick="saveStockIn()" class="px-4 py-2 bg-emerald-500 text-white rounded">บันทึก</button>`);
+      
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button>
+        <button onclick="saveStockIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">ยืนยันนำเข้าคลังสินค้า</button>
+      `;
+      
+      showModal(title, bodyHTML, footerHTML);
     }
 
     function onStockInItemChanged() {
-      const opt = document.getElementById('stockInItemSelect').options[document.getElementById('stockInItemSelect').selectedIndex];
-      if(!opt) return;
-      if (opt.dataset.status === "แบบรายชิ้น") {
-        document.getElementById('stockInQtyField').value = "1";
-        document.getElementById('stockInQtyField').readOnly = true;
-        document.getElementById('stockInWarningText').classList.remove('hidden');
+      const select = document.getElementById('stockInItemSelect');
+      const unitField = document.getElementById('stockInUnitField');
+      const qtyField = document.getElementById('stockInQtyField');
+      const warningText = document.getElementById('stockInWarningText');
+      const refField = document.getElementById('stockInRefField');
+      
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption) return;
+
+      if (selectedOption.dataset.unit) {
+        unitField.value = selectedOption.dataset.unit;
+      }
+
+      if (selectedOption.dataset.status === "แบบรายชิ้น") {
+        qtyField.value = "1";
+        qtyField.readOnly = true;
+        warningText.classList.remove('hidden');
+        refField.placeholder = "กรุณากรอกหรือสแกนหมายเลข Serial Number ของพัสดุ";
+        refField.required = true;
       } else {
-        document.getElementById('stockInQtyField').value = "";
-        document.getElementById('stockInQtyField').readOnly = false;
-        document.getElementById('stockInWarningText').classList.add('hidden');
+        qtyField.value = "";
+        qtyField.readOnly = false;
+        warningText.classList.add('hidden');
+        refField.placeholder = "เลขที่ใบพัสดุ หรือ เลขที่สัญญา";
+        refField.required = false;
       }
     }
-    
+
     function onStockInSourceTypeChanged() {
-      const type = document.getElementById('stockInSourceTypeSelect').value;
-      if (type === 'Purchase') {
-        document.getElementById('poIdContainer').classList.remove('hidden');
-        document.getElementById('stockInPoIdField').required = true;
+      const sourceType = document.getElementById('stockInSourceTypeSelect').value;
+      const poContainer = document.getElementById('poIdContainer');
+      const poField = document.getElementById('stockInPoIdField');
+
+      if (sourceType === 'Purchase') {
+        poContainer.classList.remove('hidden');
+        poField.required = true;
       } else {
-        document.getElementById('poIdContainer').classList.add('hidden');
-        document.getElementById('stockInPoIdField').required = false;
+        poContainer.classList.add('hidden');
+        poField.required = false;
+        poField.value = ''; // ล้างค่าทิ้งเมื่อซ่อน
       }
     }
 
     function saveStockIn() {
-      // NOTE: Remove updateStockSummary call in backend
-      closeModal('dynamicModal');
-      showToast("UI Mock: บันทึกข้อมูล", "success");
+      const form = document.getElementById('stockInForm');
+      if (!form.reportValidity()) return;
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      showLoading("กำลังอัปเดตปริมาณยอดคงเหลือ...");
+      
+      const saveAction = async () => {
+        try {
+          data.User = state.currentUser;
+          const res = await apiCall('handleStockIn', [data]);
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('dynamicModal');
+            showToast(res.message, "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      };
+      
+      saveAction();
     }
 
-    function renderStockOut(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">บันทึกเบิกใช้งาน (Stock Out) - UI Placeholder</div>`; }
-    function renderStockAudit(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">ระบบเช็คสต็อก - UI Placeholder</div>`; }
-    
-    function renderStockSummary(target) {
+    // ========================================== STOCK OUT VIEW ==========================================
+    function renderStockOut(target) {
+      const items = state.stockOut;
       target.innerHTML = `
-        <div class="bg-white rounded-2xl border overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-900 text-white"><tr><th class="p-3">รหัสอะไหล่</th><th class="p-3">ชื่อรายการ</th><th class="p-3">ยอดคงคลังสุทธิ (จากสูตร Sheet)</th><th class="p-3">สถานะ</th></tr></thead>
-            <tbody class="divide-y">
-              ${state.stockSummary.map(s => {
-                const item = state.itemMaster.find(i => i.Item_ID === s.Item_ID) || {};
-                const bal = s.Balance || s.Balanec || 0; // fallback for typo
-                const statusStr = s.Status_Stock || (bal <= (item.Min_Stock||0) ? "Low" : "Normal");
-                return `<tr><td class="p-3">${s.Item_ID}</td><td class="p-3">${item.Item_Name}</td><td class="p-3 font-bold">${bal}</td><td class="p-3">${statusStr}</td></tr>`;
-              }).join('') || '<tr><td colspan="4" class="p-3 text-center">ไม่มีข้อมูล</td></tr>'}
-            </tbody>
-          </table>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <input type="text" id="stockOutSearch" oninput="filterTable('stockOutTable', this.value)" placeholder="ค้นหาบันทึกการเบิก..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <button onclick="openStockOutForm()" class="bg-rose-500 hover:bg-rose-600 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-rose-500/10">
+              <i class="fa-solid fa-plus mr-1.5"></i> บันทึกเบิกใช้สินค้า (Stock Out)
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="stockOutTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">รายการบันทึก (ID)</th>
+                  <th class="p-4">วันที่เบิก</th>
+                  <th class="p-4">รหัสอะไหล่</th>
+                  <th class="p-4">ชื่ออะไหล่</th>
+                  <th class="p-4">จำนวนเบิก</th>
+                  <th class="p-4">เชื่อมโยงใบซ่อม (Job ID)</th>
+                  <th class="p-4">รหัสคุรุภัณฑ์คอมพิวเตอร์</th>
+                  <th class="p-4">ช่างผู้ทำการเบิก</th>
+                  <th class="p-4">หมายเหตุ</th>
+                  <th class="p-4">ผู้ทำรายการ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${items.map(item => {
+                  const master = state.itemMaster.find(m => m.Item_ID === item.Item_ID);
+                  return `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-4 font-bold text-slate-700">${item.StockOut_ID}</td>
+                      <td class="p-4 text-slate-600">${item.Date}</td>
+                      <td class="p-4 font-mono text-xs font-semibold text-slate-500">${item.Item_ID}</td>
+                      <td class="p-4 font-semibold text-slate-800">${master ? master.Item_Name : 'ไม่พบข้อมูล'}</td>
+                      <td class="p-4 font-bold text-rose-600">-${item.Quantity} ${item.Unit}</td>
+                      <td class="p-4 text-slate-600 font-mono text-xs">${item.Job_ID || '-'}</td>
+                      <td class="p-4 text-slate-600 font-mono text-xs">${item.Device_ID || '-'}</td>
+                      <td class="p-4 text-slate-700 font-semibold">${item.Technician}</td>
+                      <td class="p-4 text-xs text-slate-500">${item.Note || '-'}</td>
+                      <td class="p-4 text-slate-500">${item.User}</td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="10" class="p-8 text-center text-slate-400">ยังไม่มีบันทึกประวัติการเบิกออกในวันนี้</td></tr>'}
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     }
 
-    function renderTransactionLog(target) { target.innerHTML = `<div class="p-8 text-center text-slate-500">Log History - UI Placeholder</div>`; }
+    function openStockOutForm() {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดฟอร์ม
+      const title = "ทำบันทึกเบิกใช้งานอะไหล่ระบบไอที (Stock Out)";
+      const bodyHTML = `
+        <form id="stockOutForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกอะไหล่ไอทีที่เบิกใช้ <span class="text-red-500">*</span></label>
+            <select name="Item_ID" id="stockOutItemSelect" required onchange="onStockOutItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">เลือกอะไหล่ที่คงเหลือในคลัง</option>
+              ${state.itemMaster.map(item => {
+                const stockInfo = getStockData(item.Item_ID, item);
+                const currentBalance = stockInfo.balance;
+                return `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}" ${currentBalance <= 0 ? 'disabled class="text-red-400 bg-red-50"' : ''}>${item.Item_ID} - ${item.Item_Name} [คงเหลือ: ${currentBalance} ${item.Unit}] [การคุม: ${item.Status || 'แบบกลุ่ม'}]</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ระบุจำนวนที่ต้องการเบิกใช้งาน <span class="text-red-500">*</span></label>
+            <div class="relative flex items-center">
+              <input type="number" name="Quantity" id="stockOutQtyField" min="1" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <input type="text" name="Unit" id="stockOutUnitField" readonly class="absolute right-3 w-16 text-center text-xs bg-slate-100 border-none font-bold text-slate-600" value="ชิ้น">
+            </div>
+            <p id="stockOutWarningText" class="text-[10px] text-rose-500 font-bold mt-1 hidden"><i class="fa-solid fa-triangle-exclamation"></i> อะไหล่ประเภท "แบบรายชิ้น" จำกัดการเบิกใช้งานที่ละ 1 ชิ้น</p>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">เลขเอกสารใบสั่งงานซ่อม (Job ID) (ถ้ามี)</label>
+            <select name="Job_ID" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">ไม่มี (กรณีเป็นพัสดุสิ้นเปลืองทั่วไป)</option>
+              ${state.repairJobs.filter(j => j.Status !== "ซ่อมสำเร็จ").map(j => `<option value="${j.Job_ID}">${j.Job_ID} - ปัญหา: ${j.Problem}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสครุภัณฑ์คอมพิวเตอร์ที่นำไปใช้งาน (ถ้ามี)</label>
+            <select name="Device_ID" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+              <option value="">ไม่ได้นำไปติดตั้งกับครุภัณฑ์เฉพาะ</option>
+              ${state.deviceAssets.map(d => `<option value="${d.Device_ID}">${d.Device_ID} - ${d.Brand} ${d.Model} (ผู้ใช้: ${d.User})</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ช่างผู้มีชื่อเป็นผู้เบิกติดตั้ง <span class="text-red-500">*</span></label>
+            <input type="text" name="Technician" value="${state.currentUser}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+          </div>
+          <div class="col-span-1 md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุช่วยจำ (เช่น ระบุเฉพาะเครื่อง หรือ Serial Number ของชิ้นที่เบิกออก)</label>
+            <textarea name="Note" id="stockOutNoteField" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3" placeholder="ระบุตึก แผนก หรือเลขห้อง"></textarea>
+          </div>
+        </form>
+      `;
+      
+      const footerHTML = `
+        <button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button>
+        <button onclick="saveStockOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">ยืนยันการเบิกอะไหล่</button>
+      `;
+      
+      showModal(title, bodyHTML, footerHTML);
+    }
 
-    function showToast(msg, type="success") {
-      alert(type.toUpperCase() + ": " + msg); // simplified for recovery
+    function onStockOutItemChanged() {
+      const select = document.getElementById('stockOutItemSelect');
+      const unitField = document.getElementById('stockOutUnitField');
+      const qtyField = document.getElementById('stockOutQtyField');
+      const warningText = document.getElementById('stockOutWarningText');
+      const noteField = document.getElementById('stockOutNoteField');
+
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption) return;
+
+      if (selectedOption.dataset.unit) {
+        unitField.value = selectedOption.dataset.unit;
+      }
+
+      if (selectedOption.dataset.status === "แบบรายชิ้น") {
+        qtyField.value = "1";
+        qtyField.readOnly = true;
+        warningText.classList.remove('hidden');
+        noteField.placeholder = "กรุณาระบุหมายเลข Serial Number ของพัสดุชิ้นที่เบิกออกจากตู้จัดเก็บคลัง";
+        noteField.required = true;
+      } else {
+        qtyField.value = "";
+        qtyField.readOnly = false;
+        warningText.classList.add('hidden');
+        noteField.placeholder = "ระบุตึก แผนก หรือเลขห้อง";
+        noteField.required = false;
+      }
     }
-    function showLoading(msg) { document.getElementById('loadingOverlay').classList.remove('hidden'); document.getElementById('loadingOverlay').classList.add('flex'); }
-    function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); document.getElementById('loadingOverlay').classList.remove('flex'); }
-    function showModal(title, body, footer) {
+
+    function saveStockOut() {
+      const form = document.getElementById('stockOutForm');
+      if (!form.reportValidity()) return;
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      showLoading("กำลังตรวจสอบสมดุลและตัดสต็อก...");
+      
+      const saveAction = async () => {
+        try {
+          data.Technician = state.currentUser;
+          data.User = state.currentUser;
+          const res = await apiCall('handleStockOut', [data]);
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('dynamicModal');
+            showToast(res.message, "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "warning");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      };
+      
+      saveAction();
+    }
+
+    // ========================================== REQUIREMENT 5: STOCK AUDIT & CHECK SYSTEM ==========================================
+    function renderStockAudit(target) {
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-w-4xl mx-auto">
+          <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center">
+            <i class="fa-solid fa-clipboard-check text-brandPink-500 mr-2 text-xl"></i>
+            ระบบตรวจเช็คสต็อกคลังคอมพิวเตอร์ประจำวัน (Stock Audit & Check)
+          </h3>
+          <p class="text-xs text-slate-400 mb-6">ใช้ตรวจสอบยอดคงคลังกับพัสดุจริงเพื่อหาค่าความแตกต่าง (Variance) และสร้างเอกสารปรับปรุงยอดอัตโนมัติ</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">เลือกอะไหล่พัสดุที่ตรวจสอบยอด</label>
+                <select id="auditItemSelect" onchange="onAuditItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+                  <option value="">-- กรุณาเลือกรายการอะไหล่ --</option>
+                  ${state.itemMaster.map(item => {
+                    const stockInfo = getStockData(item.Item_ID, item);
+                    const currentBalance = stockInfo.balance;
+                    return `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}" data-location="${item.Location}" data-balance="${currentBalance}">${item.Item_ID} - ${item.Item_Name} (${item.Brand} ${item.Model})</option>`;
+                  }).join('')}
+                </select>
+              </div>
+
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2.5 text-xs text-slate-600">
+                <div class="flex justify-between">
+                  <span class="font-semibold">สถานที่จัดเก็บคลังหลัก:</span>
+                  <span id="auditLocation" class="font-bold text-slate-800">-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">การควบคุมสต็อกพัสดุ:</span>
+                  <span id="auditStatus" class="font-bold text-brandPink-600">-</span>
+                </div>
+                <div class="flex justify-between border-t pt-2 mt-2">
+                  <span class="font-bold text-slate-700">ยอดพัสดุคงเหลือในระบบ:</span>
+                  <span class="font-extrabold text-slate-900" id="auditSystemBalText">0 ชิ้น</span>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">จำนวนนับพัสดุจริงบนตู้จัดเก็บ (Physical Count) <span class="text-red-500">*</span></label>
+                <div class="relative flex items-center">
+                  <input type="number" id="auditPhysicalCount" oninput="calculateStockVariance()" placeholder="ใส่ยอดจำนวนพัสดุจริง..." class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500">
+                  <span id="auditUnitText" class="absolute right-4 text-xs font-bold text-slate-400">ชิ้น</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-pink-50/50 p-6 rounded-2xl border border-pink-100 flex flex-col justify-between text-center">
+              <div>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ผลการตรวจสอบสต็อกคงเหลือ</p>
+                <div class="my-6">
+                  <h1 class="text-5xl font-black text-slate-700 transition-all duration-300" id="auditVarianceText">0</h1>
+                  <p class="text-xs font-bold text-slate-500 mt-2" id="auditVarianceStatusText">พร้อมทำการตรวจสอบ</p>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <div class="bg-white p-3.5 rounded-xl border border-pink-200 text-left text-[11px] text-slate-500 space-y-1">
+                  <p class="font-semibold text-slate-700">📌 แนวทางการทำงานปรับปรุงสต็อก:</p>
+                  <p>• หากผลต่างเป็น <span class="text-emerald-600 font-bold">บวก</span> ระบบจะเพิ่มธุรกรรมนำเข้าคลัง (Stock In)</p>
+                  <p>• หากผลต่างเป็น <span class="text-rose-600 font-bold">ลบ</span> ระบบจะเพิ่มธุรกรรมเบิกใช้อะไหล่ (Stock Out)</p>
+                </div>
+                <button onclick="commitStockAuditAdjustment()" class="w-full bg-brandPink-500 hover:bg-brandPink-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-pink-500/20 transition flex items-center justify-center space-x-2">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span>ยืนยันบันทึกผลการเช็คสต็อก</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function onAuditItemChanged() {
+      const select = document.getElementById('auditItemSelect');
+      const locationSpan = document.getElementById('auditLocation');
+      const statusSpan = document.getElementById('auditStatus');
+      const sysBalSpan = document.getElementById('auditSystemBalText');
+      const unitSpan = document.getElementById('auditUnitText');
+      const physicalInput = document.getElementById('auditPhysicalCount');
+
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption || !selectedOption.value) {
+        locationSpan.innerText = "-";
+        statusSpan.innerText = "-";
+        sysBalSpan.innerText = "0 ชิ้น";
+        unitSpan.innerText = "ชิ้น";
+        physicalInput.value = "";
+        calculateStockVariance();
+        return;
+      }
+
+      locationSpan.innerText = selectedOption.dataset.location || "ตู้จัดเก็บหลัก ชั้น 1";
+      statusSpan.innerText = selectedOption.dataset.status || "แบบกลุ่ม";
+      sysBalSpan.innerText = `${selectedOption.dataset.balance} ${selectedOption.dataset.unit}`;
+      unitSpan.innerText = selectedOption.dataset.unit;
+      physicalInput.value = "";
+      
+      calculateStockVariance();
+    }
+
+    function calculateStockVariance() {
+      const select = document.getElementById('auditItemSelect');
+      const physicalInput = document.getElementById('auditPhysicalCount');
+      const varText = document.getElementById('auditVarianceText');
+      const statusText = document.getElementById('auditVarianceStatusText');
+
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption || !selectedOption.value || physicalInput.value === "") {
+        varText.innerText = "0";
+        varText.className = "text-5xl font-black text-slate-400";
+        statusText.innerText = "กรุณาใส่จำนวนนับพัสดุจริงเพื่อคำนวณ";
+        statusText.className = "text-xs font-bold text-slate-500";
+        return;
+      }
+
+      const sysBalance = Number(selectedOption.dataset.balance) || 0;
+      const physicalCount = Number(physicalInput.value) || 0;
+      const diff = physicalCount - sysBalance;
+
+      if (diff === 0) {
+        varText.innerText = "0";
+        varText.className = "text-5xl font-black text-slate-600";
+        statusText.innerText = "ยอดพัสดุคลังถูกต้อง (ตรงกับระบบ)";
+        statusText.className = "text-xs font-bold text-emerald-600";
+      } else if (diff > 0) {
+        varText.innerText = `+${diff}`;
+        varText.className = "text-5xl font-black text-emerald-600";
+        statusText.innerText = "พัสดุในคลัง เกินจากระบบ (ต้องนำเข้าส่วนเกิน)";
+        statusText.className = "text-xs font-bold text-emerald-700";
+      } else {
+        varText.innerText = `${diff}`;
+        varText.className = "text-5xl font-black text-rose-600";
+        statusText.innerText = "พัสดุในคลัง ขาดจากระบบ (ต้องเบิกจ่ายส่วนขาด)";
+        statusText.className = "text-xs font-bold text-rose-700";
+      }
+    }
+
+    async function commitStockAuditAdjustment() {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนยืนยันบันทึก
+      const select = document.getElementById('auditItemSelect');
+      const physicalInput = document.getElementById('auditPhysicalCount');
+
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption || !selectedOption.value) {
+        showToast("กรุณาเลือกรายการอะไหล่ที่ประสงค์ปรับยอดสต็อก", "warning");
+        return;
+      }
+
+      if (physicalInput.value === "") {
+        showToast("กรุณาระบุจำนวนสินค้าที่ตรวจสอบได้จริงบนหน้าตู้คลังสินค้า", "warning");
+        return;
+      }
+
+      const itemId = selectedOption.value;
+      const sysBalance = Number(selectedOption.dataset.balance) || 0;
+      const physicalCount = Number(physicalInput.value) || 0;
+      const diff = physicalCount - sysBalance;
+
+      if (diff === 0) {
+        showToast("ยอดสต็อกตรงกันเรียบร้อยแล้ว ไม่จำเป็นต้องปรับปรุงยอดใดๆ", "info");
+        return;
+      }
+
+      showLoading("กำลังสร้างรายการปรับปรุงยอดคลังโรงพยาบาล...");
+
+      try {
+        let res;
+        if (diff > 0) {
+          const adjustmentData = {
+            Item_ID: itemId,
+            Quantity: diff,
+            Unit: selectedOption.dataset.unit,
+            Source_Type: "Adjustment",
+            Reference_No: "AUDIT-ADJUST",
+            Note: "ปรับยอดอัตโนมัติจากการเช็คสต็อกคลัง (ยอดจริงมากกว่าระบบ)",
+            User: state.currentUser
+          };
+          res = await apiCall('handleStockIn', [adjustmentData]);
+        } else {
+          const adjustmentData = {
+            Item_ID: itemId,
+            Quantity: Math.abs(diff),
+            Unit: selectedOption.dataset.unit,
+            Job_ID: "",
+            Device_ID: "",
+            Technician: state.currentUser,
+            Note: "ปรับยอดตัดจ่ายอัตโนมัติจากการเช็คสต็อกคลัง (ยอดจริงน้อยกว่าระบบ)",
+            User: state.currentUser
+          };
+          res = await apiCall('handleStockOut', [adjustmentData]);
+        }
+
+        hideLoading();
+        if (res.success) {
+          showToast(`ปรับปรุงสต็อกสำเร็จ! ${res.message}`, "success");
+          physicalInput.value = "";
+          fetchSystemData();
+        } else {
+          showToast(res.message, "danger");
+        }
+      } catch (err) {
+        hideLoading();
+        showToast(err.message, "danger");
+      }
+    }
+
+    // ========================================== RENDER STOCK SUMMARY VIEW ==========================================
+    function renderStockSummary(target) {
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden" id="printArea">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
+            <div class="flex items-center space-x-2">
+              <input type="text" id="summarySearch" oninput="filterTable('summaryTable', this.value)" placeholder="ค้นหาอะไหล่ในคลัง..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="printReport()" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-4 py-2 rounded-xl flex items-center shadow-md shadow-pink-500/10">
+                <i class="fa-solid fa-print mr-1.5"></i> พิมพ์รายงานสรุป (A4 Landscape)
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 bg-slate-50 border-b no-print">
+            <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">คำอธิบายแถบสีแจ้งเตือน</h5>
+            <div class="flex flex-wrap gap-4 text-xs font-semibold">
+              <span class="flex items-center text-slate-700"><span class="w-3.5 h-3.5 rounded bg-emerald-100 mr-1.5 inline-block border border-emerald-300"></span> จำนวนสต็อกปลอดภัยปกติ</span>
+              <span class="flex items-center text-slate-700"><span class="w-3.5 h-3.5 rounded bg-rose-100 mr-1.5 inline-block border border-rose-300 animate-pulse"></span> สต็อกต่ำกว่าเกณฑ์สั่งซื้อขั้นต่ำ (Low Stock Alert)</span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto p-4">
+            <div class="hidden print:block mb-6 text-center">
+              <h2 class="text-xl font-bold text-slate-950">รายงานยอดสต็อกคงเหลืออะไหล่และอุปกรณ์คอมพิวเตอร์ โรงพยาบาล</h2>
+              <p class="text-sm text-slate-600 mt-1">ข้อมูล ณ วันที่: ${new Date().toLocaleDateString('th-TH')} | พิมพ์โดย: ${state.currentUser}</p>
+              <div class="h-[2px] bg-slate-800 my-4"></div>
+            </div>
+
+            <table class="w-full text-left text-sm" id="summaryTable">
+              <thead class="bg-slate-900 text-slate-100 font-bold">
+                <tr>
+                  <th class="p-3 rounded-l-lg">รหัสอะไหล่ (Item ID)</th>
+                  <th class="p-3">ชื่อรายการสินค้า</th>
+                  <th class="p-3 text-center">สั่งซื้อขั้นต่ำ (Min)</th>
+                  <th class="p-3 text-center text-emerald-300">นำเข้า (In)</th>
+                  <th class="p-3 text-center text-rose-300">เบิกออก (Out)</th>
+                  <th class="p-3 text-center text-brandPink-100">คงเหลือสุทธิ (Balance)</th>
+                  <th class="p-3 text-center">หน่วยนับ</th>
+                  <th class="p-3 rounded-r-lg">สถานะคลัง</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${state.itemMaster.map(item => {
+                  const stockInfo = getStockData(item.Item_ID, item);
+                  const balance = stockInfo.balance;
+                  const inQty = stockInfo.stockIn;
+                  const outQty = stockInfo.stockOut;
+                  const isLowStock = stockInfo.isLow;
+                  
+                  const rowBg = isLowStock ? "bg-rose-50/70 text-slate-900 font-medium" : "hover:bg-slate-50/50";
+                  const badge = isLowStock 
+                    ? `<span class="bg-rose-500 text-white font-extrabold px-3 py-1 rounded-full text-[10px] badge-pulse inline-flex items-center"><i class="fa-solid fa-bell mr-1"></i> LOW STOCK ALERT</span>`
+                    : `<span class="bg-emerald-500 text-white font-extrabold px-3 py-1 rounded-full text-[10px] inline-flex items-center"><i class="fa-solid fa-circle-check mr-1"></i> สต็อกคงตัว</span>`;
+
+                  return `
+                    <tr class="${rowBg}">
+                      <td class="p-3.5 font-bold text-slate-800">${item.Item_ID}</td>
+                      <td class="p-3.5 font-semibold text-slate-900">${item.Item_Name}</td>
+                      <td class="p-3.5 text-center font-bold text-slate-500">${item.Min_Stock}</td>
+                      <td class="p-3.5 text-center font-bold text-emerald-600">${inQty}</td>
+                      <td class="p-3.5 text-center font-bold text-rose-600">${outQty}</td>
+                      <td class="p-3.5 text-center font-extrabold text-base ${isLowStock ? 'text-rose-600' : 'text-slate-900'}">${balance}</td>
+                      <td class="p-3.5 text-center text-slate-500 font-semibold">${item.Unit}</td>
+                      <td class="p-3.5">${badge}</td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400">ไม่มีข้อมูลสรุปสำหรับคลัง</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================== RENDER TRANSACTION LOG VIEW ==========================================
+    function renderTransactionLog(target) {
+      const items = state.transactionLogs;
+      target.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <input type="text" id="logSearch" oninput="filterTable('logTable', this.value)" placeholder="ค้นหาประวัติธุรกรรม..." class="text-sm border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500 w-64">
+            </div>
+            <span class="text-xs text-slate-500 font-semibold">แสดงประวัติที่เกิดขึ้นทั้งหมดแบบเรียลไทม์</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" id="logTable">
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">Log ID</th>
+                  <th class="p-4">วันเวลาการทำรายการ</th>
+                  <th class="p-4">ประเภทเหตุการณ์ (Type)</th>
+                  <th class="p-4">รหัสสินค้าอ้างอิง</th>
+                  <th class="p-4 text-center">ปริมาณการจำกัดจำนวน</th>
+                  <th class="p-4">เลขที่อ้างอิงธุรกรรม</th>
+                  <th class="p-4">ผู้ดำเนินงานระบบ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-xs">
+                ${items.slice().reverse().map(log => {
+                  let badge = "bg-slate-100 text-slate-700";
+                  if (log.Type.includes("CREATE")) badge = "bg-blue-50 text-blue-700 border border-blue-200";
+                  if (log.Type.includes("UPDATE")) badge = "bg-amber-50 text-amber-700 border border-amber-200";
+                  if (log.Type.includes("DELETE")) badge = "bg-red-50 text-red-700 border border-red-200";
+                  if (log.Type === 'STOCK_IN') badge = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+                  if (log.Type === 'STOCK_OUT') badge = "bg-rose-50 text-rose-700 border border-rose-200";
+
+                  return `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-4 font-bold text-slate-500">${log.Log_ID}</td>
+                      <td class="p-4 text-slate-600">${log.Date}</td>
+                      <td class="p-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badge}">${log.Type}</span></td>
+                      <td class="p-4 font-semibold text-slate-800">${log.Item_ID}</td>
+                      <td class="p-4 text-center font-bold text-slate-900">${log.Qty}</td>
+                      <td class="p-4 text-slate-500 font-mono text-[10px]">${log.Ref_ID || '-'}</td>
+                      <td class="p-4 text-slate-600 font-medium">${log.User}</td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบข้อมูลประวัติระบบ</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================== GLOBAL ACTIONS (DELETE) ==========================================
+    function deleteRow(sheetName, idValue) {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนกดลบข้อมูล
+      if (!confirm("คุณมั่นใจที่จะลบข้อมูลรายการนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนคืนและจะถูกบันทึกประวัติลงระบบ")) return;
+      
+      let idFieldName = "";
+      switch(sheetName) {
+        case "Category_Type": idFieldName = "Category_Type_ID"; break;
+        case "Category": idFieldName = "Category_ID"; break;
+        case "Item_Master": idFieldName = "Item_ID"; break;
+        case "Device_Asset": idFieldName = "Device_ID"; break;
+        case "Repair_Job": idFieldName = "Job_ID"; break;
+      }
+
+      showLoading("กำลังประมวลผลการลบจากฐานข้อมูล...");
+      
+      const deleteAction = async () => {
+        try {
+          const res = await apiCall('deleteRecord', [sheetName, idFieldName, idValue]);
+          hideLoading();
+          if (res.success) {
+            showToast(res.message, "success");
+            fetchSystemData();
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast(err.message, "danger");
+        }
+      }; mechanics
+
+      deleteAction();
+    }
+
+    // ========================================== FILTER TABLE SEARCH ==========================================
+    function filterTable(tableId, query) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      
+      const rows = table.getElementsByTagName('tr');
+      const text = query.toLowerCase();
+      
+      for (let i = 1; i < rows.length; i++) {
+        let match = false;
+        const cells = rows[i].getElementsByTagName('td');
+        
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(text)) {
+            match = true;
+            break;
+          }
+        }
+        
+        rows[i].style.display = match ? '' : 'none';
+      }
+    }
+
+    // ========================================== TOAST & MODAL WRAPPERS ==========================================
+    function showToast(message, type = "success") {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let bg = "bg-emerald-50 border-emerald-200 text-emerald-800";
+      let icon = "fa-solid fa-circle-check text-emerald-500";
+      
+      if (type === "warning") {
+        bg = "bg-amber-50 border-amber-200 text-amber-800";
+        icon = "fa-solid fa-triangle-exclamation text-amber-500";
+      } else if (type === "danger" || type === "error") {
+        bg = "bg-rose-50 border-rose-200 text-rose-800";
+        icon = "fa-solid fa-circle-xmark text-rose-500";
+      } else if (type === "info") {
+        bg = "bg-sky-50 border-sky-200 text-sky-800";
+        icon = "fa-solid fa-circle-info text-sky-500";
+      }
+      
+      toast.className = `flex items-center space-x-3 p-4 rounded-xl border shadow-lg ${bg} transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `
+        <i class="${icon} text-lg"></i>
+        <div class="text-xs font-semibold flex-1">${message}</div>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    function showLoading(text = "กำลังประมวลผล...") {
+      document.getElementById('loadingText').innerText = text;
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+      document.getElementById('loadingOverlay').classList.add('flex');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      document.getElementById('loadingOverlay').classList.remove('flex');
+    }
+
+    function showModal(title, bodyHTML, footerHTML) {
       document.getElementById('modalTitle').innerText = title;
-      document.getElementById('modalBody').innerHTML = body;
-      document.getElementById('modalFooter').innerHTML = footer;
-      document.getElementById('dynamicModal').classList.remove('hidden');
+      document.getElementById('modalBody').innerHTML = bodyHTML;
+      document.getElementById('modalFooter').innerHTML = footerHTML;
+      
+      const modal = document.getElementById('dynamicModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.querySelector('.bg-white').classList.remove('scale-95');
+      }, 10);
     }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    function openScanner(targetId) { showToast("เปิดกล้องสแกนไปที่: " + targetId, "info"); }
-    function closeScanner() {}
-    function printQR() {}
-    function downloadQR() {}
-    function previewFile() {}
-    function performUpload() {}
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.querySelector('.bg-white')?.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 150);
+    }
+
+    // ========================================== QR CODE GENERATOR ACTIONS ==========================================
+    let qrcodeInstance = null;
+    
+    function generateQRCode(text) {
+      const container = document.getElementById('qrcodeCanvas');
+      container.innerHTML = ""; 
+      
+      qrcodeInstance = new QRCode(container, {
+        text: text,
+        width: 180,
+        height: 180,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      
+      document.getElementById('qrTextValue').innerText = "Asset Code: " + text;
+      
+      const qrModal = document.getElementById('qrModal');
+      qrModal.classList.remove('hidden');
+    }
+
+    function downloadQR() {
+      const img = document.getElementById('qrcodeCanvas').querySelector('img');
+      if (img) {
+        const link = document.createElement('a');
+        link.download = `QR_CODE_${document.getElementById('qrTextValue').innerText.replace(/\s+/g, '')}.png`;
+        link.href = img.src;
+        link.click();
+        showToast("ดาวน์โหลด QR Code ไปที่อุปกรณ์สำเร็จ", "success");
+      } else {
+        showToast("ไม่สามารถสร้างรูปภาพได้", "danger");
+      }
+    }
+
+    function printQR() {
+      const img = document.getElementById('qrcodeCanvas').querySelector('img');
+      if (!img) return;
+      
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print QR Code</title>
+            <style>
+              body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
+              img { width: 250px; height: 250px; border: 1px dashed #ccc; padding: 10px; }
+              h2 { margin-top: 20px; }
+            </style>
+          </head>
+          <body>
+            <img src="${img.src}" />
+            <h2>${document.getElementById('qrTextValue').innerText}</h2>
+            <script>window.onload = function() { window.print(); window.close(); }</s` + `cript>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    // ========================================== INTEGRATED CAMERA QR/BARCODE SCANNER SYSTEM ==========================================
+    function openScanner(targetInputId) {
+      document.getElementById('scannerModal').classList.remove('hidden');
+      
+      // Initialize html5QrCode scanning engine
+      html5QrCode = new Html5Qrcode("qr-reader");
+      
+      const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        const targetInput = document.getElementById(targetInputId);
+        if (targetInput) {
+          targetInput.value = decodedText;
+          // Trigger events so that any UI change detection updates correctly
+          targetInput.dispatchEvent(new Event('change'));
+          targetInput.dispatchEvent(new Event('input'));
+        }
+        showToast("สแกนสำเร็จ: " + decodedText, "success");
+        closeScanner();
+      };
+      
+      const config = { fps: 15, qrbox: { width: 260, height: 150 } };
+      
+      // Start back camera
+      html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        qrCodeSuccessCallback,
+        (errorMessage) => {
+          // Keep scanning silently
+        }
+      ).catch((err) => {
+        showToast("ไม่สามารถเปิดใช้งานกล้องวิดีโอได้: " + err, "danger");
+        closeScanner();
+      });
+    }
+
+    function closeScanner() {
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          document.getElementById('scannerModal').classList.add('hidden');
+        }).catch(() => {
+          document.getElementById('scannerModal').classList.add('hidden');
+        });
+      } else {
+        document.getElementById('scannerModal').classList.add('hidden');
+      }
+    }
+
+    // ========================================== PRINT REPORT GENERATOR ==========================================
+    function printReport() {
+      window.print();
+    }
+
+    // ========================================== FILE UPLOAD API SYSTEM ==========================================
+    function openUploadModal(targetFieldId) {
+      if (!requireLogin()) return; // <--- ตรวจสอบการ Login ก่อนเปิดหน้าอัปโหลดแนบเอกสาร
+      activeUploadTargetFieldId = targetFieldId;
+      pendingUploadData = { base64: null, fileName: null, mimeType: null };
+      
+      document.getElementById('fileInput').value = "";
+      document.getElementById('uploadPlaceholder').classList.remove('hidden');
+      document.getElementById('uploadPreviewContainer').classList.add('hidden');
+      
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function previewFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("ขนาดไฟล์เกินขีดจำกัด 5MB กรุณาเลือกไฟล์ขนาดเล็กลง", "warning");
+        event.target.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pendingUploadData.base64 = e.target.result;
+        pendingUploadData.fileName = file.name;
+        pendingUploadData.mimeType = file.type;
+        
+        document.getElementById('uploadPlaceholder').classList.add('hidden');
+        document.getElementById('uploadPreviewContainer').classList.remove('hidden');
+        document.getElementById('uploadFileName').innerText = file.name;
+        
+        const previewImg = document.getElementById('uploadPreviewImg');
+        if (file.type.startsWith('image/')) {
+          previewImg.src = e.target.result;
+          previewImg.classList.remove('hidden');
+        } else {
+          previewImg.classList.add('hidden'); 
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function performUpload() {
+      if (!pendingUploadData.base64) {
+        showToast("กรุณาเลือกไฟล์อย่างน้อยหนึ่งไฟล์เพื่อเริ่มกระบวนการอัปโหลด", "warning");
+        return;
+      }
+      
+      showLoading("กำลังดำเนินการอัปโหลดไฟล์ไปที่ Google Drive ของท่าน...");
+      
+      const uploadAction = async () => {
+        try {
+          const res = await apiCall('uploadFileToDrive', [pendingUploadData.base64, pendingUploadData.fileName, pendingUploadData.mimeType]);
+          
+          hideLoading();
+          if (res.success) {
+            closeModal('uploadModal');
+            showToast("อัปโหลดเอกสารสำเร็จ", "success");
+            
+            const url = res.fileUrl; 
+            const remarkInput = document.getElementById('fieldRemarkLink');
+            if (remarkInput) {
+              remarkInput.value = url;
+            } else if (activeUploadTargetFieldId) {
+              await apiCall('updateRecord', ["Repair_Job", "Job_ID", activeUploadTargetFieldId, { Remark: url }]);
+              fetchSystemData(true);
+            }
+          } else {
+            showToast(res.message, "danger");
+          }
+        } catch (err) {
+          hideLoading();
+          showToast("ความผิดพลาดจากการทำงานระบบอัปโหลด: " + err.message, "danger");
+        }
+      };
+      
+      uploadAction();
+    }
   </script>
 </body>
 </html>

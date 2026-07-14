@@ -6,7 +6,7 @@
   <title>ระบบคลังอะไหล่และอุปกรณ์ไอที โรงพยาบาล</title>
   
   <!-- Add Favicon from GitHub / Deploy root -->
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link class="no-print" rel="icon" type="image/png" href="favicon.png">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,8 +23,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- HTML5 QR Code Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
  
-
   <!-- AUTHENTICATION CHECK SCRIPT (From user requirements) -->
   <script>
     (function () {
@@ -413,6 +413,7 @@
         return true;
     }
 
+    // STRICT DIRECT API COMMUNICATION ONLY (NO MOCK DB WRITES/DELETES IN LOCALSTORAGE)
     async function apiCall(action, args = []) {
       try {
         const response = await fetch(API_URL, {
@@ -524,7 +525,7 @@
       
       const lowStockItems = state.itemMaster.filter(item => {
         const sumObj = state.stockSummary.find(s => s.Item_ID === item.Item_ID);
-        const bal = sumObj ? sumObj.Balanec : 0;
+        const bal = sumObj ? (sumObj.Balance || sumObj.Balanec || 0) : 0;
         return bal <= (item.Min_Stock || 0);
       }).length;
 
@@ -592,7 +593,7 @@
           </div>
           <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 lg:col-span-2">
             <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center justify-between">
-              <span><i class="fa-solid fa-clock-rotate-left text-brandPink-500 mr-2"></i> ความเคลื่อนไหวล่าสุุดของระบบ</span>
+              <span><i class="fa-solid fa-clock-rotate-left text-brandPink-500 mr-2"></i> ความเคลื่อนไหวล่าสุดของระบบ</span>
               <button onclick="switchMenu('transactionLog')" class="text-xs text-brandPink-600 hover:underline font-semibold">ดูบันทึกทั้งหมด</button>
             </h4>
             <div class="overflow-x-auto">
@@ -703,7 +704,10 @@
               catalogHtml += `
                 <div class="py-3 flex items-center justify-between hover:bg-slate-50/50 px-2 rounded-lg transition duration-150">
                   <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-pink-50 text-brandPink-500 flex items-center justify-center"><i class="${iconClass}"></i></div>
+                    <div class="w-9 h-9 rounded-xl bg-pink-50 text-brandPink-500 flex items-center justify-center overflow-hidden shrink-0 shadow-sm border border-pink-100">
+                      ${i.Item_File_ID ? `<img src="https://lh3.googleusercontent.com/d/${i.Item_File_ID}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">` : ''}
+                      <i class="${iconClass} ${i.Item_File_ID ? 'hidden' : ''}"></i>
+                    </div>
                     <div><h5 class="text-xs font-semibold text-slate-800">${i.Item_Name}</h5><p class="text-[10px] text-slate-400">ยี่ห้อ: ${i.Brand} | รุ่น: ${i.Model} [${i.Item_ID}]</p></div>
                   </div>
                   <div class="flex items-center space-x-4">
@@ -744,7 +748,18 @@
                 </td>`;
               }
               catalogHtml += `
-                  <td class="p-3"><div class="font-semibold text-slate-800">${i.Item_Name}</div><div class="text-[10px] text-slate-500 font-mono">${i.Item_ID}</div></td>
+                  <td class="p-3">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 rounded-lg bg-pink-50 text-brandPink-500 flex items-center justify-center overflow-hidden shrink-0 shadow-sm border border-pink-100">
+                        ${i.Item_File_ID ? `<img src="https://lh3.googleusercontent.com/d/${i.Item_File_ID}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">` : ''}
+                        <i class="fa-solid fa-cube ${i.Item_File_ID ? 'hidden' : ''}"></i>
+                      </div>
+                      <div>
+                        <div class="font-semibold text-slate-800">${i.Item_Name}</div>
+                        <div class="text-[10px] text-slate-500 font-mono">${i.Item_ID}</div>
+                      </div>
+                    </div>
+                  </td>
                   <td class="p-3 text-slate-600 text-xs">${i.Brand} / ${i.Model}</td>
                   <td class="p-3 text-center">
                     <span class="font-extrabold text-base ${isLow ? 'text-rose-600' : 'text-slate-800'}">${balance}</span> <span class="text-[10px] text-slate-500">${i.Unit}</span>
@@ -877,7 +892,7 @@
       const saveAction = async () => {
         try {
           let res;
-          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Category_Type", "Category_Type_ID", id, data]);
+          if (id && id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Category_Type", "Category_Type_ID", id, data]);
           else res = await apiCall('createRecord', ["Category_Type", data, "Category_Type_ID", "TYP"]);
           hideLoading();
           if (res.success) { closeModal('dynamicModal'); showToast(res.message, "success"); fetchSystemData(); } 
@@ -954,7 +969,7 @@
       const saveAction = async () => {
         try {
           let res;
-          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Category", "Category_ID", id, data]);
+          if (id && id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Category", "Category_ID", id, data]);
           else {
             res = await apiCall('createRecord', ["Category", data, "Category_ID", "CAT"]);
             if (res.success && res.id) await apiCall('updateRecord', ["Category", "Category_ID", res.id, { Category_ID: data.Category_ID }]);
@@ -978,13 +993,42 @@
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm" id="itemTable">
-              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold"><tr><th class="p-4">Item ID / QR</th><th class="p-4">หมวดหมู่</th><th class="p-4">ชื่อสินค้า</th><th class="p-4">ยี่ห้อ / รุ่น</th><th class="p-4">สเปคการใช้งาน</th><th class="p-4">การควบคุมคลัง</th><th class="p-4">จุดสั่งชื้อขั้นต่ำ</th><th class="p-4">สถานที่จัดเก็บ</th><th class="p-4 text-right">ดำเนินการ</th></tr></thead>
+              <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
+                <tr>
+                  <th class="p-4">รูปภาพ</th>
+                  <th class="p-4">Item ID / QR</th>
+                  <th class="p-4">หมวดหมู่</th>
+                  <th class="p-4">ชื่อสินค้า</th>
+                  <th class="p-4">ยี่ห้อ / รุ่น</th>
+                  <th class="p-4">สเปคการใช้งาน</th>
+                  <th class="p-4">การควบคุมคลัง</th>
+                  <th class="p-4">จุดสั่งชื้อขั้นต่ำ</th>
+                  <th class="p-4">สถานที่จัดเก็บ</th>
+                  <th class="p-4 text-right">ดำเนินการ</th>
+                </tr>
+              </thead>
               <tbody class="divide-y divide-slate-100">
                 ${items.map(item => {
                   const cat = state.categories.find(c => c.Category_ID === item.Category_ID);
                   const isSerialized = item.Status === "แบบรายชิ้น";
-                  return `<tr class="hover:bg-slate-50/50"><td class="p-4 font-bold text-slate-700 flex items-center space-x-2"><span>${item.Item_ID}</span><button onclick="generateQRCode('${item.Item_ID}')" class="text-brandPink-500 hover:text-brandPink-600" title="แสดง QR Code"><i class="fa-solid fa-qrcode"></i></button></td><td class="p-4 font-medium text-slate-500">${cat ? cat.Category_Name : '-'}</td><td class="p-4 font-semibold text-slate-800">${item.Item_Name}</td><td class="p-4 text-slate-700">${item.Brand} / ${item.Model}</td><td class="p-4 text-slate-500 max-w-xs truncate">${item.Specification || '-'}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${isSerialized ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}"><i class="${isSerialized ? 'fa-solid fa-barcode' : 'fa-solid fa-boxes-stacked'} mr-1"></i> ${item.Status || 'แบบกลุ่ม'}</span></td><td class="p-4 font-bold text-slate-800 text-center">${item.Min_Stock} ${item.Unit}</td><td class="p-4 text-slate-600">${item.Location}</td><td class="p-4 text-right space-x-1"><button onclick="openItemMasterForm('${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteRow('Item_Master', '${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
-                }).join('') || '<tr><td colspan="9" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลอะไหล่ไอทีในระบบ</td></tr>'}
+                  return `<tr class="hover:bg-slate-50/50">
+                    <td class="p-4">
+                      <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                        ${item.Item_File_ID ? `<img src="https://lh3.googleusercontent.com/d/${item.Item_File_ID}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">` : ''}
+                        <i class="fa-solid fa-image text-slate-300 text-lg ${item.Item_File_ID ? 'hidden' : ''}"></i>
+                      </div>
+                    </td>
+                    <td class="p-4 font-bold text-slate-700 flex items-center space-x-2"><span>${item.Item_ID}</span><button onclick="generateQRCode('${item.Item_ID}')" class="text-brandPink-500 hover:text-brandPink-600" title="แสดง QR Code"><i class="fa-solid fa-qrcode"></i></button></td>
+                    <td class="p-4 font-medium text-slate-500">${cat ? cat.Category_Name : '-'}</td>
+                    <td class="p-4 font-semibold text-slate-800">${item.Item_Name}</td>
+                    <td class="p-4 text-slate-700">${item.Brand} / ${item.Model}</td>
+                    <td class="p-4 text-slate-500 max-w-xs truncate">${item.Specification || '-'}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${isSerialized ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}"><i class="${isSerialized ? 'fa-solid fa-barcode' : 'fa-solid fa-boxes-stacked'} mr-1"></i> ${item.Status || 'แบบกลุ่ม'}</span></td>
+                    <td class="p-4 font-bold text-slate-800 text-center">${item.Min_Stock} ${item.Unit}</td>
+                    <td class="p-4 text-slate-600">${item.Location}</td>
+                    <td class="p-4 text-right space-x-1"><button onclick="openItemMasterForm('${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteRow('Item_Master', '${item.Item_ID}')" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ"><i class="fa-solid fa-trash-can"></i></button></td>
+                  </tr>`;
+                }).join('') || '<tr><td colspan="10" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลอะไหล่ไอทีในระบบ</td></tr>'}
               </tbody>
             </table>
           </div>
@@ -994,7 +1038,7 @@
 
     function openItemMasterForm(id = null) {
       if (!requireLogin()) return;
-      itemFormImageData = null; // รีเซ็ตค่ารูปภาพทุกครั้งที่เปิดฟอร์ม
+      itemFormImageData = null; 
       const isEdit = !!id;
       const record = isEdit ? state.itemMaster.find(item => item.Item_ID === id) : null;
       let recordCategoryTypeID = "";
@@ -1081,7 +1125,7 @@
           let res;
           let currentId = id;
           
-          if (id !== 'null' && id !== '') {
+          if (id && id !== 'null' && id !== '') {
             res = await apiCall('updateRecord', ["Item_Master", "Item_ID", id, data]);
           } else {
             res = await apiCall('createRecord', ["Item_Master", data, "Item_ID", "ITM"]);
@@ -1198,7 +1242,7 @@
       const saveAction = async () => {
         try {
           let res;
-          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Repair_Job", "Job_ID", id, data]);
+          if (id && id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Repair_Job", "Job_ID", id, data]);
           else res = await apiCall('createRecord', ["Repair_Job", data, "Job_ID", "JOB"]);
           hideLoading();
           if (res.success) { closeModal('dynamicModal'); showToast(res.message, "success"); fetchSystemData(); } 
@@ -1379,7 +1423,7 @@
         if (!serial) return;
         
         if (pendingSerialNumbers.includes(serial)) {
-            if (scannedValue && lastScannedSerial === serial) return; // Ignore rapid double-scans from camera
+            if (scannedValue && lastScannedSerial === serial) return; 
             showToast("Serial Number นี้ถูกสแกนเข้ามาแล้ว", "warning");
             if (!scannedValue) { inputField.value = ''; inputField.focus(); }
             return;
@@ -1505,7 +1549,7 @@
       const title = "ทำบันทึกเบิกใช้งานอะไหล่ระบบไอที (Stock Out)";
       const bodyHTML = `
         <form id="stockOutForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><label class="block text-xs font-semibold text-slate-600 mb-1">เลือกอะไหล่ไอทีที่เบิกใช้ <span class="text-red-500">*</span></label><select name="Item_ID" id="stockOutItemSelect" required onchange="onStockOutItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">เลือกอะไหล่ที่คงเหลือในคลัง</option>${state.itemMaster.map(item => { const sumObj = state.stockSummary.find(s => s.Item_ID === item.Item_ID); const currentBalance = sumObj ? sumObj.Balance : 0; return `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}" ${currentBalance <= 0 ? 'disabled class="text-red-400 bg-red-50"' : ''}>${item.Item_ID} - ${item.Item_Name} [คงเหลือ: ${currentBalance} ${item.Unit}] [การคุม: ${item.Status || 'แบบกลุ่ม'}]</option>`; }).join('')}</select></div>
+          <div><label class="block text-xs font-semibold text-slate-600 mb-1">เลือกอะไหล่ไอทีที่เบิกใช้ <span class="text-red-500">*</span></label><select name="Item_ID" id="stockOutItemSelect" required onchange="onStockOutItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">เลือกอะไหล่ที่คงเหลือในคลัง</option>${state.itemMaster.map(item => { const sumObj = state.stockSummary.find(s => s.Item_ID === item.Item_ID); const currentBalance = sumObj ? (sumObj.Balance || sumObj.Balanec || 0) : 0; return `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}" ${currentBalance <= 0 ? 'disabled class="text-red-400 bg-red-50"' : ''}>${item.Item_ID} - ${item.Item_Name} [คงเหลือ: ${currentBalance} ${item.Unit}] [การคุม: ${item.Status || 'แบบกลุ่ม'}]</option>`; }).join('')}</select></div>
           <div><label class="block text-xs font-semibold text-slate-600 mb-1">ระบุจำนวนที่ต้องการเบิกใช้งาน <span class="text-red-500">*</span></label><div class="relative flex items-center"><input type="number" name="Quantity" id="stockOutQtyField" min="1" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><input type="text" name="Unit" id="stockOutUnitField" readonly class="absolute right-3 w-16 text-center text-xs bg-slate-100 border-none font-bold text-slate-600" value="ชิ้น"></div><p id="stockOutWarningText" class="text-[10px] text-rose-500 font-bold mt-1 hidden"><i class="fa-solid fa-triangle-exclamation"></i> อะไหล่ประเภท "แบบรายชิ้น" จำกัดการเบิกใช้งานที่ละ 1 ชิ้น</p></div>
           <div><label class="block text-xs font-semibold text-slate-600 mb-1">เลขเอกสารใบสั่งงานซ่อม (Job ID) (ถ้ามี)</label><select name="Job_ID" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">ไม่มี (กรณีเป็นพัสดุสิ้นเปลืองทั่วไป)</option>${state.repairJobs.filter(j => j.Status !== "ซ่อมสำเร็จ").map(j => `<option value="${j.Job_ID}">${j.Job_ID} - ปัญหา: ${j.Problem}</option>`).join('')}</select></div>
           <div><label class="block text-xs font-semibold text-slate-600 mb-1">รหัสครุภัณฑ์คอมพิวเตอร์ที่นำไปใช้งาน (ถ้ามี)</label><select name="Device_ID" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">ไม่ได้นำไปติดตั้งกับครุภัณฑ์เฉพาะ</option>${state.deviceAssets.map(d => `<option value="${d.Device_ID}">${d.Device_ID} - ${d.Brand} ${d.Model} (ผู้ใช้: ${d.User})</option>`).join('')}</select></div>
@@ -1567,7 +1611,7 @@
           <p class="text-xs text-slate-400 mb-6">ใช้ตรวจสอบยอดคงคลังกับพัสดุจริงเพื่อหาค่าความแตกต่าง (Variance) และสร้างเอกสารปรับปรุงยอดอัตโนมัติ</p>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-4">
-              <div><label class="block text-xs font-bold text-slate-700 mb-1">เลือกอะไหล่พัสดุที่ตรวจสอบยอด</label><select id="auditItemSelect" onchange="onAuditItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">-- กรุณาเลือกรายการอะไหล่ --</option>${state.itemMaster.map(item => { const sumObj = state.stockSummary.find(s => s.Item_ID === item.Item_ID); const currentBalance = sumObj ? sumObj.Balance : 0; return `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}" data-location="${item.Location}" data-balance="${currentBalance}">${item.Item_ID} - ${item.Item_Name} (${item.Brand} ${item.Model})</option>`; }).join('')}</select></div>
+              <div><label class="block text-xs font-bold text-slate-700 mb-1">เลือกอะไหล่พัสดุที่ตรวจสอบยอด</label><select id="auditItemSelect" onchange="onAuditItemChanged()" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="">-- กรุณาเลือกรายการอะไหล่ --</option>${state.itemMaster.map(item => { const sumObj = state.stockSummary.find(s => s.Item_ID === item.Item_ID); const currentBalance = sumObj ? (sumObj.Balance || sumObj.Balanec || 0) : 0; return `<option value="${item.Item_ID}" data-unit="${item.Unit}" data-status="${item.Status}" data-location="${item.Location}" data-balance="${currentBalance}">${item.Item_ID} - ${item.Item_Name} (${item.Brand} ${item.Model})</option>`; }).join('')}</select></div>
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2.5 text-xs text-slate-600"><div class="flex justify-between"><span class="font-semibold">สถานที่จัดเก็บคลังหลัก:</span><span id="auditLocation" class="font-bold text-slate-800">-</span></div><div class="flex justify-between"><span class="font-semibold">การควบคุมสต็อกพัสดุ:</span><span id="auditStatus" class="font-bold text-brandPink-600">-</span></div><div class="flex justify-between border-t pt-2 mt-2"><span class="font-bold text-slate-700">ยอดพัสดุคงเหลือในระบบ:</span><span class="font-extrabold text-slate-900" id="auditSystemBalText">0 ชิ้น</span></div></div>
               <div><label class="block text-xs font-bold text-slate-700 mb-1">จำนวนนับพัสดุจริงบนตู้จัดเก็บ (Physical Count) <span class="text-red-500">*</span></label><div class="relative flex items-center"><input type="number" id="auditPhysicalCount" oninput="calculateStockVariance()" placeholder="ใส่ยอดจำนวนพัสดุจริง..." class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><span id="auditUnitText" class="absolute right-4 text-xs font-bold text-slate-400">ชิ้น</span></div></div>
             </div>
@@ -1913,23 +1957,19 @@
             closeModal('uploadModal'); 
             showToast("อัปโหลดเอกสารสำเร็จ", "success");
             
-            // --- ส่วนที่เพิ่มใหม่: ตรวจหา Input Field ของหน้า Item_Master / Device_Asset ---
             const inputImageName = document.querySelector('input[name="Item_Image_Name"]') || document.getElementById('fieldItemImageName');
             const inputFileId = document.querySelector('input[name="Item_File_ID"]') || document.getElementById('fieldItemFileId');
             
             if (inputImageName || inputFileId) {
               if (inputImageName) {
                 inputImageName.value = res.fileName || pendingUploadData.fileName;
-                inputImageName.dispatchEvent(new Event('input')); // เพื่อกระตุ้นให้ระบบรู้ว่าค่าเปลี่ยน
+                inputImageName.dispatchEvent(new Event('input')); 
               }
               if (inputFileId) {
-                inputFileId.value = res.fileId; // ต้องรับค่า fileId มาจาก code.gs
+                inputFileId.value = res.fileId; 
                 inputFileId.dispatchEvent(new Event('input'));
               }
             } 
-            // --- สิ้นสุดส่วนที่เพิ่มใหม่ ---
-            
-            // --- โค้ดเดิม: สำหรับฟอร์มใบซ่อม (Repair_Job) ---
             else {
               const remarkInput = document.getElementById('fieldRemarkLink') || document.querySelector('input[name="Remark"]');
               if (remarkInput) {
@@ -1937,7 +1977,6 @@
                 remarkInput.dispatchEvent(new Event('input'));
               }
               else if (activeUploadTargetFieldId) { 
-                // กรณีบันทึกอัปเดตตรงลงฐานข้อมูลโดยไม่ได้ผ่านฟอร์ม
                 await apiCall('updateRecord', ["Repair_Job", "Job_ID", activeUploadTargetFieldId, { Remark: res.fileUrl }]); 
                 fetchSystemData(true); 
               }

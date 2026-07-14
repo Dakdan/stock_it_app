@@ -1910,12 +1910,45 @@
           const res = await apiCall('uploadFileToDrive', [pendingUploadData.base64, pendingUploadData.fileName, pendingUploadData.mimeType]);
           hideLoading();
           if (res.success) {
-            closeModal('uploadModal'); showToast("อัปโหลดเอกสารสำเร็จ", "success");
-            const remarkInput = document.getElementById('fieldRemarkLink');
-            if (remarkInput) remarkInput.value = res.fileUrl;
-            else if (activeUploadTargetFieldId) { await apiCall('updateRecord', ["Repair_Job", "Job_ID", activeUploadTargetFieldId, { Remark: res.fileUrl }]); fetchSystemData(true); }
-          } else { showToast(res.message, "danger"); }
-        } catch (err) { hideLoading(); showToast("ความผิดพลาดจากการทำงานระบบอัปโหลด: " + err.message, "danger"); }
+            closeModal('uploadModal'); 
+            showToast("อัปโหลดเอกสารสำเร็จ", "success");
+            
+            // --- ส่วนที่เพิ่มใหม่: ตรวจหา Input Field ของหน้า Item_Master / Device_Asset ---
+            const inputImageName = document.querySelector('input[name="Item_Image_Name"]') || document.getElementById('fieldItemImageName');
+            const inputFileId = document.querySelector('input[name="Item_File_ID"]') || document.getElementById('fieldItemFileId');
+            
+            if (inputImageName || inputFileId) {
+              if (inputImageName) {
+                inputImageName.value = res.fileName || pendingUploadData.fileName;
+                inputImageName.dispatchEvent(new Event('input')); // เพื่อกระตุ้นให้ระบบรู้ว่าค่าเปลี่ยน
+              }
+              if (inputFileId) {
+                inputFileId.value = res.fileId; // ต้องรับค่า fileId มาจาก code.gs
+                inputFileId.dispatchEvent(new Event('input'));
+              }
+            } 
+            // --- สิ้นสุดส่วนที่เพิ่มใหม่ ---
+            
+            // --- โค้ดเดิม: สำหรับฟอร์มใบซ่อม (Repair_Job) ---
+            else {
+              const remarkInput = document.getElementById('fieldRemarkLink') || document.querySelector('input[name="Remark"]');
+              if (remarkInput) {
+                remarkInput.value = res.fileUrl;
+                remarkInput.dispatchEvent(new Event('input'));
+              }
+              else if (activeUploadTargetFieldId) { 
+                // กรณีบันทึกอัปเดตตรงลงฐานข้อมูลโดยไม่ได้ผ่านฟอร์ม
+                await apiCall('updateRecord', ["Repair_Job", "Job_ID", activeUploadTargetFieldId, { Remark: res.fileUrl }]); 
+                fetchSystemData(true); 
+              }
+            }
+          } else { 
+            showToast(res.message, "danger"); 
+          }
+        } catch (err) { 
+          hideLoading(); 
+          showToast("ความผิดพลาดจากการทำงานระบบอัปโหลด: " + err.message, "danger"); 
+        }
       };
       uploadAction();
     }

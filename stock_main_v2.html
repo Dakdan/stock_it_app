@@ -372,6 +372,7 @@
     let catalogViewMode = 'grid'; 
     let html5QrCode = null; 
     let pendingSerialNumbers = []; // สำหรับเก็บรายการ S/N รับเข้าแบบต่อเนื่อง
+    let itemFormImageData = null; // ตัวแปรเก็บข้อมูลรูปภาพประกอบอะไหล่
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwoqoyq0Q-DZ1WecERSldVfevevQvS0sYAmw8dVLYItEQhULSQ4lHco_Oe4sottLaXrtg/exec";
 
@@ -993,6 +994,7 @@
 
     function openItemMasterForm(id = null) {
       if (!requireLogin()) return;
+      itemFormImageData = null; // รีเซ็ตค่ารูปภาพทุกครั้งที่เปิดฟอร์ม
       const isEdit = !!id;
       const record = isEdit ? state.itemMaster.find(item => item.Item_ID === id) : null;
       let recordCategoryTypeID = "";
@@ -1013,12 +1015,42 @@
           <div class="col-span-1 md:col-span-2"><label class="block text-xs font-semibold text-slate-600 mb-1">รายละเอียดทางเทคนิค (Specification)</label><textarea name="Specification" class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500" rows="3">${record ? record.Specification : ''}</textarea></div>
           <div><label class="block text-xs font-semibold text-slate-600 mb-1">จุดสั่งซื้อขั้นต่ำ (Min Stock) <span class="text-red-500">*</span></label><input type="number" name="Min_Stock" value="${record ? record.Min_Stock : '5'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
           <div><label class="block text-xs font-semibold text-slate-600 mb-1">สถานที่จัดเก็บ/ตู้เก็บอะไหล่ <span class="text-red-500">*</span></label><input type="text" name="Location" value="${record ? record.Location : 'ตู้เก็บหลัก ชั้น 1'}" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"></div>
-          <div><label class="block text-xs font-semibold text-slate-600 mb-1">การควบคุมสถานะ (Status) <span class="text-red-500">*</span></label><select name="Status" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="แบบกลุ่ม" ${record && record.Status === 'แบบกลุ่ม' ? 'selected' : ''}>แบบกลุ่ม (ควบคุมจำนวน Bulk)</option><option value="แบบรายชิ้น" ${record && record.Status === 'แบบรายชิ้น' ? 'selected' : ''}>แบบรายชิ้น (คุม Serial รายชิ้น)</option></select></div>
+          <div class="col-span-1 md:col-span-2"><label class="block text-xs font-semibold text-slate-600 mb-1">การควบคุมสถานะ (Status) <span class="text-red-500">*</span></label><select name="Status" required class="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandPink-500"><option value="แบบกลุ่ม" ${record && record.Status === 'แบบกลุ่ม' ? 'selected' : ''}>แบบกลุ่ม (ควบคุมจำนวน Bulk)</option><option value="แบบรายชิ้น" ${record && record.Status === 'แบบรายชิ้น' ? 'selected' : ''}>แบบรายชิ้น (คุม Serial รายชิ้น)</option></select></div>
+          
+          <div class="col-span-1 md:col-span-2 border-t pt-4 mt-2">
+            <label class="block text-xs font-semibold text-slate-600 mb-2">อัปโหลดรูปภาพประกอบอะไหล่ (ถ้ามี)</label>
+            <div class="flex items-center space-x-4">
+              <div id="itemImagePreview" class="w-24 h-24 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden shrink-0">
+                ${record && record.Item_File_ID ? `<img src="https://lh3.googleusercontent.com/d/${record.Item_File_ID}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-image text-slate-300 text-3xl"></i>'}
+              </div>
+              <div class="flex-1">
+                <input type="file" id="itemImageInput" accept="image/*" onchange="previewItemImage(event)" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-brandPink-50 file:text-brandPink-700 hover:file:bg-brandPink-100 transition cursor-pointer">
+                <p class="text-[10px] text-slate-400 mt-2">รองรับไฟล์ JPG, PNG, WEBP ขนาดไม่เกิน 5MB<br>ระบบจะเปลี่ยนชื่อไฟล์เป็น ID ของอะไหล่ให้โดยอัตโนมัติ</p>
+              </div>
+            </div>
+          </div>
         </form>
       `;
       const footerHTML = `<button onclick="closeModal('dynamicModal')" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition">ยกเลิก</button><button onclick="saveItemMaster('${id}')" class="bg-brandPink-500 hover:bg-brandPink-600 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">บันทึกข้อมูลอะไหล่</button>`;
       showModal(title, bodyHTML, footerHTML);
       if (recordCategoryTypeID) filterItemFormCategories(record.Category_ID);
+    }
+
+    function previewItemImage(event) {
+      const file = event.target.files[0];
+      if (!file) { itemFormImageData = null; return; }
+      if (file.size > 5 * 1024 * 1024) { showToast("ขนาดไฟล์ภาพเกิน 5MB", "warning"); event.target.value = ""; return; }
+      
+      const ext = file.name.split('.').pop();
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        itemFormImageData = { base64: e.target.result, mimeType: file.type, ext: ext };
+        const previewDiv = document.getElementById('itemImagePreview');
+        previewDiv.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+        previewDiv.classList.replace('border-dashed', 'border-solid');
+        previewDiv.classList.replace('border-slate-300', 'border-brandPink-400');
+      };
+      reader.readAsDataURL(file);
     }
 
     function filterItemFormCategories(selectedCatID = "") {
@@ -1047,10 +1079,37 @@
       const saveAction = async () => {
         try {
           let res;
-          if (id !== 'null' && id !== '') res = await apiCall('updateRecord', ["Item_Master", "Item_ID", id, data]);
-          else res = await apiCall('createRecord', ["Item_Master", data, "Item_ID", "ITM"]);
+          let currentId = id;
+          
+          if (id !== 'null' && id !== '') {
+            res = await apiCall('updateRecord', ["Item_Master", "Item_ID", id, data]);
+          } else {
+            res = await apiCall('createRecord', ["Item_Master", data, "Item_ID", "ITM"]);
+            if (res.success) currentId = res.id;
+          }
+          
+          // ระบบประมวลผลรูปภาพ (ถ้ามีการเลือกอัปโหลดใหม่)
+          if (res.success && itemFormImageData && currentId) {
+            showLoading("กำลังอัปโหลดรูปภาพอะไหล่ไปยังระบบ Drive...");
+            const newFileName = `${currentId}.${itemFormImageData.ext}`; // นำ Item_ID มาตั้งเป็นชื่อไฟล์
+            const uploadRes = await apiCall('uploadFileToDrive', [itemFormImageData.base64, newFileName, itemFormImageData.mimeType]);
+            
+            if (uploadRes.success) {
+              await apiCall('updateRecord', ["Item_Master", "Item_ID", currentId, { 
+                Item_Image_Name: uploadRes.fileName, 
+                Item_File_ID: uploadRes.fileId 
+              }]);
+            } else {
+              showToast("บันทึกข้อมูลสำเร็จ แต่เกิดปัญหาขณะอัปโหลดรูปภาพ: " + uploadRes.message, "warning");
+            }
+          }
+
           hideLoading();
-          if (res.success) { closeModal('dynamicModal'); showToast("บันทึกข้อมูลอะไหล่พัสดุสำเร็จ", "success"); fetchSystemData(); } 
+          if (res.success) { 
+            closeModal('dynamicModal'); 
+            showToast("บันทึกข้อมูลอะไหล่พัสดุสำเร็จ", "success"); 
+            fetchSystemData(); 
+          } 
           else { showToast(res.message, "danger"); }
         } catch (err) { hideLoading(); showToast(err.message, "danger"); }
       };
